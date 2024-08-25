@@ -12,12 +12,20 @@ export const AuthProvider = ({ children }) => {
     };
 
     const verifyUser = (phoneNumber, authCode) => {
-        return axios.post('http://127.0.0.1:8000/api/verify/', { phone_number: phoneNumber, code: authCode })
-            .then(response => {
-                setIsVerified(true);
-                setToken(response.data.access);
-            });
+        console.log('Data being sent:', { phone_number: phoneNumber, code: authCode });
+
+        return axios.post('http://127.0.0.1:8000/api/verify/', {
+            code: authCode,
+            phone_number: phoneNumber,
+
+        }).then(response => {
+            setIsVerified(true);
+            setToken(response.data.access);
+        }).catch(error => {
+            console.error('Verification error:', error.response.data);
+        });
     };
+
 
     return (
         <AuthContext.Provider value={{ isVerified, registerUser, verifyUser, token }}>
