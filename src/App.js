@@ -4,8 +4,11 @@ import SplashScreen from './components/SplashScreen/SplashScreen';
 import Home from './components/pages/Home';
 import Login from './components/pages/Login';
 import SubscriptionPage from './components/pages/SubscriptionPage';
+import About from './components/pages/About';
+import Contact from './components/pages/Contact';
 import VisitPage from './components/pages/VisitPage';
 import UserVisitsPage from './components/pages/UserVisitsPage';
+import Navbar from './components/Navbar/Navbar';  // اضافه کردن Navbar
 import { AuthProvider } from './components/context/AuthContext';
 import { SubscriptionProvider } from './components/context/SubscriptionContext';
 
@@ -24,13 +27,18 @@ function App() {
                         {showSplash ? (
                             <SplashScreen onComplete={handleSplashComplete} />
                         ) : (
-                            <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/subscriptions" element={<SubscriptionPage />} />
-                                <Route path="/visits" element={<VisitPage />} />
-                                <Route path="/user-visits" element={<UserVisitsPage />} />
-                            </Routes>
+                            <>
+                                <Navbar /> {/* نمایش Navbar در بالای تمام صفحات */}
+                                <Routes>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/about" element={<About />} />
+                                    <Route path="/contact" element={<Contact />} />
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/subscriptions" element={<SubscriptionPage />} />
+                                    <Route path="/visits" element={<VisitPage />} />
+                                    <Route path="/user-visits" element={<UserVisitsPage />} />
+                                </Routes>
+                            </>
                         )}
                     </div>
                 </Router>
