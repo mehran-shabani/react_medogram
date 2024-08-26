@@ -1,29 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { moveUp,  HomeContainer, Title, Description } from '../../styles/Home.Styles';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
-const HomeContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background-color: #f5f5f5;
-    padding: 2rem;
-`;
-
-const Title = styled.h1`
-    font-size: 2.5rem;
-    color: #333;
-    margin-bottom: 1rem;
-`;
-
-const Description = styled.p`
-    font-size: 1.2rem;
-    color: #555;
-    margin-bottom: 2rem;
-    max-width: 800px;
-`;
 
 const VisitButton = styled(Link)`
     padding: 1rem 2rem;
@@ -32,11 +11,13 @@ const VisitButton = styled(Link)`
     text-decoration: none;
     border-radius: 50px;
     font-size: 1.5rem;
-    box-shadow: 0 0 20px #007bff;
-    transition: transform 0.3s ease;
+    box-shadow: 0 0 20px rgba(0, 123, 255, 0.7);
+    transition: all 0.3s ease;
+    animation: ${moveUp} 2s ease-in-out;
 
     &:hover {
         transform: scale(1.1);
+        box-shadow: 0 0 30px rgba(0, 123, 255, 1);
     }
 `;
 

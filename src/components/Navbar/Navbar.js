@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { devices } from '../../styles/media';
+import { devices } from "../../styles/media";
 
-// استایل برای Container اصلی Navbar
 const NavbarContainer = styled.nav`
-    background-color: #007bff;
+    background-color: #007bff; // Primary Blue
     color: white;
     padding: 1rem;
     display: flex;
@@ -15,7 +14,6 @@ const NavbarContainer = styled.nav`
     z-index: 1000;
 `;
 
-// استایل برای برند یا لوگو
 const Brand = styled.h1`
     font-size: 1.5rem;
     color: white;
@@ -27,15 +25,14 @@ const Brand = styled.h1`
 
     @keyframes glow {
         from {
-            text-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f, 0 0 40px #00f, 0 0 50px #00f, 0 0 60px #00f, 0 0 70px #00f;
+            text-shadow: 0 0 10px #80bdff, 0 0 20px #80bdff, 0 0 30px #80bdff; // Light Blue Glow
         }
         to {
-            text-shadow: 0 0 20px #00f, 0 0 30px #00f, 0 0 40px #00f, 0 0 50px #00f, 0 0 60px #00f, 0 0 70px #00f, 0 0 80px #00f;
+            text-shadow: 0 0 20px #80bdff, 0 0 30px #80bdff, 0 0 40px #80bdff;
         }
     }
 `;
 
-// استایل برای آیکون منوی همبرگری
 const MenuIcon = styled.button`
     background: none;
     border: none;
@@ -43,14 +40,18 @@ const MenuIcon = styled.button`
     font-size: 2rem;
     cursor: pointer;
     display: none;
+    transition: transform 0.3s ease-in-out;
 
-    @media ${devices.tablet} {
+    &:hover {
+        transform: rotate(90deg);
+    }
+
+    @media ${devices.mobileS} {
         display: block;
         margin-left: auto;
     }
 `;
 
-// Overlay برای بستن منو با کلیک در خارج از منو
 const NavOverlay = styled.div`
     position: fixed;
     top: 0;
@@ -60,9 +61,10 @@ const NavOverlay = styled.div`
     background: rgba(0, 0, 0, 0.5);
     display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
     z-index: 900;
+    opacity: ${({ isOpen }) => (isOpen ? '1' : '0')};
+    transition: opacity 0.3s ease-in-out;
 `;
 
-// استایل برای لینک‌های منوی همبرگری
 const NavLinks = styled.ul`
     list-style: none;
     display: flex;
@@ -71,7 +73,7 @@ const NavLinks = styled.ul`
     gap: 1rem;
     margin: 0;
 
-    @media ${devices.tablet} {
+    @media ${devices.mobileS} {
         flex-direction: column;
         position: fixed;
         top: 0;
@@ -102,15 +104,37 @@ const NavLinkTitle = styled.h2`
 const NavLink = styled.li`
     padding: 0.5rem 1rem;
     text-align: right;
+    transition: color 0.3s ease-in-out;
 
     a {
-        color: #007bff;
+        color: #007bff; // Primary Blue
         text-decoration: none;
         font-size: 1rem;
-    }
+        position: relative;
+        transition: color 0.3s ease-in-out;
 
-    a:hover {
-        color: #0056b3;
+        &:hover {
+            color: #0056b3; // Dark Blue
+            text-decoration: underline;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 100%;
+            height: 2px;
+            background-color: #007bff; // Primary Blue
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        &:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
     }
 `;
 
