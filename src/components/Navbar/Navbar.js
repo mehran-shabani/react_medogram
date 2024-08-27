@@ -177,6 +177,7 @@ const Navbar = () => {
                 <NavLinks isOpen={isOpen} onClick={(e) => e.stopPropagation()}>
                     <NavLinkCategory>
                         <NavLinkTitle>حساب کاربری</NavLinkTitle>
+                        <NavLink><Link to="/">خانه</Link></NavLink>
                         <NavLink><Link to="/login">ورود</Link></NavLink>
                         <NavLink><Link to="/user-visits">ویزیت‌های شما</Link></NavLink>
                     </NavLinkCategory>
