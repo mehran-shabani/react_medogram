@@ -8,9 +8,10 @@ import About from './components/pages/About';
 import Contact from './components/pages/Contact';
 import VisitPage from './components/pages/VisitPage';
 import UserVisitsPage from './components/pages/UserVisitsPage';
-import Navbar from './components/Navbar/Navbar';  // اضافه کردن Navbar
+import Navbar from './components/Navbar/Navbar';
 import { AuthProvider } from './components/context/AuthContext';
 import { SubscriptionProvider } from './components/context/SubscriptionContext';
+import ChatPage from "./components/pages/ChatPage";
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);
@@ -28,18 +29,25 @@ function App() {
                             <SplashScreen onComplete={handleSplashComplete} />
                         ) : (
                             <>
-                                <Navbar /> {/* نمایش Navbar در بالای تمام صفحات */}
+
+                                <Navbar />
                                 <Routes>
-                                    <Route path="/" element={<Home />} />
-                                    <Route path="/about" element={<About />} />
-                                    <Route path="/contact" element={<Contact />} />
-                                    <Route path="/login" element={<Login />} />
-                                    <Route path="/subscriptions" element={<SubscriptionPage />} />
-                                    <Route path="/visits" element={<VisitPage />} />
-                                    <Route path="/user-visits" element={<UserVisitsPage />} />
+                                    <Route path="/" element={<Home/>}/>
+                                    <Route path="/about" element={<About/>}/>
+                                    <Route path="/contact" element={<Contact/>}/>
+                                    <Route path="/login" element={<Login/>}/>
+                                    <Route path="/subscriptions" element={<SubscriptionPage/>}/>
+                                    <Route path="/visits" element={<VisitPage/>}/>
+                                    <Route path="/user-visits" element={<UserVisitsPage/>}/>
                                 </Routes>
+
                             </>
-                        )}
+                            )}
+                    </div>
+                    <div>
+                        <Routes>
+                            <Route path="/chat" element={<ChatPage/>}/>
+                        </Routes>
                     </div>
                 </Router>
             </SubscriptionProvider>

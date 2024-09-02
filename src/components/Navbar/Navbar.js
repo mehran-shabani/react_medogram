@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { devices } from "../../styles/media";
 
 const NavbarContainer = styled.nav`
-    background-color: #007bff; // Primary Blue
+    background: linear-gradient(90deg, #0056b3, #00c6ff); // Darker Blue to Light Blue
     color: white;
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -15,21 +15,21 @@ const NavbarContainer = styled.nav`
 `;
 
 const Brand = styled.h1`
-    font-size: 1.5rem;
-    color: white;
+    font-size: 1.8rem;
     margin: 0;
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    animation: glow 1.5s infinite alternate;
+    display: flex;
+    align-items: baseline;
 
-    @keyframes glow {
-        from {
-            text-shadow: 0 0 10px #80bdff, 0 0 20px #80bdff, 0 0 30px #80bdff; // Light Blue Glow
-        }
-        to {
-            text-shadow: 0 0 20px #80bdff, 0 0 30px #80bdff, 0 0 40px #80bdff;
-        }
+    span:first-child {
+        color: #003d80; // Darker Blue
+        font-weight: bold;
+    }
+
+    span:last-child {
+        color: white;
+        font-weight: normal;
     }
 `;
 
@@ -87,59 +87,51 @@ const NavLinks = styled.ul`
         transition: transform 0.3s ease-in-out;
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
         z-index: 1000;
+        padding: 1rem;
     }
 `;
 
-const NavLinkCategory = styled.div`
-    margin-bottom: 1rem;
-    text-align: right;
+const NavCategory = styled.div`
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eaeaea; // Line between segments
+    padding-bottom: 1rem;
+
+    &:last-child {
+        border-bottom: none; // Remove border from last category
+    }
 `;
 
 const NavLinkTitle = styled.h2`
-    font-size: 1rem;
-    color: #333;
+    font-size: 1.2rem;
+    color: #003d80; // Darker Blue
     margin-bottom: 0.5rem;
+    cursor: pointer;
+`;
+const SubNav = styled.ul`
+    list-style: none;
+    padding-left: 1rem;
+    display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
+    transition: max-height 0.3s ease-in-out;
 `;
 
-const NavLink = styled.li`
-    padding: 0.5rem 1rem;
-    text-align: right;
-    transition: color 0.3s ease-in-out;
+const SubNavLinkItem = styled.li`
+    padding: 0.25rem 0;
 
     a {
         color: #007bff; // Primary Blue
         text-decoration: none;
-        font-size: 1rem;
-        position: relative;
-        transition: color 0.3s ease-in-out;
 
         &:hover {
             color: #0056b3; // Dark Blue
-            text-decoration: underline;
-        }
-
-        &::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -4px;
-            width: 100%;
-            height: 2px;
-            background-color: #007bff; // Primary Blue
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        &:hover::after {
-            transform: scaleX(1);
-            transform-origin: left;
         }
     }
 `;
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [profileOpen, setProfileOpen] = useState(false);
+    const [managementOpen, setManagementOpen] = useState(false);
+    const [aboutOpen, setAboutOpen] = useState(false);
 
     const toggleMenu = (e) => {
         e.stopPropagation();
@@ -148,6 +140,9 @@ const Navbar = () => {
 
     const closeMenu = () => {
         setIsOpen(false);
+        setProfileOpen(false);
+        setManagementOpen(false);
+        setAboutOpen(false);
     };
 
     useEffect(() => {
@@ -169,28 +164,39 @@ const Navbar = () => {
     return (
         <>
             <NavbarContainer>
-                <Brand>medogram</Brand>
+                <Brand>
+                    <span>MED</span>
+                    <span>OGRAM</span>
+                </Brand>
                 <MenuIcon onClick={toggleMenu}>
                     &#9776;
                 </MenuIcon>
                 <NavOverlay isOpen={isOpen} onClick={closeMenu} />
                 <NavLinks isOpen={isOpen} onClick={(e) => e.stopPropagation()}>
-                    <NavLinkCategory>
-                        <NavLinkTitle>حساب کاربری</NavLinkTitle>
-                        <NavLink><Link to="/">خانه</Link></NavLink>
-                        <NavLink><Link to="/login">ورود</Link></NavLink>
-                        <NavLink><Link to="/user-visits">ویزیت‌های شما</Link></NavLink>
-                    </NavLinkCategory>
-                    <NavLinkCategory>
-                        <NavLinkTitle>مدیریت</NavLinkTitle>
-                        <NavLink><Link to="/subscriptions">اشتراک‌ها</Link></NavLink>
-                        <NavLink><Link to="/visits">ویزیت‌ها</Link></NavLink>
-                    </NavLinkCategory>
-                    <NavLinkCategory>
-                        <NavLinkTitle>درباره ما</NavLinkTitle>
-                        <NavLink><Link to="/about">درباره ما</Link></NavLink>
-                        <NavLink><Link to="/contact">تماس با ما</Link></NavLink>
-                    </NavLinkCategory>
+                    <NavCategory>
+                        <NavLinkTitle onClick={() => setProfileOpen(!profileOpen)}>Profile</NavLinkTitle>
+                        <SubNav isOpen={profileOpen}>
+                            <SubNavLinkItem><Link to="/">Home</Link></SubNavLinkItem>
+                            <SubNavLinkItem><Link to="/login">Login</Link></SubNavLinkItem>
+                            <SubNavLinkItem><Link to="/user-visits">Your Visit</Link></SubNavLinkItem>
+                        </SubNav>
+                    </NavCategory>
+                    <NavCategory>
+                        <NavLinkTitle onClick={() => setManagementOpen(!managementOpen)}>Management</NavLinkTitle>
+                        <SubNav isOpen={managementOpen}>
+                            <SubNavLinkItem><Link to="/subscriptions">Subscription</Link></SubNavLinkItem>
+                            <SubNavLinkItem><Link to="/visits">Do Visit!</Link></SubNavLinkItem>
+                            <SubNavLinkItem><Link to="/chat">DocAI</Link></SubNavLinkItem>
+
+                        </SubNav>
+                    </NavCategory>
+                    <NavCategory>
+                        <NavLinkTitle onClick={() => setAboutOpen(!aboutOpen)}>About Us</NavLinkTitle>
+                        <SubNav isOpen={aboutOpen}>
+                            <SubNavLinkItem><Link to="/about">About Us</Link></SubNavLinkItem>
+                            <SubNavLinkItem><Link to="/contact">Contact Us</Link></SubNavLinkItem>
+                        </SubNav>
+                    </NavCategory>
                 </NavLinks>
             </NavbarContainer>
         </>
