@@ -187,6 +187,7 @@ const Navbar = () => {
                             <SubNavLinkItem><Link to="/subscriptions">Subscription</Link></SubNavLinkItem>
                             <SubNavLinkItem><Link to="/visits">Do Visit!</Link></SubNavLinkItem>
                             <SubNavLinkItem><Link to="/chat">DocAI</Link></SubNavLinkItem>
+                            <SubNavLinkItem><Link to="/profile">Profile</Link></SubNavLinkItem>
 
                         </SubNav>
                     </NavCategory>
