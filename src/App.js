@@ -13,7 +13,6 @@ import { AuthProvider } from './components/context/AuthContext';
 import { SubscriptionProvider } from './components/context/SubscriptionContext';
 import ChatPage from "./components/pages/ChatPage";
 import ProfilePage from "./components/pages/ProfilePage";
-import {ProfileProvider} from "./components/context/ProfileContext";
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);
@@ -41,11 +40,7 @@ function App() {
                                     <Route path="/subscriptions" element={<SubscriptionPage/>}/>
                                     <Route path="/visits" element={<VisitPage/>}/>
                                     <Route path="/user-visits" element={<UserVisitsPage/>}/>
-
-                                    <Route path="/profile" element={<ProfileProvider>
-                                        <ProfilePage/>
-                                    </ProfileProvider>}/>
-
+                                    <Route path="/profile" element={<ProfilePage/>}/>
                                 </Routes>
 
                             </>
