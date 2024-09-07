@@ -1,82 +1,94 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { SubscriptionContext } from '../context/SubscriptionContext';
-import { Typography, Button, MenuItem, Select, Paper, Container } from '@mui/material';
-import PaymentDetails from './PaymentDetails';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 const SubscriptionPage = () => {
-    const { token } = useContext(AuthContext);
-    const { subscriptions } = useContext(SubscriptionContext);
-    const [selectedDuration, setSelectedDuration] = useState('');
-    const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+    const { token } = useContext(AuthContext);  // دریافت توکن از context
+    const [selectedDuration, setSelectedDuration] = useState('');  // مدت زمان انتخاب‌شده
+    const [hasSubscription, setHasSubscription] = useState(false);  // آیا کاربر اشتراکی دارد؟
+
+    // بررسی وجود اشتراک برای کاربر
+    useEffect(() => {
+        // فرض می‌کنیم که شما اینجا API را برای چک کردن اشتراک کاربر فراخوانی می‌کنید
+        axios.get('http://127.0.0.1:8000/api/subscriptions/create-payment/', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then(response => {
+                if (response.data.length > 0) {
+                    setHasSubscription(true);  // اگر اشتراکی وجود دارد
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching subscriptions:', error);
+            });
+    }, [token]);
 
     const handleSelectChange = (event) => {
-        setSelectedDuration(event.target.value);
+        setSelectedDuration(event.target.value);  // ذخیره مدت زمان انتخاب‌شده
     };
 
     const handleProceedToPayment = () => {
+        console.log('handleProceedToPayment called!');
+
+        // بررسی توکن
         if (!token) {
-            toast.error('Please log in first.');
+            toast.error('لطفاً ابتدا وارد شوید.');
             return;
         }
 
-        const currentSubscription = subscriptions.find(
-            (sub) => sub.duration === selectedDuration
-        );
-
-        if (!currentSubscription) {
-            toast.error('Selected subscription not found.');
+        // بررسی انتخاب مدت زمان
+        if (!selectedDuration) {
+            toast.error('لطفاً یک مدت زمان اشتراک انتخاب کنید.');
             return;
         }
 
-        setShowPaymentDetails(true);
+        console.log('Sending request to backend for payment...');
+
+
+        axios.post('http://127.0.0.1:8000/api/subscriptions/create-payment/', {
+            duration: selectedDuration
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then(response => {
+                console.log('Response:', response);  // بررسی پاسخ
+                if (response.data.payment_url) {
+                    window.location.href = response.data.payment_url;  // هدایت به درگاه پرداخت
+                } else {
+                    toast.error('پرداخت انجام نشد. دوباره تلاش کنید.');
+                }
+            })
+            .catch(error => {
+                console.error('Error during payment creation:', error);
+                toast.error('خطا در ایجاد پرداخت. لطفاً دوباره تلاش کنید.');
+            });
     };
 
     return (
-        <Container maxWidth="sm" sx={{ padding: 4 }}>
-            <Paper elevation={6} sx={{ padding: 4, borderRadius: 2 }}>
-                <Typography variant="h4" align="center" gutterBottom>
-                    Choose Your Subscription
-                </Typography>
-                <Select
-                    value={selectedDuration}
-                    onChange={handleSelectChange}
-                    displayEmpty
-                    fullWidth
-                    sx={{ mb: 3, '& .MuiOutlinedInput-notchedOutline': { borderColor: '#1976d2' } }}
-                >
-                    <MenuItem value="" disabled>
-                        Select a subscription plan
-                    </MenuItem>
-                    <MenuItem value="1_month">1 Month - $10</MenuItem>
-                    <MenuItem value="3_months">3 Months - $25</MenuItem>
-                    <MenuItem value="6_months">6 Months - $45</MenuItem>
-                </Select>
+        <div>
+            <h1>انتخاب اشتراک</h1>
 
-                <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    onClick={handleProceedToPayment}
-                    disabled={!selectedDuration}
-                    sx={{ padding: 1.5, fontSize: '1.1rem' }}
-                >
-                    Continue to Payment
-                </Button>
-            </Paper>
+            {!hasSubscription ? (
+                <div>
+                    <select value={selectedDuration} onChange={handleSelectChange}>
+                        <option value="" disabled>یک طرح اشتراک انتخاب کنید</option>
+                        <option value="1_month">یک ماهه - 300,000 تومان</option>
+                        <option value="3_months">سه ماهه - 750,000 تومان</option>
+                        <option value="6_months">شش ماهه - 1,400,000 تومان</option>
+                    </select>
 
-            {showPaymentDetails && (
-                <PaymentDetails
-                    selectedSubscription={{
-                        duration: selectedDuration,
-                        user_id: subscriptions[0].user,
-                    }}
-                />
+                    <button
+                        onClick={handleProceedToPayment}
+                        disabled={!selectedDuration}  // غیر فعال کردن دکمه اگر مدت زمان انتخاب نشده باشد
+                    >
+                        ادامه به پرداخت
+                    </button>
+                </div>
+            ) : (
+                <p>شما یک اشتراک فعال دارید.</p>
             )}
-            <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
-        </Container>
+        </div>
     );
 };
 

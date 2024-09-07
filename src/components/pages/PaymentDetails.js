@@ -11,24 +11,41 @@ const PaymentDetails = ({ selectedSubscription }) => {
     const [paymentUrl, setPaymentUrl] = useState(null);
 
     const priceMap = {
-        '1_month': '30,000 تومان',
-        '3_months': '75,000 تومان',
-        '6_months': '140,000 تومان',
+        '1_month': 30000,
+        '3_months': 75000,
+        '6_months': 140000,
+    };
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('fa-IR', {
+            style: 'currency',
+            currency: 'IRR',
+            minimumFractionDigits: 0
+        }).format(price) + ' تومان';
     };
 
     const handlePayment = async () => {
+        if (!token) {
+            toast.error('لطفاً ابتدا وارد شوید.');
+            return;
+        }
+
         setLoading(true);
         try {
             const response = await axios.post(
-                `http://127.0.0.1:8000/api/subscriptions/${selectedSubscription.user_id}/create-payment/`,
+                `http://127.0.0.1:8000/api/subscriptions/create-payment/`,
                 { duration: selectedSubscription.duration },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setPaymentUrl(response.data.payment_url);
-            setLoading(false);
         } catch (error) {
             console.error('Error during payment creation:', error);
-            toast.error('خطا در ایجاد پرداخت. لطفاً دوباره تلاش کنید.');
+            if (error.response && error.response.data && error.response.data.error) {
+                toast.error(`خطا: ${error.response.data.error}`);
+            } else {
+                toast.error('خطا در ایجاد پرداخت. لطفاً دوباره تلاش کنید.');
+            }
+        } finally {
             setLoading(false);
         }
     };
@@ -44,8 +61,8 @@ const PaymentDetails = ({ selectedSubscription }) => {
             <Typography variant="h6" gutterBottom>
                 جزئیات اشتراک
             </Typography>
-            <Typography>مدت اشتراک: {selectedSubscription.duration === '1_month' ? '1 ماهه' : selectedSubscription.duration === '3_months' ? '3 ماهه' : '6 ماهه'}</Typography>
-            <Typography>مبلغ: {priceMap[selectedSubscription.duration]}</Typography>
+            <Typography>مدت اشتراک: {selectedSubscription.duration === '1_month' ? 'یک ماهه' : selectedSubscription.duration === '3_months' ? 'سه ماهه' : 'شش ماهه'}</Typography>
+            <Typography>مبلغ: {formatPrice(priceMap[selectedSubscription.duration])}</Typography>
 
             {!paymentUrl && (
                 <Button

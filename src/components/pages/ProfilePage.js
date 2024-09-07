@@ -3,10 +3,10 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Container, TextField, Button, Paper, Box, Typography, CircularProgress } from '@mui/material';
-import { AuthContext } from '../context/AuthContext'; // AuthContext import
+import { AuthContext } from '../context/AuthContext';
 
 const ProfilePage = () => {
-    const { isVerified, token } = useContext(AuthContext); // Use `isVerified` and `token` from AuthContext
+    const { isVerified, token } = useContext(AuthContext);
     const [profile, setProfile] = useState({
         username: '',
         email: ''
@@ -16,22 +16,22 @@ const ProfilePage = () => {
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
-        // If the user is not verified, show a toast message and redirect them after a delay
+
         if (!isVerified) {
             toast.error('Please verify your account to access the profile page.');
             setTimeout(() => {
-                window.location.href = '/login'; // Redirect to login after showing the message
-            }, 3000); // Delay of 3 seconds before redirect
+                window.location.href = '/login';
+            }, 3000);
             return;
         }
 
-        // Fetch profile if user is verified
+
         const fetchProfile = async () => {
             try {
                 console.log('Fetching profile...');
                 const response = await axios.get('http://localhost:8000/api/profile/', {
                     headers: {
-                        Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+                        Authorization: `Bearer ${token}`,
                     },
 
                 });
@@ -58,14 +58,14 @@ const ProfilePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log('Submitting profile update:', profile); // Log the data being submitted
+            console.log('Submitting profile update:', profile);
             const response = await axios.post('http://localhost:8000/api/profile/update/', profile, {
                 headers: {
-                    Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+                    Authorization: `Bearer ${token}`,
                 },
 
             });
-            console.log('Profile updated successfully:', response.data); // Log success response
+            console.log('Profile updated successfully:', response.data);
             setProfile(response.data);
             setErrors({});
             setIsEditing(false);

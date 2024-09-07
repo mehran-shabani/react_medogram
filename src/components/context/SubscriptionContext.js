@@ -5,29 +5,26 @@ import { AuthContext } from './AuthContext';
 export const SubscriptionContext = createContext();
 
 export const SubscriptionProvider = ({ children }) => {
-    const { token } = useContext(AuthContext);
-    const [subscriptions, setSubscriptions] = useState([]);
+    const { token } = useContext(AuthContext);  // توکن از AuthContext دریافت می‌شود
+    const [subscriptions, setSubscriptions] = useState([]);  // حالت برای ذخیره‌سازی اشتراک‌ها
 
     useEffect(() => {
-        if (token) {
-            axios.get('http://127.0.0.1:8000/api/subscriptions/', {
+        if (token) {  // اگر توکن موجود است
+            axios.get('http://127.0.0.1:8000/api/subscriptions/create-payment', {
                 headers: { Authorization: `Bearer ${token}` }
-            }).then(response => {
-                setSubscriptions(response.data);
-            });
+            })
+                .then(response => {
+                    console.log('API Response:', response.data);  // بررسی پاسخ API
+                    setSubscriptions(response.data);  // ذخیره اشتراک‌ها در state
+                })
+                .catch(error => {
+                    console.error('Error fetching subscriptions:', error);  // بررسی خطا
+                });
         }
-    }, [token]);
-
-    const createSubscription = (duration) => {
-        return axios.post('http://127.0.0.1:8000/api/subscriptions/', { duration }, {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
-            setSubscriptions([...subscriptions, response.data]);
-        });
-    };
+    }, [token]);  // اجرا هنگام تغییر توکن
 
     return (
-        <SubscriptionContext.Provider value={{ subscriptions, createSubscription }}>
+        <SubscriptionContext.Provider value={{ subscriptions }}>
             {children}
         </SubscriptionContext.Provider>
     );
