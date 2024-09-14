@@ -29,7 +29,7 @@ const Spinner = styled.div`
 const Text = styled.div`
     font-size: 1.5rem;
     color: #333;
-    font-weight: bold;
+    font-weight: ;
 `;
 
 const SplashScreen = ({ onComplete }) => {
