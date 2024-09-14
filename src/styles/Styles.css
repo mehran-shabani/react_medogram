@@ -1,0 +1,24 @@
+/* styles.css */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.gradient-background {
+    background: linear-gradient(135deg, #328681, #052436);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    direction: rtl; /* اضافه کردن این خط برای نمایش متن‌ها از راست به چپ */
+    text-align: right; /* تنظیم تراز متن به راست */
+}
+
+.typography-animation {
+    animation: fadeInUp 1s ease-out;
+}

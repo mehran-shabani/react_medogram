@@ -13,6 +13,8 @@ import { AuthProvider } from './components/context/AuthContext';
 import { SubscriptionProvider } from './components/context/SubscriptionContext';
 import ChatPage from "./components/pages/ChatPage";
 import ProfilePage from "./components/pages/ProfilePage";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);

@@ -4,15 +4,13 @@ import styled from 'styled-components';
 const ChatContainer = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    height: 80vh;
-    width: 350px;
+    height: 75vh;
+    width: 750px; /* Increase width to make it more prominent */
     border: 2px solid #007bff;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 123, 255, 0.5);
-    overflow: hidden;
+    background-color: #fff;
     position: relative;
-    background-color: #f8f9fa;
 `;
 
 const ChatHeader = styled.div`
@@ -22,14 +20,15 @@ const ChatHeader = styled.div`
     text-align: center;
     font-size: 1.5rem;
     font-weight: bold;
+    border-radius: 10px 10px 0 0; /* Rounded corners at the top */
 `;
 
 const MessageContainer = styled.div`
     padding: 1rem;
-    height: 100%;
+    height: calc(100% - 80px); /* Adjust height to fit the input area */
     overflow-y: auto;
     flex: 1;
-    background-color: #fff;
+    background-color: #f8f9fa;
 `;
 
 const UserMessage = styled.div`
@@ -58,6 +57,7 @@ const InputContainer = styled.div`
     display: flex;
     padding: 0.5rem;
     background-color: #f1f1f1;
+    border-top: 1px solid #ddd; /* Separator between messages and input */
 `;
 
 const InputField = styled.input`
@@ -98,7 +98,7 @@ const ChatBot = () => {
             };
 
             const botMessage = {
-                text: `DocAI: How can I assist you with your health today?`, // Simple response simulation
+                text: `DocAI: How can I assist you with your health today?`,
                 sender: 'bot',
             };
 
@@ -131,7 +131,5 @@ const ChatBot = () => {
         </ChatContainer>
     );
 };
-
-
 
 export default ChatBot;
