@@ -1,7 +1,8 @@
 // Footer.js
 import React from 'react';
 import { Container, Box, Typography, Grid, Link as MuiLink } from '@mui/material';
-
+import TelegramIcon from '@mui/icons-material/Telegram';
+import InstagramIcon from '@mui/icons-material/Instagram';
 const Footer = () => {
     return (
         <Container
@@ -10,7 +11,6 @@ const Footer = () => {
             sx={{ mt: 8, py: 4, borderTop: '1px solid #ddd', direction: 'rtl' }}
         >
             <Grid container spacing={4} justifyContent="center">
-                {/* ستون اول */}
                 <Grid item xs={12} md={3}>
                     <Box display="flex" flexDirection="column" alignItems="center">
                         <img
@@ -27,7 +27,6 @@ const Footer = () => {
                         </Typography>
                     </Box>
                 </Grid>
-                {/* ستون دوم */}
                 <Grid item xs={12} md={3}>
                     <Box display="flex" flexDirection="column" alignItems="center">
                         <img
@@ -61,7 +60,6 @@ const Footer = () => {
                         </Typography>
                     </Box>
                 </Grid>
-                {/* ستون لوگوها */}
                 <Grid item xs={12} md={3}>
                     <Box display="flex" flexDirection="column" alignItems="center">
                         <MuiLink
@@ -114,7 +112,7 @@ const Footer = () => {
                         rel="noopener noreferrer"
                         sx={{ mx: 1 }}
                     >
-                        <i className="fab fa-instagram fa-2x" title="Instagram"></i>
+                        <InstagramIcon fontSize="large" color="primary" titleAccess="Instagram" />
                     </MuiLink>
                     <MuiLink
                         href="https://t.me/medogram3018"
@@ -122,7 +120,15 @@ const Footer = () => {
                         rel="noopener noreferrer"
                         sx={{ mx: 1 }}
                     >
-                        <i className="fab fa-telegram-plane fa-2x" title="Telegram"></i>
+                        <i    fontsize= 'large' className="fab fa-telegram-plane fa-2x" title="Telegram"></i>
+                    </MuiLink>
+                    <MuiLink
+                        href="https://t.me/medogramiran"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ mx: 1 }}
+                    >
+                        <TelegramIcon fontSize="large" color="primary" titleAccess="Telegram" />
                     </MuiLink>
                 </Box>
             </Box>
