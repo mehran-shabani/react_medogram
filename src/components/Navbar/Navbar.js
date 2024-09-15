@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { devices } from "../../styles/media";
 
 const NavbarContainer = styled.nav`
-    background: linear-gradient(90deg, #0056b3, #00c6ff); // Darker Blue to Light Blue
+    background: linear-gradient(90deg, #0056b3, #00c6ff);
     color: white;
     padding: 0.75rem 1rem;
     display: flex;
@@ -23,7 +23,7 @@ const Brand = styled.h1`
     align-items: baseline;
 
     span:first-child {
-        color: #003d80; // Darker Blue
+        color: #003d80;
         font-weight: bold;
     }
 
@@ -34,12 +34,12 @@ const Brand = styled.h1`
 `;
 
 const MenuIcon = styled.button`
+    display: none;
     background: none;
     border: none;
     color: white;
     font-size: 2rem;
     cursor: pointer;
-    display: none;
     transition: transform 0.3s ease-in-out;
 
     &:hover {
@@ -48,21 +48,24 @@ const MenuIcon = styled.button`
 
     @media ${devices.mobileS} {
         display: block;
-        margin-left: auto;
     }
 `;
 
 const NavOverlay = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
-    z-index: 900;
-    opacity: ${({ isOpen }) => (isOpen ? '1' : '0')};
-    transition: opacity 0.3s ease-in-out;
+    display: none;
+
+    @media ${devices.desktop} {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
+        z-index: 900;
+        opacity: ${({ isOpen }) => (isOpen ? '1' : '0')};
+        transition: opacity 0.3s ease-in-out;
+    }
 `;
 
 const NavLinks = styled.ul`
@@ -82,56 +85,95 @@ const NavLinks = styled.ul`
         width: 250px;
         background-color: white;
         color: #007bff;
-        padding-top: 2rem;
+        padding: 2rem 1rem;
         transform: ${({ isOpen }) => (isOpen ? 'translateX(0)' : 'translateX(100%)')};
         transition: transform 0.3s ease-in-out;
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
         z-index: 1000;
-        padding: 1rem;
+        overflow-y: auto;
     }
 `;
 
-const NavCategory = styled.div`
-    margin-bottom: 2rem;
-    border-bottom: 1px solid #eaeaea; // Line between segments
-    padding-bottom: 1rem;
-
-    &:last-child {
-        border-bottom: none; // Remove border from last category
-    }
+const NavItem = styled.li`
+    position: relative;
 `;
 
-const NavLinkTitle = styled.h2`
-    font-size: 1.2rem;
-    color: #003d80; // Darker Blue
-    margin-bottom: 0.5rem;
+const NavLinkTitle = styled.a`
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
     cursor: pointer;
-`;
-const SubNav = styled.ul`
-    list-style: none;
-    padding-left: 1rem;
-    display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
-    transition: max-height 0.3s ease-in-out;
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: #003d80;
+    }
+
+    @media ${devices.mobileS} {
+        color: #007bff;
+        font-size: 1.2rem;
+        display: block;
+        padding: 0.5rem 0;
+    }
 `;
 
-const SubNavLinkItem = styled.li`
-    padding: 0.25rem 0;
+const SubNav = styled.ul`
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 0;
+    min-width: 150px;
+    z-index: 1;
+
+    ${NavItem}:hover & {
+        display: block;
+    }
+
+    @media ${devices.mobileS} {
+        position: static;
+        box-shadow: none;
+        display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
+        padding-left: 1rem;
+    }
+`;
+
+const SubNavItem = styled.li`
+    padding: 0.25rem 1rem;
 
     a {
-        color: #007bff; // Primary Blue
+        color: #007bff;
         text-decoration: none;
+        display: block;
+        transition: color 0.3s ease;
 
         &:hover {
-            color: #0056b3; // Dark Blue
+            color: #0056b3;
         }
+    }
+`;
+
+const CloseButton = styled.button`
+    display: none;
+    
+    @media ${devices.mobileS} {
+        display: block;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #007bff;
+        cursor: pointer;
     }
 `;
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [profileOpen, setProfileOpen] = useState(false);
-    const [managementOpen, setManagementOpen] = useState(false);
-    const [aboutOpen, setAboutOpen] = useState(false);
+    const [openSubNav, setOpenSubNav] = useState(null);
 
     const toggleMenu = (e) => {
         e.stopPropagation();
@@ -140,9 +182,15 @@ const Navbar = () => {
 
     const closeMenu = () => {
         setIsOpen(false);
-        setProfileOpen(false);
-        setManagementOpen(false);
-        setAboutOpen(false);
+        setOpenSubNav(null);
+    };
+
+    const toggleSubNav = (index) => {
+        if (openSubNav === index) {
+            setOpenSubNav(null);
+        } else {
+            setOpenSubNav(index);
+        }
     };
 
     useEffect(() => {
@@ -161,46 +209,65 @@ const Navbar = () => {
         };
     }, [isOpen]);
 
-    return (
-        <>
-            <NavbarContainer>
-                <Brand>
-                    <span>MED</span>
-                    <span>OGRAM</span>
-                </Brand>
-                <MenuIcon onClick={toggleMenu}>
-                    &#9776;
-                </MenuIcon>
-                <NavOverlay isOpen={isOpen} onClick={closeMenu} />
-                <NavLinks isOpen={isOpen} onClick={(e) => e.stopPropagation()}>
-                    <NavCategory>
-                        <NavLinkTitle onClick={() => setProfileOpen(!profileOpen)}>Profile</NavLinkTitle>
-                        <SubNav isOpen={profileOpen}>
-                            <SubNavLinkItem><Link to="/">Home</Link></SubNavLinkItem>
-                            <SubNavLinkItem><Link to="/login">Login</Link></SubNavLinkItem>
-                            <SubNavLinkItem><Link to="/user-visits">Your Visit</Link></SubNavLinkItem>
-                        </SubNav>
-                    </NavCategory>
-                    <NavCategory>
-                        <NavLinkTitle onClick={() => setManagementOpen(!managementOpen)}>Management</NavLinkTitle>
-                        <SubNav isOpen={managementOpen}>
-                            <SubNavLinkItem><Link to="/subscriptions">Subscription</Link></SubNavLinkItem>
-                            <SubNavLinkItem><Link to="/visits">Do Visit!</Link></SubNavLinkItem>
-                            <SubNavLinkItem><Link to="/chat">DocAI</Link></SubNavLinkItem>
-                            <SubNavLinkItem><Link to="/profile">Profile</Link></SubNavLinkItem>
+    const navItems = [
+        {
+            title: 'Profile',
+            subItems: [
+                { title: 'Home', link: '/' },
+                { title: 'Login', link: '/login' },
+                { title: 'Your Visit', link: '/user-visits' },
+            ],
+        },
+        {
+            title: 'Management',
+            subItems: [
+                { title: 'Subscription', link: '/subscriptions' },
+                { title: 'Do Visit!', link: '/visits' },
+                { title: 'DocAI', link: '/chat' },
+                { title: 'Profile', link: '/profile' },
+            ],
+        },
+        {
+            title: 'About Us',
+            subItems: [
+                { title: 'About Us', link: '/about' },
+                { title: 'Contact Us', link: '/contact' },
+            ],
+        },
+    ];
 
+    return (
+        <NavbarContainer>
+            <Brand>
+                <span>MED</span>
+                <span>OGRAM</span>
+            </Brand>
+            <MenuIcon onClick={toggleMenu}>&#9776;</MenuIcon>
+            <NavOverlay isOpen={isOpen} onClick={closeMenu} />
+            <NavLinks isOpen={isOpen} onClick={(e) => e.stopPropagation()}>
+                <CloseButton onClick={closeMenu}>&times;</CloseButton>
+                {navItems.map((item, index) => (
+                    <NavItem key={index}>
+                        <NavLinkTitle
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                toggleSubNav(index);
+                            }}
+                        >
+                            {item.title}
+                        </NavLinkTitle>
+                        <SubNav isOpen={openSubNav === index}>
+                            {item.subItems.map((subItem, subIndex) => (
+                                <SubNavItem key={subIndex}>
+                                    <Link to={subItem.link} onClick={closeMenu}>{subItem.title}</Link>
+                                </SubNavItem>
+                            ))}
                         </SubNav>
-                    </NavCategory>
-                    <NavCategory>
-                        <NavLinkTitle onClick={() => setAboutOpen(!aboutOpen)}>About Us</NavLinkTitle>
-                        <SubNav isOpen={aboutOpen}>
-                            <SubNavLinkItem><Link to="/about">About Us</Link></SubNavLinkItem>
-                            <SubNavLinkItem><Link to="/contact">Contact Us</Link></SubNavLinkItem>
-                        </SubNav>
-                    </NavCategory>
-                </NavLinks>
-            </NavbarContainer>
-        </>
+                    </NavItem>
+                ))}
+            </NavLinks>
+        </NavbarContainer>
     );
 };
 
