@@ -1,14 +1,24 @@
-// Footer.js
 import React from 'react';
-import { Container, Box, Typography, Grid, Link as MuiLink } from '@mui/material';
+import { Container, Box, Typography, Grid, Link as MuiLink, useTheme, useMediaQuery } from '@mui/material';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
+
 const Footer = () => {
+    const theme = useTheme();
+    useMediaQuery(theme.breakpoints.down('sm'));
     return (
         <Container
             component="footer"
             maxWidth="lg"
-            sx={{ mt: 8, py: 4, borderTop: '1px solid #ddd', direction: 'rtl' }}
+            sx={{
+                mt: 8,
+                py: 6,
+                borderTop: '1px solid #ddd',
+                direction: 'rtl',
+                backgroundColor: '#f8f9fa',
+            }}
         >
             <Grid container spacing={4} justifyContent="center">
                 <Grid item xs={12} md={3}>
@@ -19,10 +29,10 @@ const Footer = () => {
                             title="کادر مجرب"
                             style={{ width: 64, height: 64 }}
                         />
-                        <Typography variant="h6" sx={{ mt: 2 }}>
+                        <Typography variant="h6" sx={{ mt: 2, fontWeight: 'bold', color: '#0056b3' }}>
                             کادر مجرب
                         </Typography>
-                        <Typography variant="body2" align="center">
+                        <Typography variant="body2" align="center" sx={{ mt: 1, color: '#555' }}>
                             پزشکان و پرستاران ما با تجربه و تخصص بالا آماده ارائه خدمات آنلاین و تلفنی هستند.
                         </Typography>
                     </Box>
@@ -35,15 +45,14 @@ const Footer = () => {
                             title="نیروهای آموزش دیده"
                             style={{ width: 64, height: 64 }}
                         />
-                        <Typography variant="h6" sx={{ mt: 2 }}>
+                        <Typography variant="h6" sx={{ mt: 2, fontWeight: 'bold', color: '#0056b3' }}>
                             نیروهای آموزش دیده
                         </Typography>
-                        <Typography variant="body2" align="center">
+                        <Typography variant="body2" align="center" sx={{ mt: 1, color: '#555' }}>
                             تمامی نیروهای ما دوره‌های آموزشی حرفه‌ای را گذرانده‌اند.
                         </Typography>
                     </Box>
                 </Grid>
-                {/* ستون سوم */}
                 <Grid item xs={12} md={3}>
                     <Box display="flex" flexDirection="column" alignItems="center">
                         <img
@@ -52,10 +61,10 @@ const Footer = () => {
                             title="پاسخگویی ۲۴ ساعته"
                             style={{ width: 64, height: 64 }}
                         />
-                        <Typography variant="h6" sx={{ mt: 2 }}>
+                        <Typography variant="h6" sx={{ mt: 2, fontWeight: 'bold', color: '#0056b3' }}>
                             پاسخگویی ۲۴ ساعته
                         </Typography>
-                        <Typography variant="body2" align="center">
+                        <Typography variant="body2" align="center" sx={{ mt: 1, color: '#555' }}>
                             ما به صورت شبانه‌روزی آماده پاسخگویی به شما هستیم.
                         </Typography>
                     </Box>
@@ -85,7 +94,6 @@ const Footer = () => {
                                 style={{ height: 50 }}
                             />
                         </MuiLink>
-                        {/* لوگوی ساماندهی */}
                         <img
                             referrerPolicy="origin"
                             id="rgvjjzpejxlzsizpesgtrgvj"
@@ -103,16 +111,30 @@ const Footer = () => {
                     </Box>
                 </Grid>
             </Grid>
-            <Box mt={4} textAlign="center">
-                <Typography variant="body2">© .2024 Medogram All rights reserved</Typography>
-                <Box mt={2}>
+            <Box mt={6} textAlign="center">
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0056b3', mb: 2 }}>
+                    ارتباط با ما
+                </Typography>
+                <Grid container spacing={2} justifyContent="center">
+                    <Grid item>
+                        <MuiLink href="tel:09135666326" sx={{ display: 'flex', alignItems: 'center', color: '#555', textDecoration: 'none' }}>
+                            <PhoneIcon sx={{ mr: 1 }} /> 0913-566-6326
+                        </MuiLink>
+                    </Grid>
+                    <Grid item>
+                        <MuiLink href="mailto:info@medogram.ir" sx={{ display: 'flex', alignItems: 'center', color: '#555', textDecoration: 'none' }}>
+                            <EmailIcon sx={{ mr: 1 }} /> info@medogram.ir
+                        </MuiLink>
+                    </Grid>
+                </Grid>
+                <Box mt={3}>
                     <MuiLink
                         href="https://www.instagram.com/medogram_abadeh"
                         target="_blank"
                         rel="noopener noreferrer"
                         sx={{ mx: 1 }}
                     >
-                        <InstagramIcon fontSize="large" color="primary" titleAccess="Instagram" />
+                        <InstagramIcon fontSize="large" sx={{ color: '#E1306C' }} titleAccess="Instagram" />
                     </MuiLink>
                     <MuiLink
                         href="https://t.me/medogram3018"
@@ -120,7 +142,7 @@ const Footer = () => {
                         rel="noopener noreferrer"
                         sx={{ mx: 1 }}
                     >
-                        <i    fontsize= 'large' className="fab fa-telegram-plane fa-2x" title="Telegram"></i>
+                        <TelegramIcon fontSize="large" sx={{ color: '#0088cc' }} titleAccess="Telegram" />
                     </MuiLink>
                     <MuiLink
                         href="https://t.me/medogramiran"
@@ -128,10 +150,13 @@ const Footer = () => {
                         rel="noopener noreferrer"
                         sx={{ mx: 1 }}
                     >
-                        <TelegramIcon fontSize="large" color="primary" titleAccess="Telegram" />
+                        <TelegramIcon fontSize="large" sx={{ color: '#0088cc' }} titleAccess="Telegram" />
                     </MuiLink>
                 </Box>
             </Box>
+            <Typography variant="body2" align="center" sx={{ mt: 4, color: '#777' }}>
+                © 2024 Medogram. All rights reserved.
+            </Typography>
         </Container>
     );
 };
