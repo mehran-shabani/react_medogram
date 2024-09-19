@@ -216,6 +216,7 @@ const Navbar = () => {
                 { title: 'Home', link: '/' },
                 { title: 'Login', link: '/login' },
                 { title: 'Your Visit', link: '/user-visits' },
+                {tiltle: 'Blog', link:'blogs'}
             ],
         },
         {

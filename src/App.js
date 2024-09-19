@@ -14,8 +14,10 @@ import { SubscriptionProvider } from './components/context/SubscriptionContext';
 import ChatPage from "./components/pages/ChatPage";
 import ProfilePage from "./components/pages/ProfilePage";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
-
+import Footer from "./components/pages/Footer";
+import BlogPage from "./components/context/BlogPage";
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './styles/theme';
 function App() {
     const [showSplash, setShowSplash] = useState(true);
 
@@ -32,8 +34,8 @@ function App() {
                             <SplashScreen onComplete={handleSplashComplete} />
                         ) : (
                             <>
-
-                                <Navbar />
+                            <ThemeProvider theme={theme}>
+                                <Navbar/>
                                 <Routes>
                                     <Route path="/" element={<Home/>}/>
                                     <Route path="/about" element={<About/>}/>
@@ -43,16 +45,15 @@ function App() {
                                     <Route path="/visits" element={<VisitPage/>}/>
                                     <Route path="/user-visits" element={<UserVisitsPage/>}/>
                                     <Route path="/profile" element={<ProfilePage/>}/>
+                                    <Route path="/blogs" element={<BlogPage />} />
+                                    <Route path="/chat" element={<ChatPage/>}/>
                                 </Routes>
-
+                                <Footer />
+                            </ThemeProvider>
                             </>
-                            )}
+                        )}
                     </div>
-                    <div>
-                        <Routes>
-                            <Route path="/chat" element={<ChatPage/>}/>
-                        </Routes>
-                    </div>
+
                 </Router>
             </SubscriptionProvider>
         </AuthProvider>
