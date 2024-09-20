@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Button, Box, Grid, Card, CardContent, IconButton, useMediaQuery } from '@mui/material';
 import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
-import Footer from './Footer';
 import '../../styles/Styles.css';
 import { motion } from 'framer-motion';
 import { MedicalServices, LocalHospital, Medication } from '@mui/icons-material';
@@ -107,7 +106,7 @@ const Home = () => {
                     </Box>
                 </motion.div>
             </Container>
-            <Footer />
+
         </ThemeProvider>
     );
 };
