@@ -6,7 +6,7 @@ import { devices } from '../../styles/media';
 
 const PageBackground = styled.div`
     min-height: 100vh;
-    width: 85&;
+    
     background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
     display: flex;
     justify-content: center;
