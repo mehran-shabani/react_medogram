@@ -3,15 +3,15 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SplashScreen from './components/SplashScreen/SplashScreen';
 import Home from './components/pages/Home';
 import Login from './components/pages/Login';
-import SubscriptionPage from './components/pages/SubscriptionPage';
 import About from './components/pages/About';
 import Contact from './components/pages/Contact';
 import VisitPage from './components/pages/VisitPage';
 import UserVisitsPage from './components/pages/UserVisitsPage';
 import Navbar from './components/Navbar/Navbar';
 import { AuthProvider } from './components/context/AuthContext';
-import { SubscriptionProvider } from './components/context/SubscriptionContext';
+import { TransactionProvider } from './components/context/TransactionContext';
 import ChatPage from "./components/pages/ChatPage";
+import PaymentVisit from './components/pages/PaymentVisit';
 import ProfilePage from "./components/pages/ProfilePage";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Footer from "./components/pages/Footer";
@@ -27,7 +27,8 @@ function App() {
 
     return (
         <AuthProvider>
-            <SubscriptionProvider>
+        <TransactionProvider>
+
                 <Router>
                     <div className="App">
                         {showSplash ? (
@@ -41,10 +42,10 @@ function App() {
                                     <Route path="/about" element={<About/>}/>
                                     <Route path="/contact" element={<Contact/>}/>
                                     <Route path="/login" element={<Login/>}/>
-                                    <Route path="/subscriptions" element={<SubscriptionPage/>}/>
                                     <Route path="/visits" element={<VisitPage/>}/>
                                     <Route path="/user-visits" element={<UserVisitsPage/>}/>
                                     <Route path="/profile" element={<ProfilePage/>}/>
+                                    <Route path="/payment-visit" element={<PaymentVisit />} />
                                     <Route path="/blogs" element={<BlogPage />} />
                                     <Route path="/chat" element={<ChatPage/>}/>
                                 </Routes>
@@ -55,7 +56,7 @@ function App() {
                     </div>
 
                 </Router>
-            </SubscriptionProvider>
+        </TransactionProvider>
         </AuthProvider>
     );
 }

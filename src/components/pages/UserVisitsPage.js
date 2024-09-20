@@ -93,7 +93,7 @@ const UserVisitsPage = () => {
     useEffect(() => {
         if (token) {
             setLoading(true);
-            axios.get('http://127.0.0.1:8000/api/user-visits/', {
+            axios.get('http://127.0.0.1:8000/api/visit', {
                 headers: { Authorization: `Bearer ${token}` }
             }).then(response => {
                 setVisits(response.data);
