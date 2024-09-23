@@ -15,7 +15,7 @@ import PaymentVisit from './components/pages/PaymentVisit';
 import ProfilePage from "./components/pages/ProfilePage";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Footer from "./components/pages/Footer";
-import BlogPage from "./components/context/BlogPage";
+import BlogPostPage from "./components/pages/BlogPostPage";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
 function App() {
@@ -46,7 +46,7 @@ function App() {
                                     <Route path="/user-visits" element={<UserVisitsPage/>}/>
                                     <Route path="/profile" element={<ProfilePage/>}/>
                                     <Route path="/payment-visit" element={<PaymentVisit />} />
-                                    <Route path="/blogs" element={<BlogPage />} />
+                                    <Route path="/blogs" element={<BlogPostPage />} />
                                     <Route path="/chat" element={<ChatPage/>}/>
                                 </Routes>
                                 <Footer />
