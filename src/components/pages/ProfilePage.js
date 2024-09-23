@@ -29,7 +29,7 @@ const ProfilePage = () => {
         const fetchProfile = async () => {
             try {
                 console.log('Fetching profile...');
-                const response = await axios.get('http://localhost:8000/api/profile/', {
+                const response = await axios.get('https://api.medogram.ir/api/profile/', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -59,7 +59,7 @@ const ProfilePage = () => {
         e.preventDefault();
         try {
             console.log('Submitting profile update:', profile);
-            const response = await axios.post('http://localhost:8000/api/profile/update/', profile, {
+            const response = await axios.post('https://api.medogram.ir/api/profile/update/', profile, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
