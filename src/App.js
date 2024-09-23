@@ -31,6 +31,7 @@ function App() {
 
                 <Router>
                     <div className="App">
+
                         {showSplash ? (
                             <SplashScreen onComplete={handleSplashComplete} />
                         ) : (
@@ -46,6 +47,7 @@ function App() {
                                     <Route path="/user-visits" element={<UserVisitsPage/>}/>
                                     <Route path="/profile" element={<ProfilePage/>}/>
                                     <Route path="/payment-visit" element={<PaymentVisit />} />
+
                                     <Route path="/blogs" element={<BlogPostPage />} />
                                     <Route path="/chat" element={<ChatPage/>}/>
                                 </Routes>
