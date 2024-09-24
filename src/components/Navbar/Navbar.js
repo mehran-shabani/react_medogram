@@ -222,7 +222,7 @@ const Navbar = () => {
         {
             title: 'Management',
             subItems: [
-                { title: 'Subscription', link: '/subscriptions' },
+                { title: 'Payment Visit', link: '/payment-visit' },
                 { title: 'Do Visit!', link: '/visits' },
                 { title: 'DocAI', link: '/chat' },
                 { title: 'Profile', link: '/profile' },

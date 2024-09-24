@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { useTransaction } from '../context/TransactionContext';
+
 import {
     Box,
     TextField,
@@ -100,7 +100,7 @@ const symptomCategories = [
 const Visit = () => {
     const { token } = useContext(AuthContext);
     const [activeStep, setActiveStep] = useState(0);
-    const { hasRecentTransaction, loading: loadingTransaction } = useTransaction(); // Use Transaction context
+
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -275,12 +275,6 @@ const Visit = () => {
                 return null;
         }
     };
-    // Check for recent transaction
-    useEffect(() => {
-        if (!loadingTransaction && hasRecentTransaction === false) {
-            toast.info('Please visit the payment page to pay for your visit.');
-        }
-    }, [hasRecentTransaction, loadingTransaction]);
 
     return (
         <Box

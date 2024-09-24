@@ -9,9 +9,9 @@ import VisitPage from './components/pages/VisitPage';
 import UserVisitsPage from './components/pages/UserVisitsPage';
 import Navbar from './components/Navbar/Navbar';
 import { AuthProvider } from './components/context/AuthContext';
-import { TransactionProvider } from './components/context/TransactionContext';
 import ChatPage from "./components/pages/ChatPage";
-import PaymentVisit from './components/pages/PaymentVisit';
+import TransactionComponent from './components/pages/TransactionComponent';
+import PaymentRedirect from "./components/pages/PaymentRedirect";
 import ProfilePage from "./components/pages/ProfilePage";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Footer from "./components/pages/Footer";
@@ -27,7 +27,7 @@ function App() {
 
     return (
         <AuthProvider>
-        <TransactionProvider>
+
 
                 <Router>
                     <div className="App">
@@ -46,8 +46,8 @@ function App() {
                                     <Route path="/visits" element={<VisitPage/>}/>
                                     <Route path="/user-visits" element={<UserVisitsPage/>}/>
                                     <Route path="/profile" element={<ProfilePage/>}/>
-                                    <Route path="/payment-visit" element={<PaymentVisit />} />
-
+                                    <Route path="/payment-visit" element={<TransactionComponent />} />
+                                    <Route path="/payment-redirect" element={<PaymentRedirect />} />
                                     <Route path="/blogs" element={<BlogPostPage />} />
                                     <Route path="/chat" element={<ChatPage/>}/>
                                 </Routes>
@@ -58,7 +58,7 @@ function App() {
                     </div>
 
                 </Router>
-        </TransactionProvider>
+
         </AuthProvider>
     );
 }
