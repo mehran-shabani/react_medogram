@@ -8,13 +8,13 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
 
     const registerUser = (phoneNumber) => {
-        return axios.post('https://api.medogram.ir/api/register/', { phone_number: phoneNumber });
+        return axios.post('http://127.0.0.1:8000/api/register/', { phone_number: phoneNumber });
     };
 
     const verifyUser = (phoneNumber, authCode) => {
         console.log('Data being sent:', { phone_number: phoneNumber, code: authCode });
 
-        return axios.post('https://api.medogram.ir/api/verify/', {
+        return axios.post('http://127.0.0.1:8000/api/verify/', {
             code: authCode,
             phone_number: phoneNumber,
 

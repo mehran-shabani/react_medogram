@@ -65,7 +65,7 @@ const TransactionComponent = () => {
                 }
             };
 
-            const response = await axios.post('https://api.medogram.ir/api/transaction/', {}, config);
+            const response = await axios.post('http://127.0.0.1:8000/api/transaction/', {}, config);
             setPaymentUrl(response.data.payment_url);
             toast.success('Payment link generated successfully!');
         } catch (err) {

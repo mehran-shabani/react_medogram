@@ -5,6 +5,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import styled from 'styled-components';
 import { FaThumbsUp, FaThumbsDown, FaComment, FaUserCircle } from 'react-icons/fa';
+import { useCallback } from 'react';
 
 const BlogListPage = () => {
     const { isVerified, token } = useContext(AuthContext);
@@ -13,39 +14,43 @@ const BlogListPage = () => {
     const [error, setError] = useState(null);
     const [commentText, setCommentText] = useState('');
     const [activeCommentBox, setActiveCommentBox] = useState(null);
+    const [page, setPage] = useState(1); // اضافه کردن state برای صفحه
+    const [hasMore, setHasMore] = useState(true);
 
-    useEffect(() => {
-        const fetchAllBlogs = async () => {
-            let currentId = 1;
-            let stopFetching = false;
-            let fetchedBlogs = [];
-
-            while (!stopFetching) {
-                try {
-                    const response = await axios.get(`https://api.medogram.ir/api/blogs/${currentId}/`);
-
-                    if (response.data) {
-                        fetchedBlogs.push(response.data);
-                        currentId++;
-                    } else {
-                        stopFetching = true;
-                    }
-                } catch (err) {
-                    if (err.response && err.response.data.detail === "No Blog matches the given query.") {
-                        stopFetching = true;
-                    } else {
-                        setError("Error fetching blogs");
-                        stopFetching = true;
-                    }
-                }
-            }
-
-            setBlogs(fetchedBlogs);
+    const loadBlogs = useCallback(async () => {
+        try {
+            const response = await axios.get(`http://127.0.0.1:8000/api/blogs/?page=${page}`);
+            setBlogs((prevBlogs) => [...prevBlogs, ...response.data]);
+            setHasMore(response.data.next !== null);
             setLoading(false);
-        };
+        } catch (error) {
+            setError("Failed to load blogs.");
+            setLoading(false);
+        }
+    }, [page]);
 
-        fetchAllBlogs();
-    }, []);
+    // استفاده از useEffect برای بارگذاری اولیه داده‌ها
+    useEffect(() => {
+        loadBlogs(); // فراخوانی تابع بارگذاری پست‌ها
+    }, [loadBlogs]);
+
+    const isPhoneNumber = (user) => {
+        // این عبارت منظم بررسی می‌کند که آیا user فقط شامل اعداد است یا نه
+        return /^[0-9]+$/.test(user);
+    };
+
+    // متد برای مدیریت اسکرول و بارگذاری بیشتر پست‌ها
+    const handleScroll = useCallback(() => {
+        if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && hasMore) {
+            setPage((prevPage) => prevPage + 1);
+        }
+    }, [hasMore]); // این تابع فقط زمانی که hasMore تغییر کند، بازتعریف می‌شود
+
+    // اضافه کردن event listener برای اسکرول
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [handleScroll]);
 
     const handleCommentSubmit = async (blogId) => {
         if (!isVerified) {
@@ -55,7 +60,7 @@ const BlogListPage = () => {
 
         try {
             const response = await axios.post(
-                `https://api.medogram.ir/api/blogs/${blogId}/comments/`,
+                `http://127.0.0.1:8000/api/blogs/${blogId}/comments/`,
                 { comment: commentText },
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -82,7 +87,7 @@ const BlogListPage = () => {
 
         try {
             const response = await axios.post(
-                `https://api.medogram.ir/api/comments/${commentId}/${action}/`,
+                `http://127.0.0.1:8000/api/comments/${commentId}/${action}/`,
                 null,
                 {
                     headers: { Authorization: `Bearer ${token}` }
@@ -102,7 +107,7 @@ const BlogListPage = () => {
         }
     };
 
-    if (loading) {
+    if (loading && page === 1) {
         return <LoadingSpinner><div></div><div></div><div></div><div></div></LoadingSpinner>;
     }
 
@@ -136,11 +141,11 @@ const BlogListPage = () => {
                                             <CommentItem key={comment.id}>
                                                 <CommentContent>{comment.comment}</CommentContent>
                                                 <CommentMeta>
-                                                    <span>
-                                                        <FaUserCircle />
-                                                        {comment.user || 'Anonymous User'}
-                                                        {!comment.user && <AnonymousUserBadge>Guest</AnonymousUserBadge>}
-                                                    </span>
+                                                <span>
+                                               <FaUserCircle />
+                                                    {comment.user && !isPhoneNumber(comment.user) ? comment.user : 'Anonymous'}
+                                                    {(!comment.user || isPhoneNumber(comment.user)) && <AnonymousUserBadge>Guest</AnonymousUserBadge>}
+                                                </span>
                                                     <span>{new Date(comment.created_at).toLocaleDateString()}</span>
                                                 </CommentMeta>
                                                 <ButtonGroup>
