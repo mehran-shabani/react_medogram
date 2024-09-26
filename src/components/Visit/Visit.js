@@ -89,9 +89,9 @@ const symptomCategories = [
             { value: 'chest_tightness', label: 'Chest Tightness' },
             { value: 'sore_throat', label: 'Sore Throat' },
             { value: 'runny_nose', label: 'Runny Nose' },
-            { value: 'nasal_congestion', label: 'Nasal Congestion' },
-            { value: 'sneezing', label: 'Sneezing' },
             { value: 'fever', label: 'Fever' },
+            { value: 'sneezing', label: 'Sneezing' },
+            { value: 'difficulty_breathing', label: 'Difficult Breathing'},
         ],
     },
 ];

@@ -17,14 +17,18 @@ export const AuthProvider = ({ children }) => {
         return axios.post('http://127.0.0.1:8000/api/verify/', {
             code: authCode,
             phone_number: phoneNumber,
-
-        }).then(response => {
-            setIsVerified(true);
-            setToken(response.data.access);
-        }).catch(error => {
-            console.error('Verification error:', error.response.data);
-        });
+        })
+            .then(response => {
+                setIsVerified(true);
+                setToken(response.data.access);
+                return response;
+            })
+            .catch(error => {
+                console.error('Verification error:', error.response.data);
+                throw error;
+            });
     };
+
 
 
     return (

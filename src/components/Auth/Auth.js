@@ -97,11 +97,16 @@ const Auth = () => {
             toast.success('Verification successful!');
             navigate('/');
         } catch (error) {
-            toast.error('Invalid verification code');
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.error(error.response.data.message);
+            } else {
+                toast.error('Invalid verification code');
+            }
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <motion.div
