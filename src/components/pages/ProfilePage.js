@@ -2,8 +2,45 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Container, TextField, Button, Paper, Box, Typography, CircularProgress } from '@mui/material';
+import {
+    Container, TextField, Button, Box, Typography, CircularProgress, Avatar,
+    Card, CardContent, CardActions, Divider, IconButton, Fade, Paper
+} from '@mui/material';
+import { styled } from '@mui/system';
+import { Edit, Save, Cancel, Person, AccountBalance } from '@mui/icons-material';
 import { AuthContext } from '../context/AuthContext';
+
+const StyledCard = styled(Card)(({ theme }) => ({
+    maxWidth: 500,
+    margin: '2rem auto',
+    padding: theme.spacing(3),
+    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+    borderRadius: theme.shape.borderRadius * 2,
+}));
+
+const ProfileAvatar = styled(Avatar)(({ theme }) => ({
+    width: theme.spacing(15),
+    height: theme.spacing(15),
+    margin: '0 auto',
+    backgroundColor: theme.palette.primary.main,
+}));
+
+const ProfileField = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: theme.spacing(2),
+}));
+
+const WalletPaper = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(2),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.palette.primary.light,
+    color: theme.palette.primary.contrastText,
+    marginBottom: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+}));
 
 const ProfilePage = () => {
     const { isVerified, token } = useContext(AuthContext);
@@ -11,12 +48,12 @@ const ProfilePage = () => {
         username: '',
         email: ''
     });
+    const [walletAmount, setWalletAmount] = useState(null);
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState({});
     const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
-
         if (!isVerified) {
             toast.error('Please verify your account to access the profile page.');
             setTimeout(() => {
@@ -25,59 +62,49 @@ const ProfilePage = () => {
             return;
         }
 
-
-        const fetchProfile = async () => {
+        const fetchProfileAndWallet = async () => {
             try {
-                console.log('Fetching profile...');
-                const response = await axios.get('http://127.0.0.1:8000/api/profile/', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-
-                });
-                console.log('Profile fetched successfully:', response.data); // Log success response
-                setProfile(response.data);
+                const [profileResponse, walletResponse] = await Promise.all([
+                    axios.get('http://127.0.0.1:8000/api/profile/', {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
+                    axios.get('http://127.0.0.1:8000/api/box', {
+                        headers: { Authorization: `Bearer ${token}` },
+                    })
+                ]);
+                setProfile(profileResponse.data);
+                setWalletAmount(walletResponse.data.amount);
             } catch (error) {
-                console.error('Error fetching profile:', error.response || error.message); // Log error
-                toast.error('Error fetching profile!');
+                console.error('Error fetching data:', error.response || error.message);
+                toast.error('Error fetching profile or wallet information!');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProfile();
+        fetchProfileAndWallet();
     }, [isVerified, token]);
 
     const handleChange = (e) => {
-        setProfile({
-            ...profile,
-            [e.target.name]: e.target.value
-        });
+        setProfile({ ...profile, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log('Submitting profile update:', profile);
             const response = await axios.post('http://127.0.0.1:8000/api/profile/update/', profile, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-
+                headers: { Authorization: `Bearer ${token}` },
             });
-            console.log('Profile updated successfully:', response.data);
             setProfile(response.data);
             setErrors({});
             setIsEditing(false);
             toast.success('Profile updated successfully!');
         } catch (error) {
-            console.error('Error updating profile:', error.response || error.message); // Log error
+            console.error('Error updating profile:', error.response || error.message);
             if (error.response && error.response.data) {
                 setErrors(error.response.data);
-                toast.error('Error updating profile!');
-            } else {
-                toast.error('Error updating profile!');
             }
+            toast.error('Error updating profile!');
         }
     };
 
@@ -93,69 +120,85 @@ const ProfilePage = () => {
 
     return (
         <Container maxWidth="sm">
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-            />
-            <Paper elevation={3} style={{ padding: '2rem', marginTop: '2rem' }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Profile Page
-                </Typography>
-                {isEditing ? (
-                    <form onSubmit={handleSubmit}>
-                        <Box mb={2}>
-                            <TextField
-                                fullWidth
-                                label="Username"
-                                name="username"
-                                value={profile.username}
-                                onChange={handleChange}
-                                error={!!errors.username}
-                                helperText={errors.username}
-                                variant="outlined"
-                            />
-                        </Box>
-                        <Box mb={2}>
-                            <TextField
-                                fullWidth
-                                label="Email"
-                                name="email"
-                                type="email"
-                                value={profile.email}
-                                onChange={handleChange}
-                                error={!!errors.email}
-                                helperText={errors.email}
-                                variant="outlined"
-                            />
-                        </Box>
-                        <Box display="flex" justifyContent="space-between">
-                            <Button type="submit" variant="contained" color="primary">
-                                Save
-                            </Button>
-                            <Button variant="outlined" color="secondary" onClick={() => setIsEditing(false)}>
-                                Cancel
-                            </Button>
-                        </Box>
-                    </form>
-                ) : (
-                    <Box>
-                        <Typography variant="body1"><strong>Username:</strong> {profile.username}</Typography>
-                        <Typography variant="body1"><strong>Email:</strong> {profile.email}</Typography>
-                        <Box mt={2}>
-                            <Button variant="contained" color="primary" onClick={() => setIsEditing(true)}>
+            <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
+            <Fade in={true} timeout={800}>
+                <StyledCard>
+                    <CardContent>
+                        <ProfileAvatar>
+                            <Person fontSize="large" />
+                        </ProfileAvatar>
+                        <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ mt: 2 }}>
+                            {profile.username}
+                        </Typography>
+                        <Divider sx={{ my: 2 }} />
+                        <WalletPaper elevation={3}>
+                            <AccountBalance sx={{ mr: 1 }} />
+                            <Typography variant="h6">
+                                Wallet Balance: 💵  ﷼ {walletAmount !== null ? walletAmount.toFixed(0) : 'N/A'}
+                            </Typography>
+                        </WalletPaper>
+                        {isEditing ? (
+                            <form onSubmit={handleSubmit}>
+                                <TextField
+                                    fullWidth
+                                    label="Username"
+                                    name="username"
+                                    value={profile.username}
+                                    onChange={handleChange}
+                                    error={!!errors.username}
+                                    helperText={errors.username}
+                                    variant="outlined"
+                                    margin="normal"
+                                />
+                                <TextField
+                                    fullWidth
+                                    label="Email"
+                                    name="email"
+                                    type="email"
+                                    value={profile.email}
+                                    onChange={handleChange}
+                                    error={!!errors.email}
+                                    helperText={errors.email}
+                                    variant="outlined"
+                                    margin="normal"
+                                />
+                            </form>
+                        ) : (
+                            <>
+                                <ProfileField>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 1 }}>Username:</Typography>
+                                    <Typography variant="body1">{profile.username}</Typography>
+                                </ProfileField>
+                                <ProfileField>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 1 }}>Email:</Typography>
+                                    <Typography variant="body1">{profile.email}</Typography>
+                                </ProfileField>
+                            </>
+                        )}
+                    </CardContent>
+                    <CardActions sx={{ justifyContent: 'center' }}>
+                        {isEditing ? (
+                            <>
+                                <IconButton color="primary" onClick={handleSubmit}>
+                                    <Save />
+                                </IconButton>
+                                <IconButton color="secondary" onClick={() => setIsEditing(false)}>
+                                    <Cancel />
+                                </IconButton>
+                            </>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<Edit />}
+                                onClick={() => setIsEditing(true)}
+                            >
                                 Edit Profile
                             </Button>
-                        </Box>
-                    </Box>
-                )}
-            </Paper>
+                        )}
+                    </CardActions>
+                </StyledCard>
+            </Fade>
         </Container>
     );
 };
