@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-
 import {
     Box,
     TextField,
@@ -21,7 +20,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const symptomCategories = [
     {
         label: 'General Symptoms',
-        key: 'generalSymptoms',
+        key: 'general_symptoms', // اصلاح نام کلیدها مطابق با نیاز سرور
         options: [
             { value: 'fever', label: 'Fever' },
             { value: 'fatigue', label: 'Fatigue' },
@@ -36,7 +35,7 @@ const symptomCategories = [
     },
     {
         label: 'Neurological Symptoms',
-        key: 'neurologicalSymptoms',
+        key: 'neurological_symptoms',
         options: [
             { value: 'headache', label: 'Headache' },
             { value: 'dizziness', label: 'Dizziness' },
@@ -52,7 +51,7 @@ const symptomCategories = [
     },
     {
         label: 'Cardiovascular Symptoms',
-        key: 'cardiovascularSymptoms',
+        key: 'cardiovascular_symptoms',
         options: [
             { value: 'chest_pain', label: 'Chest Pain' },
             { value: 'palpitations', label: 'Palpitations' },
@@ -67,7 +66,7 @@ const symptomCategories = [
     },
     {
         label: 'Gastrointestinal Symptoms',
-        key: 'gastrointestinalSymptoms',
+        key: 'gastrointestinal_symptoms',
         options: [
             { value: 'nausea', label: 'Nausea' },
             { value: 'vomiting', label: 'Vomiting' },
@@ -82,7 +81,7 @@ const symptomCategories = [
     },
     {
         label: 'Respiratory Symptoms',
-        key: 'respiratorySymptoms',
+        key: 'respiratory_symptoms',
         options: [
             { value: 'cough', label: 'Cough' },
             { value: 'shortness_of_breath', label: 'Shortness of Breath' },
@@ -100,16 +99,15 @@ const symptomCategories = [
 const Visit = () => {
     const { token } = useContext(AuthContext);
     const [activeStep, setActiveStep] = useState(0);
-
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         urgency: 'prescription',
-        generalSymptoms: '',
-        neurologicalSymptoms: '',
-        cardiovascularSymptoms: '',
-        gastrointestinalSymptoms: '',
-        respiratorySymptoms: '',
+        general_symptoms: '',
+        neurological_symptoms: '',
+        cardiovascular_symptoms: '',
+        gastrointestinal_symptoms: '',
+        respiratory_symptoms: '',
         description: '',
     });
 
@@ -138,7 +136,7 @@ const Visit = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!formData.name.trim()) {
-            toast.error('please insert name.')
+            toast.error('Please insert name.');
             return;
         }
 
@@ -152,14 +150,7 @@ const Visit = () => {
         try {
             const response = await axios.post(
                 'http://127.0.0.1:8000/api/visit/',
-                {
-                    ...formData,
-                    general_symptoms: formData.generalSymptoms,
-                    neurological_symptoms: formData.neurologicalSymptoms,
-                    cardiovascular_symptoms: formData.cardiovascularSymptoms,
-                    gastrointestinal_symptoms: formData.gastrointestinalSymptoms,
-                    respiratory_symptoms: formData.respiratorySymptoms,
-                },
+                formData,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -168,11 +159,11 @@ const Visit = () => {
             setFormData({
                 name: '',
                 urgency: 'prescription',
-                generalSymptoms: '',
-                neurologicalSymptoms: '',
-                cardiovascularSymptoms: '',
-                gastrointestinalSymptoms: '',
-                respiratorySymptoms: '',
+                general_symptoms: '',
+                neurological_symptoms: '',
+                cardiovascular_symptoms: '',
+                gastrointestinal_symptoms: '',
+                respiratory_symptoms: '',
                 description: '',
             });
             setActiveStep(0);
