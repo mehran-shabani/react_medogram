@@ -10,13 +10,14 @@ const NavbarContainer = styled(motion.nav)`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: fixed;
+    position: static;
+    height: 20px;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(0.0000000000000000000001px);
 `;
 
 const Brand = styled(motion.h1)`
