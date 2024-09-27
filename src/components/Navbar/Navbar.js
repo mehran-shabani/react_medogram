@@ -11,7 +11,7 @@ const NavbarContainer = styled(motion.nav)`
     justify-content: space-between;
     align-items: center;
     position: static;
-    height: 20px;
+    height: 21px;
     top: 0;
     left: 0;
     right: 0;
