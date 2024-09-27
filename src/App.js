@@ -7,6 +7,7 @@ import About from './components/pages/About';
 import Contact from './components/pages/Contact';
 import VisitPage from './components/pages/VisitPage';
 import UserVisitsPage from './components/pages/UserVisitsPage';
+import ExcludedServices from './components/pages/ExcludedServices'
 import Navbar from './components/Navbar/Navbar';
 import { AuthProvider } from './components/context/AuthContext';
 import ChatPage from "./components/pages/ChatPage";
@@ -47,6 +48,7 @@ function App() {
                                     <Route path="/user-visits" element={<UserVisitsPage/>}/>
                                     <Route path="/profile" element={<ProfilePage/>}/>
                                     <Route path="/payment-visit" element={<TransactionComponent />} />
+                                    <Route path="/excluded-services" element={<ExcludedServices />} />
                                     <Route path="/payment-redirect" element={<PaymentRedirect />} />
                                     <Route path="/blogs" element={<BlogPostPage />} />
                                     <Route path="/chat" element={<ChatPage/>}/>

@@ -76,6 +76,14 @@ const Auth = () => {
     }, [codeSent, timer]);
 
     const handleSendCode = async () => {
+        // Validate phone number format (starts with 09 and is 11 digits)
+        const phoneNumberRegex = /^09\d{9}$/;
+
+        if (!phoneNumberRegex.test(phoneNumber)) {
+            toast.error('Invalid phone number. It should start with 09 and be 11 digits long.');
+            return;
+        }
+
         setLoading(true);
         try {
             await registerUser(phoneNumber);
