@@ -19,12 +19,12 @@ const BlogListPage = () => {
 
     const loadBlogs = useCallback(async () => {
         try {
-            const response = await axios.get(`http://127.0.0.1:8000/api/blogs/?page=${page}`);
+            const response = await axios.get(`https://api.medogram.ir/api/blogs/?page=${page}`);
             setBlogs((prevBlogs) => [...prevBlogs, ...response.data]);
             setHasMore(response.data.next !== null);
             setLoading(false);
         } catch (error) {
-            setError("Failed to load blogs.");
+            setError("بارگذاری پست‌ها با خطا مواجه شد.");
             setLoading(false);
         }
     }, [page]);
@@ -54,19 +54,19 @@ const BlogListPage = () => {
 
     const handleCommentSubmit = async (blogId) => {
         if (!isVerified) {
-            toast.error("You need to be authenticated to add a comment.");
+            toast.error("برای ارسال نظر، نیاز به احراز هویت دارید.");
             return;
         }
 
         try {
             const response = await axios.post(
-                `http://127.0.0.1:8000/api/blogs/${blogId}/comments/`,
+                `https://api.medogram.ir/api/blogs/${blogId}/comments/`,
                 { comment: commentText },
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            toast.success("Comment added successfully!");
+            toast.success("نظر با موفقیت اضافه شد!");
             setBlogs((prevBlogs) =>
                 prevBlogs.map((blog) =>
                     blog.id === blogId ? { ...blog, comments: [...blog.comments, response.data] } : blog
@@ -75,25 +75,25 @@ const BlogListPage = () => {
             setCommentText('');
             setActiveCommentBox(null);
         } catch (error) {
-            toast.error("Error adding comment.");
+            toast.error("خطا در اضافه کردن نظر.");
         }
     };
 
     const handleLikeDislike = async (commentId, action) => {
         if (!isVerified) {
-            toast.error("You need to be authenticated to like/dislike a comment.");
+            toast.error("برای لایک یا دیسلایک کردن، نیاز به احراز هویت دارید.");
             return;
         }
 
         try {
             const response = await axios.post(
-                `http://127.0.0.1:8000/api/comments/${commentId}/${action}/`,
+                `https://api.medogram.ir/api/comments/${commentId}/${action}/`,
                 null,
                 {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            toast.success(`${action === 'like' ? 'Liked' : 'Disliked'} successfully!`);
+            toast.success(`${action === 'like' ? 'لایک' : 'دیسلایک'} با موفقیت انجام شد!`);
             setBlogs((prevBlogs) =>
                 prevBlogs.map((blog) => ({
                     ...blog,
@@ -103,7 +103,7 @@ const BlogListPage = () => {
                 }))
             );
         } catch (error) {
-            toast.error(`Error during ${action}.`);
+            toast.error(`خطا در هنگام ${action === 'like' ? 'لایک' : 'دیسلایک'}.`);
         }
     };
 
@@ -117,7 +117,7 @@ const BlogListPage = () => {
 
     return (
         <PageContainer>
-            <PageTitle>Latest Blogs</PageTitle>
+            <PageTitle>آخرین پست‌های وبلاگ</PageTitle>
             {blogs.length > 0 ? (
                 <BlogList>
                     {blogs.map((blog) => (
@@ -133,7 +133,7 @@ const BlogListPage = () => {
                             </BlogMeta>
                             <CommentsSection>
                                 <SectionTitle>
-                                    <FaComment /> Comments ({blog.comments ? blog.comments.length : 0})
+                                    <FaComment /> نظرات ({blog.comments ? blog.comments.length : 0})
                                 </SectionTitle>
                                 {blog.comments && blog.comments.length > 0 ? (
                                     <CommentList>
@@ -143,8 +143,8 @@ const BlogListPage = () => {
                                                 <CommentMeta>
                                                 <span>
                                                <FaUserCircle />
-                                                    {comment.user && !isPhoneNumber(comment.user) ? comment.user : 'Anonymous'}
-                                                    {(!comment.user || isPhoneNumber(comment.user)) && <AnonymousUserBadge>Guest</AnonymousUserBadge>}
+                                                    {comment.user && !isPhoneNumber(comment.user) ? comment.user : 'ناشناس'}
+                                                    {(!comment.user || isPhoneNumber(comment.user)) && <AnonymousUserBadge>مهمان</AnonymousUserBadge>}
                                                 </span>
                                                     <span>{new Date(comment.created_at).toLocaleDateString()}</span>
                                                 </CommentMeta>
@@ -160,7 +160,7 @@ const BlogListPage = () => {
                                         ))}
                                     </CommentList>
                                 ) : (
-                                    <NoComments>No comments available for this blog.</NoComments>
+                                    <NoComments>برای این پست نظری ثبت نشده است.</NoComments>
                                 )}
                             </CommentsSection>
                             {activeCommentBox === blog.id ? (
@@ -168,27 +168,27 @@ const BlogListPage = () => {
                                     <CommentTextArea
                                         value={commentText}
                                         onChange={(e) => setCommentText(e.target.value)}
-                                        placeholder="Write a comment..."
+                                        placeholder="نظر خود را بنویسید..."
                                     />
                                     <ButtonGroup>
                                         <SubmitButton onClick={() => handleCommentSubmit(blog.id)}>
-                                            Submit Comment
+                                            ارسال نظر
                                         </SubmitButton>
                                         <CancelButton onClick={() => setActiveCommentBox(null)}>
-                                            Cancel
+                                            انصراف
                                         </CancelButton>
                                     </ButtonGroup>
                                 </AddCommentSection>
                             ) : (
                                 <AddCommentButton onClick={() => setActiveCommentBox(blog.id)}>
-                                    Add Comment
+                                    افزودن نظر
                                 </AddCommentButton>
                             )}
                         </BlogItem>
                     ))}
                 </BlogList>
             ) : (
-                <NoBlogs>No blogs available.</NoBlogs>
+                <NoBlogs>پستی برای نمایش وجود ندارد.</NoBlogs>
             )}
 
             <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} />
@@ -254,7 +254,7 @@ const BlogMeta = styled.div`
 const AuthorInfo = styled.div`
     display: flex;
     align-items: center;
-    
+
     svg {
         margin-right: 5px;
     }
@@ -271,7 +271,7 @@ const SectionTitle = styled.h3`
     margin-bottom: 20px;
     display: flex;
     align-items: center;
-    
+
     svg {
         margin-right: 10px;
     }
@@ -406,7 +406,7 @@ const LoadingSpinner = styled.div`
     position: relative;
     width: 80px;
     height: 80px;
-    
+
     div {
         box-sizing: border-box;
         display: block;

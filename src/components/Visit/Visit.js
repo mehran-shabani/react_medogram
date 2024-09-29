@@ -19,79 +19,79 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const symptomCategories = [
     {
-        label: 'General Symptoms',
-        key: 'general_symptoms', // اصلاح نام کلیدها مطابق با نیاز سرور
+        label: 'علائم عمومی',
+        key: 'general_symptoms',
         options: [
-            { value: 'fever', label: 'Fever' },
-            { value: 'fatigue', label: 'Fatigue' },
-            { value: 'weight_loss', label: 'Weight Loss' },
-            { value: 'appetite_loss', label: 'Loss of Appetite' },
-            { value: 'night_sweats', label: 'Night Sweats' },
-            { value: 'general_pain', label: 'General Pain' },
-            { value: 'swollen_lymph_nodes', label: 'Swollen Lymph Nodes' },
-            { value: 'chills', label: 'Chills' },
-            { value: 'malaise', label: 'General Malaise' },
+            { value: 'fever', label: 'تب' },
+            { value: 'fatigue', label: 'خستگی' },
+            { value: 'weight_loss', label: 'کاهش وزن' },
+            { value: 'appetite_loss', label: 'کاهش اشتها' },
+            { value: 'night_sweats', label: 'تعریق شبانه' },
+            { value: 'general_pain', label: 'درد عمومی' },
+            { value: 'swollen_lymph_nodes', label: 'تورم غدد لنفاوی' },
+            { value: 'chills', label: 'لرز' },
+            { value: 'malaise', label: 'احساس ناخوشی عمومی' },
         ],
     },
     {
-        label: 'Neurological Symptoms',
+        label: 'علائم عصبی',
         key: 'neurological_symptoms',
         options: [
-            { value: 'headache', label: 'Headache' },
-            { value: 'dizziness', label: 'Dizziness' },
-            { value: 'seizures', label: 'Seizures' },
-            { value: 'numbness', label: 'Numbness' },
-            { value: 'weakness', label: 'Muscle Weakness' },
-            { value: 'memory_loss', label: 'Memory Loss' },
-            { value: 'speech_difficulty', label: 'Speech Difficulty' },
-            { value: 'vision_problems', label: 'Vision Problems' },
-            { value: 'migraine', label: 'Migraine' },
-            { value: 'tremor', label: 'Tremor' },
+            { value: 'headache', label: 'سردرد' },
+            { value: 'dizziness', label: 'سرگیجه' },
+            { value: 'seizures', label: 'تشنج' },
+            { value: 'numbness', label: 'بی‌حسی' },
+            { value: 'weakness', label: 'ضعف عضلانی' },
+            { value: 'memory_loss', label: 'از دست دادن حافظه' },
+            { value: 'speech_difficulty', label: 'مشکل در تکلم' },
+            { value: 'vision_problems', label: 'مشکلات بینایی' },
+            { value: 'migraine', label: 'میگرن' },
+            { value: 'tremor', label: 'لرزش' },
         ],
     },
     {
-        label: 'Cardiovascular Symptoms',
+        label: 'علائم قلبی عروقی',
         key: 'cardiovascular_symptoms',
         options: [
-            { value: 'chest_pain', label: 'Chest Pain' },
-            { value: 'palpitations', label: 'Palpitations' },
-            { value: 'shortness_of_breath', label: 'Shortness of Breath' },
-            { value: 'swelling', label: 'Swelling' },
-            { value: 'high_blood_pressure', label: 'High Blood Pressure' },
-            { value: 'fatigue', label: 'Fatigue' },
-            { value: 'fainting', label: 'Fainting' },
-            { value: 'irregular_heartbeat', label: 'Irregular Heartbeat' },
-            { value: 'low_blood_pressure', label: 'Low Blood Pressure' },
+            { value: 'chest_pain', label: 'درد قفسه سینه' },
+            { value: 'palpitations', label: 'تپش قلب' },
+            { value: 'shortness_of_breath', label: 'تنگی نفس' },
+            { value: 'swelling', label: 'ورم' },
+            { value: 'high_blood_pressure', label: 'فشار خون بالا' },
+            { value: 'fatigue', label: 'خستگی' },
+            { value: 'fainting', label: 'غش کردن' },
+            { value: 'irregular_heartbeat', label: 'ضربان قلب نامنظم' },
+            { value: 'low_blood_pressure', label: 'فشار خون پایین' },
         ],
     },
     {
-        label: 'Gastrointestinal Symptoms',
+        label: 'علائم گوارشی',
         key: 'gastrointestinal_symptoms',
         options: [
-            { value: 'nausea', label: 'Nausea' },
-            { value: 'vomiting', label: 'Vomiting' },
-            { value: 'diarrhea', label: 'Diarrhea' },
-            { value: 'constipation', label: 'Constipation' },
-            { value: 'abdominal_pain', label: 'Abdominal Pain' },
-            { value: 'bloating', label: 'Bloating' },
-            { value: 'heartburn', label: 'Heartburn' },
-            { value: 'loss_of_appetite', label: 'Loss of Appetite' },
-            { value: 'indigestion', label: 'Indigestion' },
+            { value: 'nausea', label: 'حالت تهوع' },
+            { value: 'vomiting', label: 'استفراغ' },
+            { value: 'diarrhea', label: 'اسهال' },
+            { value: 'constipation', label: 'یبوست' },
+            { value: 'abdominal_pain', label: 'درد شکم' },
+            { value: 'bloating', label: 'نفخ' },
+            { value: 'heartburn', label: 'سوزش سر دل' },
+            { value: 'loss_of_appetite', label: 'بی‌اشتهایی' },
+            { value: 'indigestion', label: 'سوءهاضمه' },
         ],
     },
     {
-        label: 'Respiratory Symptoms',
+        label: 'علائم تنفسی',
         key: 'respiratory_symptoms',
         options: [
-            { value: 'cough', label: 'Cough' },
-            { value: 'shortness_of_breath', label: 'Shortness of Breath' },
-            { value: 'wheezing', label: 'Wheezing' },
-            { value: 'chest_tightness', label: 'Chest Tightness' },
-            { value: 'sore_throat', label: 'Sore Throat' },
-            { value: 'runny_nose', label: 'Runny Nose' },
-            { value: 'fever', label: 'Fever' },
-            { value: 'sneezing', label: 'Sneezing' },
-            { value: 'difficulty_breathing', label: 'Difficult Breathing'},
+            { value: 'cough', label: 'سرفه' },
+            { value: 'shortness_of_breath', label: 'تنگی نفس' },
+            { value: 'wheezing', label: 'خس خس سینه' },
+            { value: 'chest_tightness', label: 'تنگی قفسه سینه' },
+            { value: 'sore_throat', label: 'گلودرد' },
+            { value: 'runny_nose', label: 'آبریزش بینی' },
+            { value: 'fever', label: 'تب' },
+            { value: 'sneezing', label: 'عطسه' },
+            { value: 'difficulty_breathing', label: 'مشکل در تنفس' },
         ],
     },
 ];
@@ -136,20 +136,20 @@ const Visit = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!formData.name.trim()) {
-            toast.error('Please insert name.');
+            toast.error('لطفا نام را وارد کنید.');
             return;
         }
 
         const symptoms = symptomCategories.map((category) => formData[category.key]).filter(Boolean);
         if (symptoms.length === 0) {
-            toast.error('Please select at least one symptom.');
+            toast.error('لطفا حداقل یک علامت را انتخاب کنید.');
             return;
         }
 
         setLoading(true);
         try {
             const response = await axios.post(
-                'http://127.0.0.1:8000/api/visit/',
+                'https://api.medogram.ir/api/visit/',
                 formData,
                 {
                     headers: { Authorization: `Bearer ${token}` },
@@ -167,13 +167,13 @@ const Visit = () => {
                 description: '',
             });
             setActiveStep(0);
-            toast.success(`Visit successfully registered for ${response.data.name}.`);
+            toast.success(`ویزیت برای ${response.data.name} با موفقیت ثبت شد.`);
         } catch (error) {
             console.error('Error creating visit:', error);
             if (error.response && error.response.status === 401) {
-                toast.error('Authentication failed! Please log in again.');
+                toast.error('احراز هویت ناموفق بود! لطفا دوباره وارد شوید.');
             } else {
-                toast.error('Error registering the visit.');
+                toast.error('خطا در ثبت ویزیت.');
             }
         } finally {
             setLoading(false);
@@ -186,7 +186,7 @@ const Visit = () => {
                 return (
                     <>
                         <TextField
-                            label="Full Name"
+                            label="نام کامل"
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
@@ -196,17 +196,17 @@ const Visit = () => {
                         />
                         <TextField
                             select
-                            label="Type of Visit"
+                            label="نوع ویزیت"
                             name="urgency"
                             value={formData.urgency}
                             onChange={handleChange}
                             fullWidth
                             margin="normal"
                         >
-                            <MenuItem value="prescription">Prescription of common drugs</MenuItem>
-                            <MenuItem value="diet">Diet Therapy</MenuItem>
-                            <MenuItem value="addiction">Addiction Treatment</MenuItem>
-                            <MenuItem value="online_consultation">Online Consultation</MenuItem>
+                            <MenuItem value="prescription">تجویز داروهای عمومی</MenuItem>
+                            <MenuItem value="diet">درمان تغذیه‌ای</MenuItem>
+                            <MenuItem value="addiction">درمان اعتیاد</MenuItem>
+                            <MenuItem value="online_consultation">مشاوره آنلاین</MenuItem>
                         </TextField>
                     </>
                 );
@@ -251,7 +251,7 @@ const Visit = () => {
                             </TextField>
                         ))}
                         <TextField
-                            label="Additional Notes"
+                            label="توضیحات اضافی"
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
@@ -292,17 +292,17 @@ const Visit = () => {
                 }}
             >
                 <Typography variant="h5" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
-                    New Visit Registration
+                    ثبت ویزیت جدید
                 </Typography>
                 <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
                     <Step>
-                        <StepLabel>Patient Info</StepLabel>
+                        <StepLabel>اطلاعات بیمار</StepLabel>
                     </Step>
                     <Step>
-                        <StepLabel>Symptoms (1/2)</StepLabel>
+                        <StepLabel>علائم (1/2)</StepLabel>
                     </Step>
                     <Step>
-                        <StepLabel>Symptoms (2/2)</StepLabel>
+                        <StepLabel>علائم (2/2)</StepLabel>
                     </Step>
                 </Stepper>
                 <Box component="form" onSubmit={handleSubmit}>
@@ -317,7 +317,7 @@ const Visit = () => {
                             onClick={handleBack}
                             variant="outlined"
                         >
-                            Back
+                            بازگشت
                         </Button>
                         <Button
                             variant="contained"
@@ -328,9 +328,9 @@ const Visit = () => {
                             {loading ? (
                                 <CircularProgress size={24} color="inherit" />
                             ) : activeStep === 2 ? (
-                                'Submit'
+                                'ثبت'
                             ) : (
-                                'Next'
+                                'بعدی'
                             )}
                         </Button>
                     </Box>

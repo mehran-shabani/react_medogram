@@ -165,27 +165,27 @@ const navItems = [
     {
         title: 'Profile',
         subItems: [
-            { title: 'Home', link: '/' },
-            { title: 'Login', link: '/login' },
-            { title: 'Your Visit', link: '/user-visits' },
-            { title: 'Blog', link: '/blogs' },
-            { title: 'Excluded Services', link: '/excluded-services' }
+            { title: 'خانه', link: '/' },
+            { title: 'ورود', link: '/login' },
+            { title: 'پروفایل', link: '/profile' },
+            { title: 'DocAI', link: '/chat' },
         ],
     },
     {
         title: 'Management',
         subItems: [
-            { title: 'Payment Visit', link: '/payment-visit' },
-            { title: 'Do Visit!', link: '/visits' },
-            { title: 'DocAI', link: '/chat' },
-            { title: 'Profile', link: '/profile' },
+            { title: 'انجام ویزیت!', link: '/visits' },
+            { title: ' پرداخت', link: '/payment-visit' },
+            { title: ' ویزیت های شما', link: '/user-visits' },
+            { title: 'وبلاگ', link: '/blogs' },
         ],
     },
     {
         title: 'About Us',
         subItems: [
-            { title: 'About Us', link: '/about' },
-            { title: 'Contact Us', link: '/contact' },
+            { title: 'درباره ما', link: '/about' },
+            { title: ' تماس با ما', link: '/contact' },
+            { title: 'خدمات ما', link: '/excluded-services' },
         ],
     },
 ];

@@ -55,7 +55,7 @@ const ProfilePage = () => {
 
     useEffect(() => {
         if (!isVerified) {
-            toast.error('Please verify your account to access the profile page.');
+            toast.error('لطفاً حساب خود را تایید کنید تا به صفحه پروفایل دسترسی داشته باشید.');
             setTimeout(() => {
                 window.location.href = '/login';
             }, 3000);
@@ -65,18 +65,18 @@ const ProfilePage = () => {
         const fetchProfileAndWallet = async () => {
             try {
                 const [profileResponse, walletResponse] = await Promise.all([
-                    axios.get('http://127.0.0.1:8000/api/profile/', {
+                    axios.get('https://api.medogram.ir/api/profile/', {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
-                    axios.get('http://127.0.0.1:8000/api/box', {
+                    axios.get('https://api.medogram.ir/api/box', {
                         headers: { Authorization: `Bearer ${token}` },
                     })
                 ]);
                 setProfile(profileResponse.data);
                 setWalletAmount(walletResponse.data.amount);
             } catch (error) {
-                console.error('Error fetching data:', error.response || error.message);
-                toast.error('Error fetching profile or wallet information!');
+                console.error('خطا در دریافت اطلاعات:', error.response || error.message);
+                toast.error('خطا در دریافت اطلاعات پروفایل یا کیف پول!');
             } finally {
                 setLoading(false);
             }
@@ -92,19 +92,19 @@ const ProfilePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/profile/update/', profile, {
+            const response = await axios.post('https://api.medogram.ir/api/profile/update/', profile, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setProfile(response.data);
             setErrors({});
             setIsEditing(false);
-            toast.success('Profile updated successfully!');
+            toast.success('پروفایل با موفقیت به‌روزرسانی شد!');
         } catch (error) {
-            console.error('Error updating profile:', error.response || error.message);
+            console.error('خطا در به‌روزرسانی پروفایل:', error.response || error.message);
             if (error.response && error.response.data) {
                 setErrors(error.response.data);
             }
-            toast.error('Error updating profile!');
+            toast.error('خطا در به‌روزرسانی پروفایل!');
         }
     };
 
@@ -134,14 +134,14 @@ const ProfilePage = () => {
                         <WalletPaper elevation={3}>
                             <AccountBalance sx={{ mr: 1 }} />
                             <Typography variant="h6">
-                                Wallet Balance: 💵  ﷼ {walletAmount !== null ? walletAmount.toFixed(0) : 'N/A'}
+                                موجودی کیف پول: 💵  ﷼ {walletAmount !== null ? walletAmount.toFixed(0) : 'N/A'}
                             </Typography>
                         </WalletPaper>
                         {isEditing ? (
                             <form onSubmit={handleSubmit}>
                                 <TextField
                                     fullWidth
-                                    label="Username"
+                                    label="نام کاربری"
                                     name="username"
                                     value={profile.username}
                                     onChange={handleChange}
@@ -152,7 +152,7 @@ const ProfilePage = () => {
                                 />
                                 <TextField
                                     fullWidth
-                                    label="Email"
+                                    label="ایمیل"
                                     name="email"
                                     type="email"
                                     value={profile.email}
@@ -166,11 +166,11 @@ const ProfilePage = () => {
                         ) : (
                             <>
                                 <ProfileField>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 1 }}>Username:</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 1 }}>نام کاربری:</Typography>
                                     <Typography variant="body1">{profile.username}</Typography>
                                 </ProfileField>
                                 <ProfileField>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 1 }}>Email:</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 1 }}>ایمیل:</Typography>
                                     <Typography variant="body1">{profile.email}</Typography>
                                 </ProfileField>
                             </>
@@ -193,7 +193,7 @@ const ProfilePage = () => {
                                 startIcon={<Edit />}
                                 onClick={() => setIsEditing(true)}
                             >
-                                Edit Profile
+                                ویرایش پروفایل
                             </Button>
                         )}
                     </CardActions>

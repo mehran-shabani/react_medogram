@@ -70,20 +70,20 @@ const About = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                About Medogram
+                درباره مدوگرام
             </Title>
             <Description
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
             >
-                At Medogram, we're revolutionizing healthcare delivery by leveraging advanced technologies and intelligent algorithms. Our mission is to provide top-tier medical services online and via phone, making quality healthcare accessible to everyone in the community.
+                در مدوگرام، ما با استفاده از تکنولوژی‌های پیشرفته و الگوریتم‌های هوشمند، ارائه خدمات بهداشتی را متحول کرده‌ایم. ماموریت ما ارائه خدمات پزشکی با کیفیت به صورت آنلاین و تلفنی است تا مراقبت‌های بهداشتی با کیفیت برای همه افراد جامعه در دسترس باشد.
             </Description>
             <FeatureContainer>
                 {[
-                    { title: 'Advanced Technology', description: 'Utilizing cutting-edge AI and machine learning algorithms for accurate diagnoses.' },
-                    { title: 'Affordable Care', description: 'Reducing costs to make healthcare accessible to all segments of society.' },
-                    { title: '24/7 Availability', description: 'Round-the-clock access to medical professionals for your convenience.' }
+                    { title: 'تکنولوژی پیشرفته', description: 'استفاده از هوش مصنوعی و الگوریتم‌های یادگیری ماشین برای تشخیص‌های دقیق.' },
+                    { title: 'مراقبت مقرون‌به‌صرفه', description: 'کاهش هزینه‌ها برای دسترسی همگان به خدمات بهداشتی.' },
+                    { title: 'دسترسی 24/7', description: 'دسترسی شبانه‌روزی به متخصصین پزشکی برای راحتی شما.' }
                 ].map((feature, index) => (
                     <FeatureCard
                         key={index}

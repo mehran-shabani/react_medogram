@@ -31,15 +31,15 @@ const pulseAnimation = keyframes`
 `;
 
 const gradientAnimation = keyframes`
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 `;
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -101,13 +101,13 @@ const ExcludedServices = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const services = [
-        'Management of life-threatening emergencies such as cardiac arrest, stroke, and major accidents.',
-        'Physical transfer and transport of patients to healthcare facilities.',
-        'On-site medical services at accident scenes for immediate examination and stabilization.',
-        'Emergency surgical interventions requiring in-person surgical teams and equipment.',
-        'Immediate administration of life-saving medications like epinephrine or naloxone.',
-        'Stabilizing critical conditions such as controlling blood pressure or assisting with breathing.',
-        'Physical examinations that require direct patient contact, such as pulse checks or abdominal palpation.'
+        'مدیریت اورژانس‌های تهدیدکننده زندگی مانند ایست قلبی، سکته مغزی و حوادث بزرگ.',
+        'انتقال و حمل فیزیکی بیماران به مراکز بهداشتی.',
+        'خدمات پزشکی در محل حادثه برای معاینه فوری و تثبیت وضعیت.',
+        'مداخلات جراحی اورژانسی که نیاز به تیم‌های جراحی حضوری و تجهیزات دارند.',
+        'تجویز فوری داروهای نجات‌بخش مانند اپی‌نفرین یا نالوکسان.',
+        'تثبیت شرایط بحرانی مانند کنترل فشار خون یا کمک به تنفس.',
+        'معاینات فیزیکی که نیاز به تماس مستقیم با بیمار دارند، مانند بررسی نبض یا لمس شکم.'
     ];
 
     return (
@@ -118,15 +118,15 @@ const ExcludedServices = () => {
                     <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <WarningIcon sx={{ fontSize: 40, color: '#FF3B30', mr: 2 }} />
                         <Typography variant={isMobile ? "h5" : "h4"} align="center" sx={{ color: '#FF3B30', fontWeight: 'bold', letterSpacing: 0.5 }}>
-                            Critical Alert: Services Not Covered
+                            هشدار بحرانی: خدمات تحت پوشش نیست
                         </Typography>
                     </Box>
                 </Fade>
                 <Grow in={true} timeout={1500}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 4 }}>
                         <Typography variant="subtitle1" align="center" sx={{ color: '#333', maxWidth: '700px', fontWeight: 'medium', lineHeight: 1.6 }}>
-                            The following critical medical procedures and emergency services fall outside Medogram's scope.
-                            These situations require immediate professional medical intervention. Please seek in-person medical attention immediately if you encounter any of these scenarios.
+                            رویه‌های پزشکی حیاتی و خدمات اورژانسی زیر در محدوده پوشش مدوگرام قرار نمی‌گیرند.
+                            این وضعیت‌ها نیاز به مداخله پزشکی حرفه‌ای حضوری دارند. در صورت مواجهه با هر یک از این شرایط، بلافاصله به دنبال مراقبت‌های پزشکی حضوری باشید.
                         </Typography>
                     </Box>
                 </Grow>
@@ -153,9 +153,9 @@ const ExcludedServices = () => {
                         </MotionListItem>
                     ))}
                 </List>
-                <Tooltip title="If you're experiencing any of these situations, call emergency services immediately." arrow placement="top">
+                <Tooltip title="اگر با هر یک از این شرایط مواجه شدید، فوراً با خدمات اورژانس تماس بگیرید." arrow placement="top">
                     <Typography variant="caption" align="center" sx={{ display: 'block', mt: 4, color: '#666', fontStyle: 'italic' }}>
-                        In case of emergency, always dial your local emergency number.
+                        در مواقع اضطراری همیشه شماره اورژانس محلی خود را شماره‌گیری کنید.
                     </Typography>
                 </Tooltip>
             </ContentWrapper>

@@ -26,9 +26,9 @@ let theme = createTheme({
 theme = responsiveFontSizes(theme);
 
 const serviceCards = [
-    { title: 'Online Consultations', icon: <MedicalServices />, description: 'Get expert medical advice from the comfort of your home.' },
-    { title: 'AI-Powered Diagnostics', icon: <LocalHospital />, description: 'Cutting-edge AI technology for accurate and fast diagnoses.' },
-    { title: 'Personalized Treatment', icon: <Medication />, description: 'Tailored treatment plans designed specifically for you.' },
+    { title: 'مشاوره آنلاین', icon: <MedicalServices />, description: 'دریافت مشاوره پزشکی تخصصی از راحتی خانه خود.' },
+    { title: 'تشخیص هوشمند با هوش مصنوعی', icon: <LocalHospital />, description: 'استفاده از فناوری پیشرفته هوش مصنوعی برای تشخیص دقیق و سریع.' },
+    { title: 'درمان شخصی‌سازی‌شده', icon: <Medication />, description: 'برنامه‌های درمانی مخصوص به نیازهای شما طراحی شده است.' },
 ];
 
 const Home = () => {
@@ -49,10 +49,10 @@ const Home = () => {
                 >
                     <Box className="gradient-background" sx={{ borderRadius: 4, p: 4, boxShadow: 3 }}>
                         <Typography variant="h2" color="primary" gutterBottom className="typography-animation" align="center">
-                            Medogram
+                            MEDOGRAM
                         </Typography>
                         <Typography variant="h5" paragraph className="typography-animation" align="center">
-                            Revolutionary Healthcare at Your Fingertips
+                            تحولی در مراقبت‌های بهداشتی در دستان شما
                         </Typography>
                         <Grid container spacing={4} sx={{ mt: 4 }}>
                             {serviceCards.map((card, index) => (
@@ -77,7 +77,7 @@ const Home = () => {
                         </Grid>
                         <Box sx={{ mt: 6, mb: 4 }}>
                             <Typography variant="body1" paragraph className="typography-animation">
-                                At Medogram, we're revolutionizing healthcare by making advanced medical services accessible to everyone. Our AI-powered platform offers personalized care, cutting-edge diagnostics, and continuous monitoring, all at a fraction of traditional costs.
+                                در مدوگرام، ما با ارائه خدمات پزشکی پیشرفته و استفاده از پلتفرم‌های هوش مصنوعی، مراقبت‌های شخصی و تشخیص‌های پیشرفته را در دسترس همه قرار داده‌ایم. مراقبت‌های بهداشتی با هزینه‌ای کمتر از هزینه‌های سنتی در دستان شما است.
                             </Typography>
                         </Box>
                         <Box textAlign="center" mt={4}>
@@ -99,7 +99,7 @@ const Home = () => {
                                         },
                                     }}
                                 >
-                                    Book a Visit Now
+                                    رزرو ویزیت
                                 </Button>
                             </motion.div>
                         </Box>

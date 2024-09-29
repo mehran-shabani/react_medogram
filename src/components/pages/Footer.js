@@ -117,8 +117,8 @@ const Footer = () => {
                 </Typography>
                 <Grid container spacing={2} justifyContent="center">
                     <Grid item>
-                        <MuiLink href="tel:09135666326" sx={{ display: 'flex', alignItems: 'center', color: '#555', textDecoration: 'none' }}>
-                            <PhoneIcon sx={{ mr: 1 }} /> 0913-566-6326
+                        <MuiLink href="tel:09961733668" sx={{ display: 'flex', alignItems: 'center', color: '#555', textDecoration: 'none' }}>
+                            <PhoneIcon sx={{ mr: 1 }} /> 0996-173-3668
                         </MuiLink>
                     </Grid>
                     <Grid item>
@@ -129,7 +129,7 @@ const Footer = () => {
                 </Grid>
                 <Box mt={3}>
                     <MuiLink
-                        href="https://www.instagram.com/medogram_abadeh"
+                        href="https://www.instagram.com/medogram_online"
                         target="_blank"
                         rel="noopener noreferrer"
                         sx={{ mx: 1 }}

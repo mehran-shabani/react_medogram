@@ -106,24 +106,24 @@ const PaymentRedirect = () => {
             setTransId(transIdFromURL);
             setIdGet(idGetFromURL);
         } else {
-            setStatus('Missing payment information');
+            setStatus('اطلاعات پرداخت ناقص است');
             setIsLoading(false);
         }
     }, [location]);
 
     const verifyPayment = useCallback(async () => {
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/verify-payment/', {
+            const response = await axios.post('https://api.medogram.ir/api/verify-payment/', {
                 trans_id: transId,
                 id_get: idGet,
             });
-            setStatus('Payment Verified');
+            setStatus('پرداخت تایید شد');
             setSnackbar({ open: true, message: response.data.message, severity: 'success' });
         } catch (error) {
-            setStatus('Payment Verification Failed');
+            setStatus('خطا در تایید پرداخت');
             setSnackbar({
                 open: true,
-                message: error.response?.data?.error || 'An error occurred',
+                message: error.response?.data?.error || 'خطایی رخ داده است',
                 severity: 'error',
             });
         } finally {
@@ -151,7 +151,7 @@ const PaymentRedirect = () => {
                         <BackgroundPattern />
                         <ContentBox>
                             <Typography variant="h4" component="h1" gutterBottom color="primary">
-                                Payment Verification
+                                تایید پرداخت
                             </Typography>
                             <AnimatedBox
                                 initial={{ opacity: 0, y: 20 }}
@@ -184,7 +184,7 @@ const PaymentRedirect = () => {
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                         }}>
-                                            {status === 'Payment Verified' ? (
+                                            {status === 'پرداخت تایید شد' ? (
                                                 <motion.div
                                                     initial={{ scale: 0 }}
                                                     animate={{ scale: 1 }}
@@ -214,7 +214,7 @@ const PaymentRedirect = () => {
                                 color="primary"
                                 sx={{ mt: 2 }}
                             >
-                                Back to Home
+                                بازگشت به خانه
                             </Button>
                         </ContentBox>
                     </StyledPaper>

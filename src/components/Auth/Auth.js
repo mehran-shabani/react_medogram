@@ -80,7 +80,7 @@ const Auth = () => {
         const phoneNumberRegex = /^09\d{9}$/;
 
         if (!phoneNumberRegex.test(phoneNumber)) {
-            toast.error('Invalid phone number. It should start with 09 and be 11 digits long.');
+            toast.error('شماره تلفن نامعتبر است. باید با 09 شروع شود و 11 رقم داشته باشد.');
             return;
         }
 
@@ -90,9 +90,9 @@ const Auth = () => {
             setCodeSent(true);
             setTimer(60);
             setCanResend(false);
-            toast.success('Verification code sent!');
+            toast.success('کد تایید ارسال شد!');
         } catch (error) {
-            toast.error('Error sending verification code');
+            toast.error('خطا در ارسال کد تایید');
         } finally {
             setLoading(false);
         }
@@ -102,13 +102,13 @@ const Auth = () => {
         setLoading(true);
         try {
             await verifyUser(phoneNumber, authCode);
-            toast.success('Verification successful!');
+            toast.success('تایید موفقیت‌آمیز بود!');
             navigate('/');
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
                 toast.error(error.response.data.message);
             } else {
-                toast.error('Invalid verification code');
+                toast.error('کد تایید نامعتبر است');
             }
         } finally {
             setLoading(false);
@@ -124,7 +124,7 @@ const Auth = () => {
         >
             <Container elevation={3}>
                 <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
-                    {codeSent ? 'Verify Code' : 'Authentication'}
+                    {codeSent ? 'تایید کد' : 'احراز هویت'}
                 </Typography>
                 <Box
                     component="form"
@@ -140,7 +140,7 @@ const Auth = () => {
                         transition={{ delay: 0.2, duration: 0.5 }}
                     >
                         <StyledTextField
-                            label="Phone Number"
+                            label="شماره تلفن"
                             variant="outlined"
                             fullWidth
                             value={phoneNumber}
@@ -164,7 +164,7 @@ const Auth = () => {
                             transition={{ delay: 0.4, duration: 0.5 }}
                         >
                             <StyledTextField
-                                label="Verification Code"
+                                label="کد تایید"
                                 variant="outlined"
                                 fullWidth
                                 value={authCode}
@@ -193,7 +193,7 @@ const Auth = () => {
                             sx={{ mt: 2 }}
                             endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
                         >
-                            {loading ? 'Processing...' : (codeSent ? 'Verify Code' : 'Send Code')}
+                            {loading ? 'در حال پردازش...' : (codeSent ? 'تایید کد' : 'ارسال کد')}
                         </StyledButton>
                     </motion.div>
 
@@ -210,7 +210,7 @@ const Auth = () => {
                                 onClick={handleSendCode}
                                 disabled={!canResend}
                             >
-                                {canResend ? 'Resend Code' : `Resend code in ${timer} seconds`}
+                                {canResend ? 'ارسال مجدد کد' : `ارسال مجدد کد در ${timer} ثانیه`}
                             </Button>
                         </motion.div>
                     )}

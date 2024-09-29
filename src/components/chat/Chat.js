@@ -5,14 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IoSend, IoHappyOutline, IoPersonCircleOutline } from 'react-icons/io5';
 
 const ChatContainer = styled(motion.div)`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  background-color: #f0f2f5;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #f0f2f5;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 `;
 
 const ChatHeader = styled.div`
@@ -119,7 +119,7 @@ const ChatBot = () => {
     const [messages, setMessages] = useState([
         {
             id: 'welcome',
-            text: "Hi there! I'm your DocAI Assistant. How can I assist you with your health concerns today?",
+            text: "سلام! من دستیار DocAI شما هستم. چطور می‌توانم امروز به شما در مسائل سلامتیتان کمک کنم؟",
             sender: 'bot',
         }
     ]);
@@ -131,7 +131,7 @@ const ChatBot = () => {
 
     const fetchUserProfile = useCallback(async () => {
         try {
-            const response = await fetch('http://127.0.0.1:8000/api/profile/', {
+            const response = await fetch('https://api.medogram.ir/api/profile/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -140,14 +140,14 @@ const ChatBot = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch user profile');
+                throw new Error('مشکلی در دریافت اطلاعات کاربر پیش آمد');
             }
 
             const data = await response.json();
-            setUserName(data.name || 'User');
+            setUserName(data.name || 'کاربر');
         } catch (error) {
-            console.error('Error fetching user profile:', error);
-            setUserName('User');
+            console.error('خطا در دریافت اطلاعات کاربر:', error);
+            setUserName('کاربر');
         }
     }, [token]);
 
@@ -169,10 +169,10 @@ const ChatBot = () => {
 
             setMessages((prevMessages) => [...prevMessages, userMessage]);
             setInput('');
-            setError(null); // Clear any previous errors
+            setError(null); // پاک کردن خطاهای قبلی
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/chat/', {
+                const response = await fetch('https://api.medogram.ir/api/chat/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -186,19 +186,19 @@ const ChatBot = () => {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    let errorMessage = 'An error occurred while processing your request.';
+                    let errorMessage = 'مشکلی در پردازش درخواست شما به وجود آمد.';
                     if (response.status === 400) {
                         if (data.error === "Insufficient funds in BoxMoney.") {
-                            errorMessage = 'You have insufficient funds to send more messages. Please add funds to your BoxMoney.';
+                            errorMessage = 'موجودی کافی برای ارسال پیام ندارید. لطفاً حساب BoxMoney خود را شارژ کنید.';
                         } else if (data.error === "User message limit not set for this user.") {
-                            errorMessage = 'Your message limit is not set. Please contact support.';
+                            errorMessage = 'محدودیت پیام برای شما تنظیم نشده است. لطفاً با پشتیبانی تماس بگیرید.';
                         } else if (data.error === "BoxMoney does not exist for this user.") {
-                            errorMessage = 'Your BoxMoney account is not set up. Please contact support.';
+                            errorMessage = 'حساب BoxMoney شما تنظیم نشده است. لطفاً با پشتیبانی تماس بگیرید.';
                         }
                     } else if (response.status === 401) {
-                        errorMessage = 'You are not authenticated. Please log in again.';
+                        errorMessage = 'احراز هویت شما معتبر نیست. لطفاً دوباره وارد شوید.';
                     } else if (response.status === 408) {
-                        errorMessage = 'The bot did not respond in time. Please try again.';
+                        errorMessage = 'ربات در زمان مشخص پاسخی نداد. لطفاً دوباره تلاش کنید.';
                     }
                     setError(errorMessage);
                     return;
@@ -212,8 +212,8 @@ const ChatBot = () => {
 
                 setMessages((prevMessages) => [...prevMessages, botMessage]);
             } catch (error) {
-                console.error('Error:', error);
-                setError('An unexpected error occurred. Please try again later.');
+                console.error('خطا:', error);
+                setError('خطایی غیرمنتظره رخ داد. لطفاً بعداً دوباره تلاش کنید.');
             }
         }
     }, [input, token]);
@@ -284,7 +284,7 @@ const ChatBot = () => {
                     value={input}
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
-                    placeholder="Type your message..."
+                    placeholder="پیام خود را تایپ کنید..."
                 />
                 <SendButton onClick={handleSendMessage}>
                     <IoSend />

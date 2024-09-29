@@ -65,11 +65,11 @@ const TransactionComponent = () => {
                 }
             };
 
-            const response = await axios.post('http://127.0.0.1:8000/api/transaction/', {}, config);
+            const response = await axios.post('https://api.medogram.ir/api/transaction/', {}, config);
             setPaymentUrl(response.data.payment_url);
-            toast.success('Payment link generated successfully!');
+            toast.success('لینک پرداخت با موفقیت ایجاد شد!');
         } catch (err) {
-            const errorMessage = err.response ? err.response.data.error : 'An error occurred while fetching the payment link.';
+            const errorMessage = err.response ? err.response.data.error : 'خطایی در دریافت لینک پرداخت رخ داده است.';
             toast.error(errorMessage);
         } finally {
             setLoading(false);
@@ -82,7 +82,7 @@ const TransactionComponent = () => {
                 <StyledPaper elevation={5}>
                     <ContentBox>
                         <Typography variant="h4" gutterBottom align="center" color="primary" style={{ fontWeight: 'bold' }}>
-                            Secure Transaction
+                            تراکنش امن
                         </Typography>
                         <Divider style={{ margin: theme.spacing(2, 0) }} />
                         {isVerified ? (
@@ -99,7 +99,7 @@ const TransactionComponent = () => {
                                                 fullWidth
                                                 startIcon={<CreditCardIcon />}
                                             >
-                                                Request Payment Link
+                                                دریافت لینک پرداخت
                                             </StyledButton>
                                         ) : (
                                             <StyledButton
@@ -111,12 +111,12 @@ const TransactionComponent = () => {
                                                 fullWidth
                                                 startIcon={<CreditCardIcon />}
                                             >
-                                                Proceed to Payment
+                                                ادامه به پرداخت
                                             </StyledButton>
                                         )
                                     )}
                                     <Typography variant="body2" style={{ marginTop: theme.spacing(2), color: theme.palette.text.secondary }}>
-                                        Your transaction is protected by our secure payment system.
+                                        تراکنش شما توسط سیستم امن ما محافظت می‌شود.
                                     </Typography>
                                 </Box>
                             </Grow>
@@ -124,10 +124,10 @@ const TransactionComponent = () => {
                             <Box textAlign="center" mt={2}>
                                 <LockIcon color="error" style={{ fontSize: 48, marginBottom: theme.spacing(2) }} />
                                 <Typography color="error" variant="h6">
-                                    Account Verification Required
+                                    تایید حساب الزامی است
                                 </Typography>
                                 <Typography color="textSecondary" style={{ marginTop: theme.spacing(1) }}>
-                                    Please verify your account to proceed with the payment.
+                                    لطفا حساب خود را تایید کنید تا بتوانید ادامه دهید.
                                 </Typography>
                             </Box>
                         )}

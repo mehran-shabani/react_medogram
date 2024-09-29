@@ -6,7 +6,6 @@ import { devices } from '../../styles/media';
 
 const PageBackground = styled.div`
     min-height: 100vh;
-    
     background: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
     display: flex;
     justify-content: center;
@@ -21,7 +20,6 @@ const ContentWrapper = styled(motion.div)`
     padding: 2rem;
     width: 100%;
     max-width: 800px;
-    
 
     @media ${devices.tablet} {
         padding: 3rem;
@@ -65,8 +63,8 @@ const VisitPage = () => {
                 transition={{ duration: 0.5 }}
             >
                 <Header>
-                    <Title>Schedule Your Visit</Title>
-                    <Subtitle>Book an appointment with our healthcare professionals</Subtitle>
+                    <Title>زمان‌بندی ویزیت شما</Title>
+                    <Subtitle>برای رزرو نوبت با متخصصان سلامت ما، وقت بگیرید</Subtitle>
                 </Header>
                 <Visit />
             </ContentWrapper>

@@ -27,17 +27,17 @@ const Contact = () => {
             }}
         >
             <Typography variant="h4" sx={{ color: '#0056b3', fontWeight: 'bold', mb: 2 }}>
-                با ما تماس بگیرید
+                تماس با ما
             </Typography>
             <Typography variant="h6" sx={{ fontSize: '1.1rem', color: '#333', textAlign: 'center', mb: 3 }}>
-                برای اطلاعات بیشتر در مورد سرویس‌های پزشکی مدوگرام
+                برای دریافت اطلاعات بیشتر در مورد خدمات پزشکی مدوگرام
             </Typography>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
                 <Button
                     variant="outlined"
                     startIcon={<PhoneIcon />}
-                    href="tel:09135666326"
+                    href="tel:09961733668"
                     sx={{
                         justifyContent: 'flex-start',
                         color: '#0056b3',
@@ -45,7 +45,7 @@ const Contact = () => {
                         '&:hover': { backgroundColor: '#e3f2fd' }
                     }}
                 >
-                    0913-566-6326
+                    0996-173-3668
                 </Button>
 
                 <Button

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import SplashScreen from './components/SplashScreen/SplashScreen';
 import Home from './components/pages/Home';
 import Login from './components/pages/Login';
@@ -19,6 +20,10 @@ import Footer from "./components/pages/Footer";
 import BlogPostPage from "./components/pages/BlogPostPage";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
+
+// لوگو را اینجا وارد کنید
+import logoImage from '../src/images/medogram-logo.png';
+
 function App() {
     const [showSplash, setShowSplash] = useState(true);
 
@@ -28,17 +33,20 @@ function App() {
 
     return (
         <AuthProvider>
+            <Router>
+                <div className="App">
+                    <Helmet>
+                        <title>Medogram</title>
+                        <link rel="icon" type="image/png" href={logoImage} />
+                        <meta name="description" content="Medogram - Your Medical Assistant" />
+                    </Helmet>
 
-
-                <Router>
-                    <div className="App">
-
-                        {showSplash ? (
-                            <SplashScreen onComplete={handleSplashComplete} />
-                        ) : (
-                            <>
+                    {showSplash ? (
+                        <SplashScreen onComplete={handleSplashComplete} />
+                    ) : (
+                        <>
                             <ThemeProvider theme={theme}>
-                                <Navbar/>
+                                <Navbar logo={logoImage} />
                                 <Routes>
                                     <Route path="/" element={<Home/>}/>
                                     <Route path="/about" element={<About/>}/>
@@ -53,14 +61,12 @@ function App() {
                                     <Route path="/blogs" element={<BlogPostPage />} />
                                     <Route path="/chat" element={<ChatPage/>}/>
                                 </Routes>
-                                <Footer />
+                                <Footer logo={logoImage} />
                             </ThemeProvider>
-                            </>
-                        )}
-                    </div>
-
-                </Router>
-
+                        </>
+                    )}
+                </div>
+            </Router>
         </AuthProvider>
     );
 }
