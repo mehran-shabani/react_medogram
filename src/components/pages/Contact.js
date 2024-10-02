@@ -75,7 +75,7 @@ const Contact = () => {
                         '&:hover': { backgroundColor: '#e3f2fd' }
                     }}
                 >
-                    @medogram3018
+                    @medogram
                 </Button>
             </Box>
 

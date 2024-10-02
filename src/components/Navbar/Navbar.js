@@ -17,7 +17,7 @@ const NavbarContainer = styled(motion.nav)`
     right: 0;
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(0.0000000000000000000001px);
+    backdrop-filter: blur(5px);
 `;
 
 const Brand = styled(motion.h1)`
@@ -231,24 +231,36 @@ const Navbar = () => {
     }, [isOpen]);
 
     useEffect(() => {
+        let timeoutId = null;
+        const threshold = 10; // تنظیم آستانه برای حساسیت اسکرول
+
         const controlNavbar = () => {
             if (typeof window !== 'undefined') {
-                if (window.scrollY > lastScrollY) {
+                // فقط اگر اسکرول بیشتر از مقدار آستانه باشد، ناوبار را مخفی کن
+                if (window.scrollY - lastScrollY > threshold) {
                     setIsVisible(false);
-                } else {
+                } else if (lastScrollY - window.scrollY > threshold) {
                     setIsVisible(true);
                 }
                 setLastScrollY(window.scrollY);
             }
         };
 
+        const debounceScroll = () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            timeoutId = setTimeout(controlNavbar, 50); // اضافه کردن debounce با تأخیر 50 میلی‌ثانیه
+        };
+
         if (typeof window !== 'undefined') {
-            window.addEventListener('scroll', controlNavbar);
+            window.addEventListener('scroll', debounceScroll);
             return () => {
-                window.removeEventListener('scroll', controlNavbar);
+                window.removeEventListener('scroll', debounceScroll);
             };
         }
     }, [lastScrollY]);
+
 
     return (
         <AnimatePresence>
