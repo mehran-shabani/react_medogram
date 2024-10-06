@@ -1,22 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const lightTheme = {
+    background: 'rgba(255, 255, 255, 0.95)',
+    text: '#333',
+    primary: '#3498db',
+    shadow: 'rgba(0, 0, 0, 0.1)',
+};
+
+const darkTheme = {
+    background: 'rgba(30, 30, 30, 0.95)',
+    text: '#f5f5f5',
+    primary: '#4db6ff',
+    shadow: 'rgba(0, 0, 0, 0.3)',
+};
+
 const NavbarContainer = styled(motion.nav)`
-    background: rgba(255, 255, 255, 0.95);
-    color: #333;
+    background: ${({ theme }) => theme.background};
+    color: ${({ theme }) => theme.text};
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: static;
-    height: 21px;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    height: 20px;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px ${({ theme }) => theme.shadow};
     backdrop-filter: blur(5px);
 `;
 
@@ -28,73 +42,51 @@ const Brand = styled(motion.h1)`
     align-items: baseline;
 
     span:first-child {
-        color: #333;
+        color: ${({ theme }) => theme.text};
         font-weight: 800;
     }
 
     span:last-child {
-        color: #3498db;
+        color: ${({ theme }) => theme.primary};
         font-weight: 300;
     }
 `;
 
 const MenuIcon = styled(motion.button)`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  width: 2rem;
-  height: 2rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 1002;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1002;
 
-  &:focus {
-    outline: none;
-  }
-
-  div {
-    width: 2rem;
-    height: 0.25rem;
-    background: ${({ isOpen }) => isOpen ? '#3498db' : '#333'};
-    border-radius: 10px;
-    transition: all 0.3s linear;
-    position: relative;
-    transform-origin: 1px;
-
-    :first-child {
-      transform: ${({ isOpen }) => isOpen ? 'rotate(45deg)' : 'rotate(0)'};
+    &:focus {
+        outline: none;
     }
+`;
 
-    :nth-child(2) {
-      opacity: ${({ isOpen }) => isOpen ? '0' : '1'};
-      transform: ${({ isOpen }) => isOpen ? 'translateX(20px)' : 'translateX(0)'};
-    }
-
-    :nth-child(3) {
-      transform: ${({ isOpen }) => isOpen ? 'rotate(-45deg)' : 'rotate(0)'};
-    }
-  }
+const MenuIconSVG = styled(motion.svg)`
+    width: 24px;
+    height: 24px;
 `;
 
 const NavLinks = styled(motion.div)`
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 300px;
+    background-color: ${({ theme }) => theme.background};
+    padding: 5rem 2rem;
+    box-shadow: -2px 0 10px ${({ theme }) => theme.shadow};
+    z-index: 1001;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 2rem;
-
-    @media (max-width: 1024px) {
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        right: 0;
-        height: 100vh;
-        width: 300px;
-        background-color: rgba(255, 255, 255, 0.98);
-        padding: 5rem 2rem;
-        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-        z-index: 1001;
-    }
 `;
 
 const NavItem = styled(motion.div)`
@@ -102,9 +94,9 @@ const NavItem = styled(motion.div)`
 `;
 
 const NavLinkTitle = styled(motion.button)`
-    color: #333;
+    color: ${({ theme }) => theme.text};
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: color 0.3s ease;
     background: none;
@@ -116,49 +108,41 @@ const NavLinkTitle = styled(motion.button)`
     font-weight: 500;
 
     &:hover {
-        color: #3498db;
-    }
-
-    @media (max-width: 1024px) {
-        font-size: 1.2rem;
-        padding: 1rem 0;
+        color: ${({ theme }) => theme.primary};
     }
 `;
 
 const SubNav = styled(motion.ul)`
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem 0;
-    min-width: 200px;
-    z-index: 1002;
-    border-radius: 4px;
+    padding: 0.5rem 0 0.5rem 1rem;
     list-style: none;
-
-    @media (max-width: 1024px) {
-        position: static;
-        box-shadow: none;
-        background-color: transparent;
-        padding-left: 1rem;
-    }
 `;
 
 const SubNavItem = styled(motion.li)`
     padding: 0.5rem 1rem;
 
     a {
-        color: #333;
+        color: ${({ theme }) => theme.text};
         text-decoration: none;
         display: block;
         transition: color 0.3s ease;
-        font-size: 0.9rem;
+        font-size: 1rem;
 
         &:hover {
-            color: #3498db;
+            color: ${({ theme }) => theme.primary};
         }
     }
+`;
+
+const ThemeToggle = styled(motion.button)`
+    background: none;
+    border: none;
+    color: ${({ theme }) => theme.text};
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 const navItems = [
@@ -195,6 +179,7 @@ const Navbar = () => {
     const [openSubNav, setOpenSubNav] = useState(null);
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const toggleMenu = (e) => {
         e.stopPropagation();
@@ -232,11 +217,10 @@ const Navbar = () => {
 
     useEffect(() => {
         let timeoutId = null;
-        const threshold = 10; // تنظیم آستانه برای حساسیت اسکرول
+        const threshold = 10;
 
         const controlNavbar = () => {
             if (typeof window !== 'undefined') {
-                // فقط اگر اسکرول بیشتر از مقدار آستانه باشد، ناوبار را مخفی کن
                 if (window.scrollY - lastScrollY > threshold) {
                     setIsVisible(false);
                 } else if (lastScrollY - window.scrollY > threshold) {
@@ -250,7 +234,7 @@ const Navbar = () => {
             if (timeoutId) {
                 clearTimeout(timeoutId);
             }
-            timeoutId = setTimeout(controlNavbar, 50); // اضافه کردن debounce با تأخیر 50 میلی‌ثانیه
+            timeoutId = setTimeout(controlNavbar, 50);
         };
 
         if (typeof window !== 'undefined') {
@@ -261,36 +245,78 @@ const Navbar = () => {
         }
     }, [lastScrollY]);
 
+    const toggleTheme = () => {
+        setIsDarkMode(!isDarkMode);
+    };
+
+    const menuVariants = {
+        closed: { d: "M3 6h18M3 12h18M3 18h18" },
+        open: { d: "M6 18L18 6M6 6l12 12" }
+    };
 
     return (
-        <AnimatePresence>
-            {isVisible && (
-                <NavbarContainer
-                    initial={{ opacity: 0, y: -100 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -100 }}
-                    transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-                >
-                    <Brand
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+        <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+            <AnimatePresence>
+                {isVisible && (
+                    <NavbarContainer
+                        initial={{ opacity: 0, y: -100 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -100 }}
+                        transition={{ type: 'spring', stiffness: 120, damping: 20 }}
                     >
-                        <span>MED</span>
-                        <span>OGRAM</span>
-                    </Brand>
-                    <MenuIcon
-                        onClick={toggleMenu}
-                        isOpen={isOpen}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                    >
-                        <div />
-                        <div />
-                        <div />
-                    </MenuIcon>
+                        <Brand
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <span>MED</span>
+                            <span>OGRAM</span>
+                        </Brand>
+                        <MenuIcon
+                            onClick={toggleMenu}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                        >
+                            <MenuIconSVG
+                                viewBox="0 0 100 100"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <circle cx="50" cy="50" r="46" stroke="currentColor" strokeWidth="6" />
+                                <path
+                                    d="M50 15 Q62 35 50 55 Q38 75 50 85"
+                                    stroke="currentColor"
+                                    strokeWidth="5"
+                                    fill="none"
+                                />
+                                <rect x="47.5" y="10" width="5" height="80" rx="2.5" fill="currentColor" />
+                                <path
+                                    d="M44 85 Q50 92 56 85 L56 80 Q50 84 44 80 Z"
+                                    fill="currentColor"
+                                />
+                                <rect x="32" y="30" width="36" height="10" rx="5" fill="currentColor" />
+                                <rect x="45" y="17" width="10" height="36" rx="5" fill="currentColor" />
+                                <path
+                                    d="M8 50 H30 L36 38 L42 62 L48 50 H92"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    fill="none"
+                                />
+                            <motion.path
+                                    variants={menuVariants}
+                                    animate={isOpen ? "open" : "closed"}
+                                    transition={{duration: 0.3}}
+                                />
+                            </MenuIconSVG>
+                        </MenuIcon>
+                    </NavbarContainer>
+                )}
+            </AnimatePresence>
+            <AnimatePresence>
+                {isOpen && (
                     <NavLinks
-                        initial={false}
-                        animate={{ x: isOpen ? 0 : '100%' }}
+                        initial={{ x: '100%' }}
+                        animate={{ x: 0 }}
+                        exit={{ x: '100%' }}
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                         onClick={(e) => e.stopPropagation()}
                     >
@@ -298,7 +324,7 @@ const Navbar = () => {
                             <NavItem key={index}>
                                 <NavLinkTitle
                                     onClick={() => toggleSubNav(index)}
-                                    whileHover={{ color: '#3498db' }}
+                                    whileHover={{ color: isDarkMode ? darkTheme.primary : lightTheme.primary }}
                                 >
                                     {item.title}
                                 </NavLinkTitle>
@@ -323,10 +349,13 @@ const Navbar = () => {
                                 </AnimatePresence>
                             </NavItem>
                         ))}
+                        <ThemeToggle onClick={toggleTheme} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                            {isDarkMode ? '🌞' : '🌙'}
+                        </ThemeToggle>
                     </NavLinks>
-                </NavbarContainer>
-            )}
-        </AnimatePresence>
+                )}
+            </AnimatePresence>
+        </ThemeProvider>
     );
 };
 
