@@ -1,8 +1,35 @@
 import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
-import styled from 'styled-components';
-import { AuthContext } from '../context/AuthContext';
+import styled, { ThemeProvider } from 'styled-components';
+import { AuthContext } from '../Auth/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IoSend, IoHappyOutline, IoPersonCircleOutline } from 'react-icons/io5';
+import { IoSend, IoHappyOutline, IoPersonCircleOutline, IoMoon, IoSunny, IoImage } from 'react-icons/io5';
+
+const lightTheme = {
+    background: '#f0f2f5',
+    headerBackground: '#128c7e',
+    headerText: 'white',
+    userMessageBackground: '#dcf8c6',
+    botMessageBackground: '#fff',
+    inputBackground: '#f0f2f5',
+    inputFocusBackground: '#e4e6eb',
+    sendButtonColor: '#0e2806',
+    sendButtonHoverColor: '#0e1f11',
+    text: '#000',
+
+};
+
+const darkTheme = {
+    background: '#1f2c33',
+    headerBackground: '#2a3942',
+    headerText: '#e9edef',
+    userMessageBackground: '#005c4b',
+    botMessageBackground: '#202c33',
+    inputBackground: '#2a3942',
+    inputFocusBackground: '#3b4a54',
+    sendButtonColor: '#00a884',
+    sendButtonHoverColor: '#02735e',
+    text: '#e9edef',
+};
 
 const ChatContainer = styled(motion.div)`
     display: flex;
@@ -11,13 +38,14 @@ const ChatContainer = styled(motion.div)`
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
-    background-color: #f0f2f5;
+    background-color: ${props => props.theme.background};
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    color: ${props => props.theme.text};
 `;
 
 const ChatHeader = styled.div`
-    background-color: #128c7e;
-    color: white;
+    background-color: ${props => props.theme.headerBackground};
+    color: ${props => props.theme.headerText};
     padding: 1rem;
     font-size: 1.2rem;
     font-weight: bold;
@@ -52,24 +80,25 @@ const MessageBubble = styled(motion.div)`
     word-wrap: break-word;
     line-height: 1.4;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    position: relative;
 `;
 
 const UserMessage = styled(MessageBubble)`
     align-self: flex-end;
-    background-color: #dcf8c6;
-    color: #000;
+    background-color: ${props => props.theme.userMessageBackground};
+    color: ${props => props.theme.text};
 `;
 
 const BotMessage = styled(MessageBubble)`
     align-self: flex-start;
-    background-color: #fff;
-    color: #000;
+    background-color: ${props => props.theme.botMessageBackground};
+    color: ${props => props.theme.text};
 `;
 
 const InputContainer = styled.div`
     display: flex;
     padding: 1rem;
-    background-color: #fff;
+    background-color: ${props => props.theme.headerBackground};
     align-items: center;
 `;
 
@@ -79,19 +108,20 @@ const InputField = styled.input`
     border: none;
     border-radius: 25px;
     font-size: 1rem;
-    background-color: #f0f2f5;
+    background-color: ${props => props.theme.inputBackground};
+    color: ${props => props.theme.text};
     transition: background-color 0.3s;
 
     &:focus {
         outline: none;
-        background-color: #e4e6eb;
+        background-color: ${props => props.theme.inputFocusBackground};
     }
 `;
 
 const SendButton = styled.button`
     background-color: transparent;
     border: none;
-    color: #128c7e;
+    color: ${props => props.theme.sendButtonColor};
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.5rem;
@@ -101,7 +131,7 @@ const SendButton = styled.button`
     transition: color 0.3s;
 
     &:hover {
-        color: #075e54;
+        color: ${props => props.theme.sendButtonHoverColor};
     }
 `;
 
@@ -115,17 +145,65 @@ const ErrorMessage = styled.div`
     text-align: center;
 `;
 
+const ThemeToggle = styled.button`
+    background: none;
+    border: none;
+    color: ${props => props.theme.headerText};
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+`;
+
+const Timestamp = styled.span`
+    font-size: 0.7rem;
+    color: ${props => props.theme.text};
+    opacity: 0.7;
+    position: absolute;
+    bottom: -1.2rem;
+    right: 0.5rem;
+`;
+
+const TypingIndicator = styled.div`
+    align-self: flex-start;
+    background-color: ${props => props.theme.botMessageBackground};
+    color: ${props => props.theme.text};
+    padding: 0.8rem 1rem;
+    border-radius: 18px;
+    margin-bottom: 0.5rem;
+    font-style: italic;
+`;
+
+const AttachmentButton = styled.button`
+    background: none;
+    border: none;
+    color: ${props => props.theme.sendButtonColor};
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s;
+
+    &:hover {
+        color: ${props => props.theme.sendButtonHoverColor};
+    }
+`;
+
 const ChatBot = () => {
     const [messages, setMessages] = useState([
         {
             id: 'welcome',
             text: "سلام! من دستیار DocAI شما هستم. چطور می‌توانم امروز به شما در مسائل سلامتیتان کمک کنم؟",
             sender: 'bot',
+            timestamp: new Date().toLocaleTimeString(),
         }
     ]);
     const [input, setInput] = useState('');
     const [userName, setUserName] = useState('');
     const [error, setError] = useState(null);
+    const [isTyping, setIsTyping] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const messageContainerRef = useRef(null);
     const { token } = useContext(AuthContext);
 
@@ -165,11 +243,13 @@ const ChatBot = () => {
                 id: Date.now(),
                 text: input,
                 sender: 'user',
+                timestamp: new Date().toLocaleTimeString(),
             };
 
             setMessages((prevMessages) => [...prevMessages, userMessage]);
             setInput('');
-            setError(null); // پاک کردن خطاهای قبلی
+            setError(null);
+            setIsTyping(true);
 
             try {
                 const response = await fetch('https://api.medogram.ir/api/chat/', {
@@ -201,19 +281,25 @@ const ChatBot = () => {
                         errorMessage = 'ربات در زمان مشخص پاسخی نداد. لطفاً دوباره تلاش کنید.';
                     }
                     setError(errorMessage);
+                    setIsTyping(false);
                     return;
                 }
 
-                const botMessage = {
-                    id: Date.now() + 1,
-                    text: data.bot_response,
-                    sender: 'bot',
-                };
+                setTimeout(() => {
+                    const botMessage = {
+                        id: Date.now() + 1,
+                        text: data.bot_response,
+                        sender: 'bot',
+                        timestamp: new Date().toLocaleTimeString(),
+                    };
 
-                setMessages((prevMessages) => [...prevMessages, botMessage]);
+                    setMessages((prevMessages) => [...prevMessages, botMessage]);
+                    setIsTyping(false);
+                }, 1000); // Simulate a delay for typing
             } catch (error) {
                 console.error('خطا:', error);
                 setError('خطایی غیرمنتظره رخ داد. لطفاً بعداً دوباره تلاش کنید.');
+                setIsTyping(false);
             }
         }
     }, [input, token]);
@@ -228,69 +314,91 @@ const ChatBot = () => {
         if (messageContainerRef.current) {
             messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, isTyping]);
+
+    const toggleTheme = () => {
+        setIsDarkMode(!isDarkMode);
+    };
+
+    const handleAttachment = () => {
+        // Implement attachment functionality here
+        console.log("Attachment button clicked");
+    };
 
     return (
-        <ChatContainer
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
-            <ChatHeader>
-                <div>
-                    <IoHappyOutline style={{ marginRight: '0.5rem' }} />
-                    DocAI Assistant
-                </div>
-                <UserInfo>
-                    <IoPersonCircleOutline />
-                    <UserName>{userName}</UserName>
-                </UserInfo>
-            </ChatHeader>
-            <MessageContainer ref={messageContainerRef}>
-                <AnimatePresence>
-                    {messages.map((msg) =>
-                        msg.sender === 'user' ? (
-                            <UserMessage
-                                key={msg.id}
-                                initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                                animate={{ opacity: 1, scale: 1, x: 0 }}
-                                exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {msg.text}
-                            </UserMessage>
-                        ) : (
-                            <BotMessage
-                                key={msg.id}
-                                initial={{ opacity: 0, scale: 0.8, x: -20 }}
-                                animate={{ opacity: 1, scale: 1, x: 0 }}
-                                exit={{ opacity: 0, scale: 0.8, x: -20 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {msg.text}
-                            </BotMessage>
-                        )
+        <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
+            <ChatContainer
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                <ChatHeader>
+                    <div>
+                        <IoHappyOutline style={{ marginRight: '0.5rem' }} />
+                        DocAI Assistant
+                    </div>
+                    <UserInfo>
+                        <IoPersonCircleOutline />
+                        <UserName>{userName}</UserName>
+                        <ThemeToggle onClick={toggleTheme}>
+                            {isDarkMode ? <IoSunny /> : <IoMoon />}
+                        </ThemeToggle>
+                    </UserInfo>
+                </ChatHeader>
+                <MessageContainer ref={messageContainerRef}>
+                    <AnimatePresence>
+                        {messages.map((msg) =>
+                            msg.sender === 'user' ? (
+                                <UserMessage
+                                    key={msg.id}
+                                    initial={{ opacity: 0, scale: 0.8, x: 20 }}
+                                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                                    exit={{ opacity: 0, scale: 0.8, x: 20 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    {msg.text}
+                                    <Timestamp>{msg.timestamp}</Timestamp>
+                                </UserMessage>
+                            ) : (
+                                <BotMessage
+                                    key={msg.id}
+                                    initial={{ opacity: 0, scale: 0.8, x: -20 }}
+                                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                                    exit={{ opacity: 0, scale: 0.8, x: -20 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    {msg.text}
+                                    <Timestamp>{msg.timestamp}</Timestamp>
+                                </BotMessage>
+                            )
+                        )}
+                    </AnimatePresence>
+                    {isTyping && (
+                        <TypingIndicator>DocAI در حال تایپ است...</TypingIndicator>
                     )}
-                </AnimatePresence>
-            </MessageContainer>
-            {error && (
-                <ErrorMessage>
-                    {error}
-                </ErrorMessage>
-            )}
-            <InputContainer>
-                <InputField
-                    type="text"
-                    value={input}
-                    onChange={handleInputChange}
-                    onKeyPress={handleKeyPress}
-                    placeholder="پیام خود را تایپ کنید..."
-                />
-                <SendButton onClick={handleSendMessage}>
-                    <IoSend />
-                </SendButton>
-            </InputContainer>
-        </ChatContainer>
+                </MessageContainer>
+                {error && (
+                    <ErrorMessage>
+                        {error}
+                    </ErrorMessage>
+                )}
+                <InputContainer>
+                    <AttachmentButton onClick={handleAttachment}>
+                        <IoImage />
+                    </AttachmentButton>
+                    <InputField
+                        type="text"
+                        value={input}
+                        onChange={handleInputChange}
+                        onKeyPress={handleKeyPress}
+                        placeholder="پیام خود را تایپ کنید..."
+                    />
+                    <SendButton onClick={handleSendMessage}>
+                        <IoSend />
+                    </SendButton>
+                </InputContainer>
+            </ChatContainer>
+        </ThemeProvider>
     );
 };
 

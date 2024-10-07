@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../Auth/AuthContext';
 import {
     Box,
     TextField,

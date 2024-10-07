@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/system';
 import { Edit, Save, Cancel, Person, AccountBalance } from '@mui/icons-material';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from './AuthContext';
 
 const StyledCard = styled(Card)(({ theme }) => ({
     maxWidth: 500,

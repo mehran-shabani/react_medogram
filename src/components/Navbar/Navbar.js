@@ -28,7 +28,7 @@ const NavbarContainer = styled(motion.nav)`
     top: 0;
     left: 0;
     right: 0;
-    height: 20px;
+    height: 1px;
     z-index: 1000;
     box-shadow: 0 2px 10px ${({ theme }) => theme.shadow};
     backdrop-filter: blur(5px);
@@ -69,7 +69,7 @@ const MenuIcon = styled(motion.button)`
     }
 `;
 
-const MenuIconSVG = styled(motion.svg)`
+const MenuIconSVG = styled.svg`
     width: 24px;
     height: 24px;
 `;
@@ -192,11 +192,7 @@ const Navbar = () => {
     };
 
     const toggleSubNav = (index) => {
-        if (openSubNav === index) {
-            setOpenSubNav(null);
-        } else {
-            setOpenSubNav(index);
-        }
+        setOpenSubNav(openSubNav === index ? null : index);
     };
 
     useEffect(() => {
@@ -216,42 +212,28 @@ const Navbar = () => {
     }, [isOpen]);
 
     useEffect(() => {
-        let timeoutId = null;
-        const threshold = 10;
-
         const controlNavbar = () => {
             if (typeof window !== 'undefined') {
-                if (window.scrollY - lastScrollY > threshold) {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY - lastScrollY > 10) {
                     setIsVisible(false);
-                } else if (lastScrollY - window.scrollY > threshold) {
+                } else if (lastScrollY - currentScrollY > 10) {
                     setIsVisible(true);
                 }
-                setLastScrollY(window.scrollY);
+                setLastScrollY(currentScrollY);
             }
-        };
-
-        const debounceScroll = () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-            timeoutId = setTimeout(controlNavbar, 50);
         };
 
         if (typeof window !== 'undefined') {
-            window.addEventListener('scroll', debounceScroll);
+            window.addEventListener('scroll', controlNavbar);
             return () => {
-                window.removeEventListener('scroll', debounceScroll);
+                window.removeEventListener('scroll', controlNavbar);
             };
         }
     }, [lastScrollY]);
 
     const toggleTheme = () => {
         setIsDarkMode(!isDarkMode);
-    };
-
-    const menuVariants = {
-        closed: { d: "M3 6h18M3 12h18M3 18h18" },
-        open: { d: "M6 18L18 6M6 6l12 12" }
     };
 
     return (
@@ -281,31 +263,9 @@ const Navbar = () => {
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                             >
-                                <circle cx="50" cy="50" r="46" stroke="currentColor" strokeWidth="6" />
-                                <path
-                                    d="M50 15 Q62 35 50 55 Q38 75 50 85"
-                                    stroke="currentColor"
-                                    strokeWidth="5"
-                                    fill="none"
-                                />
-                                <rect x="47.5" y="10" width="5" height="80" rx="2.5" fill="currentColor" />
-                                <path
-                                    d="M44 85 Q50 92 56 85 L56 80 Q50 84 44 80 Z"
-                                    fill="currentColor"
-                                />
-                                <rect x="32" y="30" width="36" height="10" rx="5" fill="currentColor" />
-                                <rect x="45" y="17" width="10" height="36" rx="5" fill="currentColor" />
-                                <path
-                                    d="M8 50 H30 L36 38 L42 62 L48 50 H92"
-                                    stroke="currentColor"
-                                    strokeWidth="3"
-                                    fill="none"
-                                />
-                            <motion.path
-                                    variants={menuVariants}
-                                    animate={isOpen ? "open" : "closed"}
-                                    transition={{duration: 0.3}}
-                                />
+                                <rect x="20" y="30" width="60" height="8" rx="4" fill="currentColor" />
+                                <rect x="20" y="46" width="60" height="8" rx="4" fill="currentColor"/>
+                                <rect x="20" y="62" width="60" height="8" rx="4" fill="currentColor"/>
                             </MenuIconSVG>
                         </MenuIcon>
                     </NavbarContainer>

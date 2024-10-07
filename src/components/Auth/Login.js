@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
-import Auth from '../Auth/Auth';
+import Auth from './Auth';
 import logoImage from '../../images/medogram-logo.png';
 
 const LoginContainer = styled.div`

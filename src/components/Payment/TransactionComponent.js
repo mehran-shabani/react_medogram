@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../Auth/AuthContext';
 import {
     Button,
     Typography,
@@ -18,6 +18,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import LockIcon from '@mui/icons-material/Lock';
+import PaymentIcon from '@mui/icons-material/Payment';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(4),
@@ -47,6 +48,17 @@ const StyledButton = styled(Button)(({ theme }) => ({
         transform: 'translateY(-2px)',
         boxShadow: '0 6px 10px 4px rgba(255, 105, 135, .3)',
     },
+}));
+
+const PaymentAmount = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    padding: theme.spacing(2),
+    borderRadius: theme.shape.borderRadius,
+    marginBottom: theme.spacing(3),
 }));
 
 const TransactionComponent = () => {
@@ -84,6 +96,12 @@ const TransactionComponent = () => {
                         <Typography variant="h4" gutterBottom align="center" color="primary" style={{ fontWeight: 'bold' }}>
                             تراکنش امن
                         </Typography>
+                        <PaymentAmount>
+                            <PaymentIcon style={{ marginRight: theme.spacing(1) }} />
+                            <Typography variant="h6">
+                                مبلغ قابل پرداخت: ۳۰,۰۰۰ تومان
+                            </Typography>
+                        </PaymentAmount>
                         <Divider style={{ margin: theme.spacing(2, 0) }} />
                         {isVerified ? (
                             <Grow in={true} timeout={500}>

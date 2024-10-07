@@ -2,22 +2,22 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import SplashScreen from './components/SplashScreen/SplashScreen';
-import Home from './components/pages/Home';
-import Login from './components/pages/Login';
-import About from './components/pages/About';
-import Contact from './components/pages/Contact';
-import VisitPage from './components/pages/VisitPage';
-import UserVisitsPage from './components/pages/UserVisitsPage';
-import ExcludedServices from './components/pages/ExcludedServices'
+import Home from './components/Home/Home';
+import Login from './components/Auth/Login';
+import About from './components/Details/About';
+import Contact from './components/Details/Contact';
+import VisitPage from './components/Visit/VisitPage';
+import UserVisitsPage from './components/Visit/UserVisitsPage';
+import ExcludedServices from './components/Details/ExcludedServices'
 import Navbar from './components/Navbar/Navbar';
-import { AuthProvider } from './components/context/AuthContext';
-import ChatPage from "./components/pages/ChatPage";
-import TransactionComponent from './components/pages/TransactionComponent';
-import PaymentRedirect from "./components/pages/PaymentRedirect";
-import ProfilePage from "./components/pages/ProfilePage";
+import { AuthProvider } from './components/Auth/AuthContext';
+import ChatPage from "./components/chat/ChatPage";
+import TransactionComponent from './components/Payment/TransactionComponent';
+import PaymentRedirect from "./components/Payment/PaymentRedirect";
+import ProfilePage from "./components/Auth/ProfilePage";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import Footer from "./components/pages/Footer";
-import BlogPostPage from "./components/pages/BlogPostPage";
+import Footer from "./components/Home/Footer";
+import BlogPostPage from "./components/Blog/BlogPostPage";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
 
