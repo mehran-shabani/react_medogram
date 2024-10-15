@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AuthContext } from '../Auth/AuthContext';
+
 
 const lightTheme = {
     background: 'rgba(255, 255, 255, 0.95)',
@@ -40,7 +42,7 @@ const Brand = styled(motion.h1)`
     cursor: pointer;
     display: flex;
     align-items: baseline;
-
+    
     span:first-child {
         color: ${({ theme }) => theme.text};
         font-weight: 800;
@@ -48,8 +50,16 @@ const Brand = styled(motion.h1)`
 
     span:last-child {
         color: ${({ theme }) => theme.primary};
-        font-weight: 300;
+        font-weight: 100;
     }
+`;
+
+const LoginIndicator = styled.div`
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: ${props => props.isLoggedIn ? '#2ecc71' : '#e74c3c'};
+    margin-left: 10px;
 `;
 
 const MenuIcon = styled(motion.button)`
@@ -152,7 +162,6 @@ const navItems = [
             { title: 'خانه', link: '/' },
             { title: 'ورود', link: '/login' },
             { title: 'پروفایل', link: '/profile' },
-
         ],
     },
     {
@@ -160,7 +169,6 @@ const navItems = [
         subItems: [
             { title: 'DocAI', link: '/chat' },
             { title: 'پیش بینی دیابت ', link: '/diabetes-prediction' },
-
         ],
     },
     {
@@ -188,6 +196,7 @@ const Navbar = () => {
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const { isVerified } = useContext(AuthContext);
 
     const toggleMenu = (e) => {
         e.stopPropagation();
@@ -259,7 +268,8 @@ const Navbar = () => {
                             whileTap={{ scale: 0.95 }}
                         >
                             <span>MED</span>
-                            <span>OGRAM</span>
+                            <span style={{color: 'lightblue', fontWeight: '300'}}>OGRAM</span>
+                            <LoginIndicator isLoggedIn={isVerified} />
                         </Brand>
                         <MenuIcon
                             onClick={toggleMenu}
@@ -270,6 +280,7 @@ const Navbar = () => {
                                 viewBox="0 0 100 100"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
+                                style={{color:'lightblue', backdrop:'blur(100px)', zIndex:'auto', opacity:'100000px'}}
                             >
                                 <rect x="20" y="30" width="60" height="8" rx="4" fill="currentColor" />
                                 <rect x="20" y="46" width="60" height="8" rx="4" fill="currentColor"/>

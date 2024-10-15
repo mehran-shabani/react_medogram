@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import SplashScreen from './components/SplashScreen/SplashScreen';
@@ -22,12 +22,21 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
 import logoImage from '../src/images/medogram-logo.png';
 import DiabetesPredict from "./components/predictions/DiabetPredict";
+import NotFound from './components/NotFound'; // اضافه کردن کامپوننت NotFound
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);
 
+    useEffect(() => {
+        const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
+        if (hasSeenSplash) {
+            setShowSplash(false);
+        }
+    }, []);
+
     const handleSplashComplete = () => {
         setShowSplash(false);
+        sessionStorage.setItem('hasSeenSplash', 'true');
     };
 
     return (
@@ -60,6 +69,7 @@ function App() {
                                     <Route path="/payment-redirect" element={<PaymentRedirect />} />
                                     <Route path="/blogs" element={<BlogPostPage />} />
                                     <Route path="/chat" element={<ChatPage/>}/>
+                                    <Route path="*" element={<NotFound />} />
                                 </Routes>
                                 <Footer logo={logoImage} />
                             </ThemeProvider>
