@@ -147,16 +147,24 @@ const ThemeToggle = styled(motion.button)`
 
 const navItems = [
     {
-        title: 'Profile',
+        title: 'پروفایل',
         subItems: [
             { title: 'خانه', link: '/' },
             { title: 'ورود', link: '/login' },
             { title: 'پروفایل', link: '/profile' },
-            { title: 'DocAI', link: '/chat' },
+
         ],
     },
     {
-        title: 'Management',
+        title: 'هوش مصنوعی',
+        subItems: [
+            { title: 'DocAI', link: '/chat' },
+            { title: 'پیش بینی دیابت ', link: '/diabetes-prediction' },
+
+        ],
+    },
+    {
+        title: 'مدیریت و ویریت',
         subItems: [
             { title: 'انجام ویزیت!', link: '/visits' },
             { title: ' پرداخت', link: '/payment-visit' },
@@ -165,7 +173,7 @@ const navItems = [
         ],
     },
     {
-        title: 'About Us',
+        title: 'درباره ما',
         subItems: [
             { title: 'درباره ما', link: '/about' },
             { title: ' تماس با ما', link: '/contact' },

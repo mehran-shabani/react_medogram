@@ -20,9 +20,8 @@ import Footer from "./components/Home/Footer";
 import BlogPostPage from "./components/Blog/BlogPostPage";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
-
-// لوگو را اینجا وارد کنید
 import logoImage from '../src/images/medogram-logo.png';
+import DiabetesPredict from "./components/predictions/DiabetPredict";
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);
@@ -55,6 +54,7 @@ function App() {
                                     <Route path="/visits" element={<VisitPage/>}/>
                                     <Route path="/user-visits" element={<UserVisitsPage/>}/>
                                     <Route path="/profile" element={<ProfilePage/>}/>
+                                    <Route path="/diabetes-prediction" element={<DiabetesPredict/>}/>
                                     <Route path="/payment-visit" element={<TransactionComponent />} />
                                     <Route path="/excluded-services" element={<ExcludedServices />} />
                                     <Route path="/payment-redirect" element={<PaymentRedirect />} />
