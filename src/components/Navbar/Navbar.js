@@ -142,6 +142,21 @@ const SubNavItem = styled(motion.li)`
         }
     }
 `;
+const CloseButton = styled(motion.button)`
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: ${({ theme }) => theme.text};
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1003;
+`;
 
 const ThemeToggle = styled(motion.button)`
     background: none;
@@ -299,6 +314,13 @@ const Navbar = () => {
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                         onClick={(e) => e.stopPropagation()}
                     >
+                        <CloseButton
+                            onClick={closeMenu}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                        >
+                            ✕
+                        </CloseButton>
                         {navItems.map((item, index) => (
                             <NavItem key={index}>
                                 <NavLinkTitle

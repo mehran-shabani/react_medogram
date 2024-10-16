@@ -127,13 +127,15 @@ const UserVisitsPage = () => {
                                     transition={{ duration: 0.3 }}
                                 >
                                     <VisitName>{visit.name}</VisitName>
-                                    <VisitUrgency urgency={visit.urgency}>{visit.urgency === 'High' ? 'اورژانسی' : visit.urgency === 'Medium' ? 'متوسط' : 'کم'}</VisitUrgency>
+                                    <VisitUrgency urgency={visit.urgency}>{visit.urgency === 'prescription' ? 'تجویز دارو' :
+                                        visit.urgency === 'diet' ? 'درمان تغذیه‌ای' :
+                                            visit.urgency === 'addiction' ?  'درمان اعتیاد' : 'مشاوره آنلاین'}</VisitUrgency>
                                 </VisitItem>
                             ))}
                         </AnimatePresence>
                     </VisitList>
                 ) : (
-                    <NoVisitsMessage>هیچ ویزیتی برنامه‌ریزی نشده است.</NoVisitsMessage>
+                    <NoVisitsMessage>ویزیتی برای شما ثبت نشده است.</NoVisitsMessage>
                 )}
             </ContentWrapper>
         </PageContainer>

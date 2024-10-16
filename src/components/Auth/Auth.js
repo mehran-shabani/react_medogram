@@ -53,15 +53,30 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 const VerificationCodeInput = styled(Box)(({ theme }) => ({
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginBottom: theme.spacing(2),
 }));
 
 const DigitInput = styled(TextField)(({ theme }) => ({
-    width: '40px',
+    width: '240px',
     '& input': {
         textAlign: 'center',
-        fontSize: '1.2rem',
+        fontSize: '1.5rem',
+        letterSpacing: '0.5em',
+    },
+}));
+
+const LogoutButton = styled(Button)(({ theme }) => ({
+    borderRadius: 25,
+    padding: '10px 20px',
+    fontWeight: 'bold',
+    transition: 'all 0.3s ease',
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+    '&:hover': {
+        backgroundColor: theme.palette.error.dark,
+        transform: 'translateY(-2px)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
     },
 }));
 
@@ -73,7 +88,7 @@ const Auth = () => {
     const [timer, setTimer] = useState(60);
     const [canResend, setCanResend] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [authCode, setAuthCode] = useState(['', '', '', '', '', '']);
+    const [authCode, setAuthCode] = useState('');
     const [agreeToTerms, setAgreeToTerms] = useState(false);
 
     const theme = useTheme();
@@ -122,7 +137,7 @@ const Auth = () => {
 
         setLoading(true);
         try {
-            await verifyUser(phoneNumber, authCode.join(''));
+            await verifyUser(phoneNumber, authCode);
             toast.success('تایید موفقیت‌آمیز بود!');
             navigate('/');
         } catch (error) {
@@ -136,23 +151,17 @@ const Auth = () => {
         }
     };
 
-    const handleDigitChange = (index, value) => {
-        if (value.length <= 1) {
-            const newAuthCode = [...authCode];
-            newAuthCode[index] = value;
-            setAuthCode(newAuthCode);
-
-            // Move focus to the next input
-            if (value !== '' && index < 5) {
-                document.getElementById(`digit-${index + 1}`).focus();
-            }
+    const handleAuthCodeChange = (e) => {
+        const value = e.target.value.replace(/\D/g, '');
+        if (value.length <= 6) {
+            setAuthCode(value);
         }
     };
 
     const handleLogout = () => {
         logout();
         toast.success('با موفقیت خارج شدید');
-        navigate('/');  // یا هر مسیر دیگری که می‌خواهید بعد از خروج به آن هدایت شود
+        navigate('/');
     };
 
     return (
@@ -175,7 +184,7 @@ const Auth = () => {
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                         >
-                            <StyledButton
+                            <LogoutButton
                                 variant="contained"
                                 fullWidth
                                 onClick={handleLogout}
@@ -183,7 +192,7 @@ const Auth = () => {
                                 endIcon={<ExitToApp />}
                             >
                                 خروج
-                            </StyledButton>
+                            </LogoutButton>
                         </motion.div>
                     </Box>
                 ) : (
@@ -225,20 +234,17 @@ const Auth = () => {
                                 transition={{ delay: 0.4, duration: 0.5 }}
                             >
                                 <VerificationCodeInput>
-                                    {authCode.map((digit, index) => (
-                                        <DigitInput
-                                            key={index}
-                                            id={`digit-${index}`}
-                                            variant="outlined"
-                                            value={digit}
-                                            onChange={(e) => handleDigitChange(index, e.target.value)}
-                                            inputProps={{
-                                                maxLength: 1,
-                                                pattern: '[0-9]*',
-                                                inputMode: 'numeric',
-                                            }}
-                                        />
-                                    ))}
+                                    <DigitInput
+                                        variant="outlined"
+                                        value={authCode}
+                                        onChange={handleAuthCodeChange}
+                                        inputProps={{
+                                            maxLength: 6,
+                                            pattern: '[0-9]*',
+                                            inputMode: 'numeric',
+                                        }}
+                                        placeholder="------"
+                                    />
                                 </VerificationCodeInput>
                             </motion.div>
                         )}
@@ -274,7 +280,7 @@ const Auth = () => {
                                 type="submit"
                                 variant="contained"
                                 fullWidth
-                                disabled={loading || (codeSent && authCode.some(digit => digit === ''))}
+                                disabled={loading || (codeSent && authCode.length !== 6)}
                                 sx={{ mt: 2 }}
                                 endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
                             >

@@ -22,7 +22,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
 import logoImage from '../src/images/medogram-logo.png';
 import DiabetesPredict from "./components/predictions/DiabetPredict";
-import NotFound from './components/NotFound'; // اضافه کردن کامپوننت NotFound
+import NotFound from './components/NotFound';
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);

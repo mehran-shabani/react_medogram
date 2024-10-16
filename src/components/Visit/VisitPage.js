@@ -45,7 +45,10 @@ const StyledPaper = ({ children }) => (
         sx={{
             borderRadius: 4,
             p: { xs: 3, md: 4 },
+            pb: 0, // Remove bottom padding
             backgroundColor: 'white',
+            display: 'flex',
+            flexDirection: 'column',
         }}
     >
         {children}
@@ -79,13 +82,13 @@ const VisitPage = () => {
                         }}
                     >
                         قیمت هر ویزیت 29,950 تومان است. لطفاً قبل از ویزیت به صفحه{' '}
-                        <Link  href="/payment-visit" color="inherit" underline="always">
+                        <Link href={'payment-visit/'} color="inherit" underline="always">
                             پرداخت ویزیت
                         </Link>{' '}
                         بروید.
                     </Alert>
 
-                    <Visit />
+                    <Visit sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} />
                 </StyledPaper>
             </StyledContainer>
         </ThemeProvider>
