@@ -71,11 +71,7 @@ const Footer = () => {
                 </Grid>
                 <Grid item xs={12} md={3}>
                     <Box display="flex" flexDirection="column" alignItems="center">
-                        <MuiLink
-                            href="https://trustseal.enamad.ir/?id=520504&Code=jdx3UPD8Cqkiw4vGO7mwQBuVLfP5ZsCG"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
+                        <MuiLink href="https://trustseal.enamad.ir/?id=520504&Code=jdx3UPD8Cqkiw4vGO7mwQBuVLfP5ZsCG" target="_blank" rel="noopener noreferrer" >
                             <img
                                 src="https://trustseal.enamad.ir/logo.aspx?id=520504&Code=jdx3UPD8Cqkiw4vGO7mwQBuVLfP5ZsCG"
                                 alt="اعتماد"

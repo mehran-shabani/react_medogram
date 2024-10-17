@@ -16,7 +16,8 @@ import TransactionComponent from './components/Payment/TransactionComponent';
 import PaymentRedirect from "./components/Payment/PaymentRedirect";
 import ProfilePage from "./components/Auth/ProfilePage";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import Footer from "./components/Home/Footer";
+//import Footer from "./components/Home/Footer";
+import BottomNavBar from "./components/appbar/SnackBar";
 import BlogPostPage from "./components/Blog/BlogPostPage";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
@@ -71,7 +72,10 @@ function App() {
                                     <Route path="/chat" element={<ChatPage/>}/>
                                     <Route path="*" element={<NotFound />} />
                                 </Routes>
-                                <Footer logo={logoImage} />
+
+                                {/* <Footer logo={logoImage} /> */}
+                                <BottomNavBar />
+                                {/* <BottomNavBar /> */}
                             </ThemeProvider>
                         </>
                     )}

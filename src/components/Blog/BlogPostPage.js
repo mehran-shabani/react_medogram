@@ -29,17 +29,17 @@ const BlogListPage = () => {
         }
     }, [page]);
 
-    // استفاده از useEffect برای بارگذاری اولیه داده‌ها
+   // <ihh>
     useEffect(() => {
         loadBlogs(); // فراخوانی تابع بارگذاری پست‌ها
     }, [loadBlogs]);
 
     const isPhoneNumber = (user) => {
-        // این عبارت منظم بررسی می‌کند که آیا user فقط شامل اعداد است یا نه
+
         return /^[0-9]+$/.test(user);
     };
 
-    // متد برای مدیریت اسکرول و بارگذاری بیشتر پست‌ها
+
     const handleScroll = useCallback(() => {
         if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && hasMore) {
             setPage((prevPage) => prevPage + 1);
