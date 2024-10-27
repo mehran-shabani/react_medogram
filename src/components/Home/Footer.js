@@ -4,6 +4,8 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
+import AndroidIcon from '@mui/icons-material/Android';
+import WebIcon from '@mui/icons-material/Web';
 
 const Footer = () => {
     const theme = useTheme();
@@ -107,6 +109,60 @@ const Footer = () => {
                     </Box>
                 </Grid>
             </Grid>
+
+            {/* Download Section */}
+            <Box mt={6} textAlign="center">
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0056b3', mb: 2 }}>
+                    دانلود اپلیکیشن مدوگرام
+                </Typography>
+                <Grid container spacing={2} justifyContent="center">
+                    <Grid item>
+                        <MuiLink
+                            href="https://api.medogram.ir/api/download-apk/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                color: '#555',
+                                textDecoration: 'none',
+                                backgroundColor: '#e8f5e9',
+                                padding: '8px 16px',
+                                borderRadius: '8px',
+                                '&:hover': {
+                                    backgroundColor: '#c8e6c9'
+                                }
+                            }}
+                        >
+                            <AndroidIcon sx={{ mr: 1, color: '#43a047' }} />
+                            نسخه اندروید
+                        </MuiLink>
+                    </Grid>
+                    <Grid item>
+                        <MuiLink
+                            href="https://pwa.medogram.ir/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                color: '#555',
+                                textDecoration: 'none',
+                                backgroundColor: '#e3f2fd',
+                                padding: '8px 16px',
+                                borderRadius: '8px',
+                                '&:hover': {
+                                    backgroundColor: '#bbdefb'
+                                }
+                            }}
+                        >
+                            <WebIcon sx={{ mr: 1, color: '#1976d2' }} />
+                            نسخه وب اپلیکیشن
+                        </MuiLink>
+                    </Grid>
+                </Grid>
+            </Box>
+
             <Box mt={6} textAlign="center">
                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#0056b3', mb: 2 }}>
                     ارتباط با ما
