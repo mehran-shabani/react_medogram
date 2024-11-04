@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../Auth/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import styled from 'styled-components';
-import { FaThumbsUp, FaThumbsDown, FaComment, FaUserCircle } from 'react-icons/fa';
-import { useCallback } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { FaThumbsUp, FaThumbsDown, FaComment, FaUserCircle, FaShare, FaBookmark } from 'react-icons/fa';
 
 const BlogListPage = () => {
     const { isVerified, token } = useContext(AuthContext);
@@ -14,39 +13,46 @@ const BlogListPage = () => {
     const [error, setError] = useState(null);
     const [commentText, setCommentText] = useState('');
     const [activeCommentBox, setActiveCommentBox] = useState(null);
-    const [page, setPage] = useState(1); // اضافه کردن state برای صفحه
+    const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [savedPosts, setSavedPosts] = useState(new Set());
 
     const loadBlogs = useCallback(async () => {
         try {
             const response = await axios.get(`https://api.medogram.ir/api/blogs/?page=${page}`);
-            setBlogs((prevBlogs) => [...prevBlogs, ...response.data]);
-            setHasMore(response.data.next !== null);
+            if (response.data && Array.isArray(response.data)) {
+                const newBlogs = response.data.filter(newBlog =>
+                    !blogs.some(existingBlog => existingBlog.id === newBlog.id)
+                );
+                setBlogs(prevBlogs => [...prevBlogs, ...newBlogs]);
+                setHasMore(response.data.length > 0);
+            } else if (response.data && response.data.results) {
+                const newBlogs = response.data.results.filter(newBlog =>
+                    !blogs.some(existingBlog => existingBlog.id === newBlog.id)
+                );
+                setBlogs(prevBlogs => [...prevBlogs, ...newBlogs]);
+                setHasMore(response.data.next !== null);
+            }
             setLoading(false);
         } catch (error) {
             setError("بارگذاری پست‌ها با خطا مواجه شد.");
             setLoading(false);
         }
-    }, [page]);
+    }, [page, blogs]);
 
-   // <ihh>
     useEffect(() => {
-        loadBlogs(); // فراخوانی تابع بارگذاری پست‌ها
+        loadBlogs();
     }, [loadBlogs]);
 
-    const isPhoneNumber = (user) => {
-
-        return /^[0-9]+$/.test(user);
-    };
-
-
     const handleScroll = useCallback(() => {
-        if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && hasMore) {
-            setPage((prevPage) => prevPage + 1);
+        if (
+            window.innerHeight + document.documentElement.scrollTop
+            === document.documentElement.offsetHeight && hasMore && !loading
+        ) {
+            setPage(prevPage => prevPage + 1);
         }
-    }, [hasMore]); // این تابع فقط زمانی که hasMore تغییر کند، بازتعریف می‌شود
+    }, [hasMore, loading]);
 
-    // اضافه کردن event listener برای اسکرول
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -58,6 +64,11 @@ const BlogListPage = () => {
             return;
         }
 
+        if (!commentText.trim()) {
+            toast.warning("لطفاً نظر خود را وارد کنید.");
+            return;
+        }
+
         try {
             const response = await axios.post(
                 `https://api.medogram.ir/api/blogs/${blogId}/comments/`,
@@ -66,16 +77,18 @@ const BlogListPage = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            toast.success("نظر با موفقیت اضافه شد!");
-            setBlogs((prevBlogs) =>
-                prevBlogs.map((blog) =>
-                    blog.id === blogId ? { ...blog, comments: [...blog.comments, response.data] } : blog
+            toast.success("نظر شما با موفقیت ثبت شد!");
+            setBlogs(prevBlogs =>
+                prevBlogs.map(blog =>
+                    blog.id === blogId
+                        ? { ...blog, comments: [...blog.comments, response.data] }
+                        : blog
                 )
             );
             setCommentText('');
             setActiveCommentBox(null);
         } catch (error) {
-            toast.error("خطا در اضافه کردن نظر.");
+            toast.error("خطا در ثبت نظر. لطفاً دوباره تلاش کنید.");
         }
     };
 
@@ -93,22 +106,65 @@ const BlogListPage = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             );
-            toast.success(`${action === 'like' ? 'لایک' : 'دیسلایک'} با موفقیت انجام شد!`);
-            setBlogs((prevBlogs) =>
-                prevBlogs.map((blog) => ({
+
+            if (action === 'like') {
+                toast.success("نظر لایک شد!", { icon: "👍" });
+            } else {
+                toast.info("نظر دیسلایک شد!", { icon: "👎" });
+            }
+
+            setBlogs(prevBlogs =>
+                prevBlogs.map(blog => ({
                     ...blog,
-                    comments: blog.comments.map((comment) =>
-                        comment.id === commentId ? { ...comment, likes: response.data.likes } : comment
+                    comments: blog.comments.map(comment =>
+                        comment.id === commentId
+                            ? { ...comment, likes: response.data.likes }
+                            : comment
                     )
                 }))
             );
         } catch (error) {
-            toast.error(`خطا در هنگام ${action === 'like' ? 'لایک' : 'دیسلایک'}.`);
+            toast.error(`خطا در ${action === 'like' ? 'لایک' : 'دیسلایک'} نظر.`);
+        }
+    };
+
+    const handleSavePost = (blogId) => {
+        if (!isVerified) {
+            toast.error("برای ذخیره پست، نیاز به احراز هویت دارید.");
+            return;
+        }
+
+        setSavedPosts(prev => {
+            const newSaved = new Set(prev);
+            if (newSaved.has(blogId)) {
+                newSaved.delete(blogId);
+                toast.info("پست از نشان‌شده‌ها حذف شد");
+            } else {
+                newSaved.add(blogId);
+                toast.success("پست در نشان‌شده‌ها ذخیره شد");
+            }
+            return newSaved;
+        });
+    };
+
+    const handleShare = (blog) => {
+        if (navigator.share) {
+            navigator.share({
+                title: blog.title,
+                text: blog.content.substring(0, 100) + '...',
+                url: window.location.href
+            }).catch(() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success("لینک پست کپی شد!");
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            toast.success("لینک پست کپی شد!");
         }
     };
 
     if (loading && page === 1) {
-        return <LoadingSpinner><div></div><div></div><div></div><div></div></LoadingSpinner>;
+        return <LoadingSpinner />;
     }
 
     if (error) {
@@ -122,158 +178,350 @@ const BlogListPage = () => {
                 <BlogList>
                     {blogs.map((blog) => (
                         <BlogItem key={blog.id}>
-                            <BlogTitle>{blog.title}</BlogTitle>
-                            <BlogContent>{blog.content}</BlogContent>
-                            <BlogMeta>
+                            <BlogHeader>
                                 <AuthorInfo>
                                     <FaUserCircle />
-                                    <span>{blog.author}</span>
+                                    <AuthorName>{blog.author}</AuthorName>
                                 </AuthorInfo>
-                                <span>{new Date(blog.created_at).toLocaleDateString()}</span>
-                            </BlogMeta>
+                                <PostDate>
+                                    {new Date(blog.created_at).toLocaleDateString('fa-IR')}
+                                </PostDate>
+                            </BlogHeader>
+
+                            <BlogTitle>{blog.title}</BlogTitle>
+
+                            {blog.image1 && (
+                                <ImageContainer>
+                                    <BlogImage
+                                        src={blog.image1}
+                                        alt={blog.title}
+                                        loading="lazy"
+                                    />
+                                </ImageContainer>
+                            )}
+
+                            <BlogContent>{blog.content}</BlogContent>
+
+                            {blog.image2 && (
+                                <ImageContainer>
+                                    <BlogImage
+                                        src={blog.image2}
+                                        alt={`تصویر اضافی برای ${blog.title}`}
+                                        loading="lazy"
+                                    />
+                                </ImageContainer>
+                            )}
+
+                            <ActionBar>
+                                <ActionButton onClick={() => handleShare(blog)}>
+                                    <FaShare /> اشتراک‌گذاری
+                                </ActionButton>
+                                <ActionButton
+                                    onClick={() => handleSavePost(blog.id)}
+                                    saved={savedPosts.has(blog.id)}
+                                >
+                                    <FaBookmark />
+                                    {savedPosts.has(blog.id) ? 'ذخیره شده' : 'ذخیره'}
+                                </ActionButton>
+                            </ActionBar>
+
                             <CommentsSection>
                                 <SectionTitle>
-                                    <FaComment /> نظرات ({blog.comments ? blog.comments.length : 0})
+                                    <FaComment /> نظرات ({blog.comments?.length || 0})
                                 </SectionTitle>
-                                {blog.comments && blog.comments.length > 0 ? (
+
+                                {blog.comments?.length > 0 ? (
                                     <CommentList>
                                         {blog.comments.map((comment) => (
                                             <CommentItem key={comment.id}>
                                                 <CommentContent>{comment.comment}</CommentContent>
                                                 <CommentMeta>
-                                                <span>
-                                               <FaUserCircle />
-                                                    {comment.user && !isPhoneNumber(comment.user) ? comment.user : 'ناشناس'}
-                                                    {(!comment.user || isPhoneNumber(comment.user)) && <AnonymousUserBadge>مهمان</AnonymousUserBadge>}
-                                                </span>
-                                                    <span>{new Date(comment.created_at).toLocaleDateString()}</span>
+                                                    <UserInfo>
+                                                        <FaUserCircle />
+                                                        <span>{comment.user || 'کاربر مهمان'}</span>
+                                                    </UserInfo>
+                                                    <CommentDate>
+                                                        {new Date(comment.created_at).toLocaleDateString('fa-IR')}
+                                                    </CommentDate>
                                                 </CommentMeta>
-                                                <ButtonGroup>
+                                                <CommentActions>
                                                     <ActionButton onClick={() => handleLikeDislike(comment.id, 'like')}>
                                                         <FaThumbsUp /> {comment.likes}
                                                     </ActionButton>
                                                     <ActionButton onClick={() => handleLikeDislike(comment.id, 'dislike')}>
                                                         <FaThumbsDown />
                                                     </ActionButton>
-                                                </ButtonGroup>
+                                                </CommentActions>
                                             </CommentItem>
                                         ))}
                                     </CommentList>
                                 ) : (
-                                    <NoComments>برای این پست نظری ثبت نشده است.</NoComments>
+                                    <NoComments>هنوز نظری ثبت نشده است.</NoComments>
+                                )}
+
+                                {activeCommentBox === blog.id ? (
+                                    <AddCommentSection>
+                                        <CommentTextArea
+                                            value={commentText}
+                                            onChange={(e) => setCommentText(e.target.value)}
+                                            placeholder="نظر خود را بنویسید..."
+                                        />
+                                        <CommentButtonGroup>
+                                            <SubmitButton onClick={() => handleCommentSubmit(blog.id)}>
+                                                ارسال نظر
+                                            </SubmitButton>
+                                            <CancelButton onClick={() => {
+                                                setActiveCommentBox(null);
+                                                setCommentText('');
+                                            }}>
+                                                انصراف
+                                            </CancelButton>
+                                        </CommentButtonGroup>
+                                    </AddCommentSection>
+                                ) : (
+                                    <AddCommentButton onClick={() => setActiveCommentBox(blog.id)}>
+                                        افزودن نظر
+                                    </AddCommentButton>
                                 )}
                             </CommentsSection>
-                            {activeCommentBox === blog.id ? (
-                                <AddCommentSection>
-                                    <CommentTextArea
-                                        value={commentText}
-                                        onChange={(e) => setCommentText(e.target.value)}
-                                        placeholder="نظر خود را بنویسید..."
-                                    />
-                                    <ButtonGroup>
-                                        <SubmitButton onClick={() => handleCommentSubmit(blog.id)}>
-                                            ارسال نظر
-                                        </SubmitButton>
-                                        <CancelButton onClick={() => setActiveCommentBox(null)}>
-                                            انصراف
-                                        </CancelButton>
-                                    </ButtonGroup>
-                                </AddCommentSection>
-                            ) : (
-                                <AddCommentButton onClick={() => setActiveCommentBox(blog.id)}>
-                                    افزودن نظر
-                                </AddCommentButton>
-                            )}
                         </BlogItem>
                     ))}
                 </BlogList>
             ) : (
                 <NoBlogs>پستی برای نمایش وجود ندارد.</NoBlogs>
             )}
-
-            <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} />
+            {loading && <LoadingSpinner />}
+            <ToastContainer
+                position="bottom-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+            />
         </PageContainer>
     );
 };
+const fadeIn = keyframes`
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+`;
 
-// Styled Components
 const PageContainer = styled.div`
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Vazirmatn', sans-serif;
+
+    @media (max-width: 768px) {
+        padding: 15px;
+    }
 `;
 
 const PageTitle = styled.h1`
     text-align: center;
     color: #2c3e50;
     font-size: 2.5em;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
+    position: relative;
+    padding-bottom: 15px;
+
+    &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(to right, #3498db, #2ecc71);
+    }
+
+    @media (max-width: 768px) {
+        font-size: 2em;
+        margin-bottom: 30px;
+    }
 `;
 
 const BlogList = styled.ul`
     list-style-type: none;
     padding: 0;
+    animation: ${fadeIn} 0.6s ease-out;
 `;
 
 const BlogItem = styled.li`
     background-color: #fff;
-    border-radius: 8px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #eef2f7;
 
     &:hover {
         transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        padding: 20px;
+        margin-bottom: 30px;
     }
 `;
 
-const BlogTitle = styled.h2`
-    color: #2c3e50;
-    margin-bottom: 15px;
-    font-size: 1.8em;
-`;
-
-const BlogContent = styled.p`
-    color: #34495e;
-    line-height: 1.6;
-    font-size: 1.1em;
-    margin-bottom: 20px;
-`;
-
-const BlogMeta = styled.div`
+const BlogHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #7f8c8d;
-    font-size: 0.9em;
     margin-bottom: 20px;
 `;
 
 const AuthorInfo = styled.div`
     display: flex;
     align-items: center;
+    gap: 8px;
+    color: #34495e;
 
     svg {
-        margin-right: 5px;
+        font-size: 1.5em;
+        color: #3498db;
+    }
+`;
+
+const AuthorName = styled.span`
+    font-weight: 500;
+`;
+
+const PostDate = styled.span`
+    color: #7f8c8d;
+    font-size: 0.9em;
+`;
+
+const ImageContainer = styled.div`
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    margin: 20px 0;
+    
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.2) 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    &:hover::after {
+        opacity: 1;
+    }
+`;
+
+const BlogImage = styled.img`
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(1.02);
+    }
+
+    @media (max-width: 768px) {
+        height: 250px;
+    }
+`;
+
+const BlogTitle = styled.h2`
+    color: #2c3e50;
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    line-height: 1.4;
+    font-weight: 600;
+
+    @media (max-width: 768px) {
+        font-size: 1.5em;
+    }
+`;
+
+const BlogContent = styled.p`
+    color: #34495e;
+    line-height: 1.8;
+    font-size: 1.1em;
+    margin: 20px 0;
+    text-align: justify;
+
+    @media (max-width: 768px) {
+        font-size: 1em;
+    }
+`;
+
+const ActionBar = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin: 20px 0;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+`;
+
+const ActionButton = styled.button`
+    background-color: ${props => props.saved ? '#2ecc71' : '#fff'};
+    color: ${props => props.saved ? '#fff' : '#3498db'};
+    border: 2px solid ${props => props.saved ? '#2ecc71' : '#3498db'};
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    font-size: 0.9em;
+
+    svg {
+        transition: transform 0.3s;
+    }
+
+    &:hover {
+        background-color: ${props => props.saved ? '#27ae60' : '#3498db'};
+        color: white;
+        transform: translateY(-2px);
+
+        svg {
+            transform: scale(1.2);
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
     }
 `;
 
 const CommentsSection = styled.div`
-    margin-top: 25px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
 `;
 
 const SectionTitle = styled.h3`
     color: #2c3e50;
-    border-bottom: 2px solid #ecf0f1;
-    padding-bottom: 10px;
+    font-size: 1.3em;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
+    gap: 8px;
 
     svg {
-        margin-right: 10px;
+        color: #3498db;
     }
 `;
 
@@ -285,103 +533,125 @@ const CommentList = styled.ul`
 const CommentItem = styled.li`
     background-color: #f8f9fa;
     border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 15px;
+    border-radius: 10px;
+    padding: 20px;
     margin-bottom: 15px;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: #fff;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transform: translateX(-5px);
+    }
 `;
 
 const CommentContent = styled.p`
     color: #34495e;
-    font-size: 1em;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    line-height: 1.6;
+    margin-bottom: 15px;
 `;
 
 const CommentMeta = styled.div`
     display: flex;
     justify-content: space-between;
-    color: #7f8c8d;
-    font-size: 0.85em;
-    margin-bottom: 10px;
-
-    span {
-        display: flex;
-        align-items: center;
-    }
-
-    svg {
-        margin-right: 5px;
-    }
+    align-items: center;
+    margin-bottom: 15px;
 `;
 
-const ButtonGroup = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-`;
-
-const ActionButton = styled.button`
-    background-color: transparent;
-    color: #3498db;
-    border: 1px solid #3498db;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s;
+const UserInfo = styled.div`
     display: flex;
     align-items: center;
+    gap: 5px;
+    color: #7f8c8d;
+    font-size: 0.9em;
 
     svg {
-        margin-right: 5px;
+        color: #95a5a6;
     }
+`;
 
-    &:hover {
-        background-color: #3498db;
-        color: white;
-    }
+const CommentDate = styled.span`
+    color: #95a5a6;
+    font-size: 0.85em;
+`;
+
+const CommentActions = styled.div`
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
 `;
 
 const AddCommentSection = styled.div`
     margin-top: 20px;
+    animation: ${fadeIn} 0.3s ease-out;
 `;
 
 const CommentTextArea = styled.textarea`
     width: 100%;
-    height: 100px;
-    padding: 10px;
-    border: 1px solid #ecf0f1;
-    border-radius: 4px;
+    height: 120px;
+    padding: 15px;
+    border: 2px solid #ecf0f1;
+    border-radius: 10px;
     resize: vertical;
     font-family: inherit;
     font-size: 1em;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+
+    &:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+        outline: none;
+    }
 `;
 
-const SubmitButton = styled.button`
+const CommentButtonGroup = styled.div`
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+`;
+
+const BaseButton = styled.button`
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    font-size: 0.9em;
+    border: none;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+`;
+
+const SubmitButton = styled(BaseButton)`
     background-color: #2ecc71;
     color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
 
     &:hover {
         background-color: #27ae60;
     }
 `;
 
-const CancelButton = styled(SubmitButton)`
+const CancelButton = styled(BaseButton)`
     background-color: #e74c3c;
+    color: white;
 
     &:hover {
         background-color: #c0392b;
     }
 `;
 
-const AddCommentButton = styled(SubmitButton)`
+const AddCommentButton = styled(BaseButton)`
     background-color: #3498db;
-    margin-top: 10px;
+    color: white;
+    margin-top: 15px;
+    width: 100%;
 
     &:hover {
         background-color: #2980b9;
@@ -389,9 +659,12 @@ const AddCommentButton = styled(SubmitButton)`
 `;
 
 const NoComments = styled.p`
+    text-align: center;
     color: #7f8c8d;
     font-style: italic;
-    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
 `;
 
 const NoBlogs = styled.p`
@@ -399,61 +672,50 @@ const NoBlogs = styled.p`
     color: #7f8c8d;
     font-style: italic;
     font-size: 1.2em;
+    padding: 40px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    margin-top: 30px;
 `;
 
 const LoadingSpinner = styled.div`
-    display: inline-block;
-    position: relative;
-    width: 80px;
-    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
 
-    div {
-        box-sizing: border-box;
-        display: block;
-        position: absolute;
-        width: 64px;
-        height: 64px;
-        margin: 8px;
-        border: 8px solid #3498db;
+    &:after {
+        content: '';
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
         border-radius: 50%;
-        animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-        border-color: #3498db transparent transparent transparent;
+        animation: spin 1s linear infinite;
     }
-    div:nth-child(1) {
-        animation-delay: -0.45s;
-    }
-    div:nth-child(2) {
-        animation-delay: -0.3s;
-    }
-    div:nth-child(3) {
-        animation-delay: -0.15s;
-    }
-    @keyframes lds-ring {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 `;
 
-const ErrorMessage = styled.p`
+const ErrorMessage = styled.div`
     text-align: center;
     color: #e74c3c;
-    font-size: 1.2em;
+    background-color: #fde8e7;
     padding: 20px;
-    background-color: #fadbd8;
-    border-radius: 8px;
-`;
+    border-radius: 10px;
+    margin: 20px 0;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 
-const AnonymousUserBadge = styled.span`
-    background-color: #95a5a6;
-    color: white;
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-size: 0.8em;
-    margin-left: 5px;
+    svg {
+        font-size: 1.5em;
+    }
 `;
 
 export default BlogListPage;

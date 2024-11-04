@@ -17,29 +17,25 @@ import PaymentRedirect from "./components/Payment/PaymentRedirect";
 import ProfilePage from "./components/Auth/ProfilePage";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Footer from "./components/Home/Footer";
-//import BottomNavBar from "./components/appbar/SnackBar";
 import BlogPostPage from "./components/Blog/BlogPostPage";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './styles/theme';
 import logoImage from '../src/images/medogram-logo.png';
 import DiabetesPredict from "./components/predictions/DiabetPredict";
-//import NotFound from './components/NotFound';
+import NotFound from './components/NotFound';
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);
-
     useEffect(() => {
         const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
         if (hasSeenSplash) {
             setShowSplash(false);
         }
     }, []);
-
     const handleSplashComplete = () => {
         setShowSplash(false);
         sessionStorage.setItem('hasSeenSplash', 'true');
     };
-
     return (
         <AuthProvider>
             <Router>
@@ -49,7 +45,6 @@ function App() {
                         <link rel="icon" type="image/png" href={logoImage} />
                         <meta name="description" content="Medogram - Your Medical Assistant" />
                     </Helmet>
-
                     {showSplash ? (
                         <SplashScreen onComplete={handleSplashComplete} />
                     ) : (
@@ -57,7 +52,8 @@ function App() {
                             <ThemeProvider theme={theme}>
                                 <Navbar logo={logoImage} />
                                 <Routes>
-                                    <Route path="*" element={<Home/>}/>
+                                    <Route path="/" element={<Home/>}/>
+                                    <Route path="*" element={<NotFound/>} />
                                     <Route path="/about" element={<About/>}/>
                                     <Route path="/contact" element={<Contact/>}/>
                                     <Route path="/login" element={<Login/>}/>
@@ -72,10 +68,7 @@ function App() {
                                     <Route path="/chat" element={<ChatPage/>}/>
 
                                 </Routes>
-
-                                {/* <Footer logo={logoImage} /> */}
                                 <Footer logo={logoImage} />
-                                {/* <BottomNavBar /> */}
                             </ThemeProvider>
                         </>
                     )}

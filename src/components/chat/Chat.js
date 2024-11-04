@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IoSend, IoHappyOutline, IoPersonCircleOutline, IoMoon, IoSunny, IoImage } from 'react-icons/io5';
 
 const lightTheme = {
-    background: '#f0f2f5',
-    headerBackground: '#128c7e',
+    background: '#f8f9fa',
+    headerBackground: '#075e54',
     headerText: 'white',
     userMessageBackground: '#dcf8c6',
     botMessageBackground: '#fff',
@@ -15,7 +15,6 @@ const lightTheme = {
     sendButtonColor: '#0e2806',
     sendButtonHoverColor: '#0e1f11',
     text: '#000',
-
 };
 
 const darkTheme = {
@@ -39,19 +38,22 @@ const ChatContainer = styled(motion.div)`
     max-width: 900px;
     margin: 0 auto;
     background-color: ${props => props.theme.background};
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    overflow: hidden;
     color: ${props => props.theme.text};
 `;
 
 const ChatHeader = styled.div`
     background-color: ${props => props.theme.headerBackground};
     color: ${props => props.theme.headerText};
-    padding: 1rem;
-    font-size: 1.2rem;
+    padding: 1.2rem;
+    font-size: 1.3rem;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const UserInfo = styled.div`
@@ -60,39 +62,38 @@ const UserInfo = styled.div`
 `;
 
 const UserName = styled.span`
-    margin-left: 0.5rem;
-    font-size: 1rem;
+    margin-left: 0.8rem;
+    font-size: 1.1rem;
 `;
 
 const MessageContainer = styled.div`
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
+    gap: 1rem;
 `;
 
 const MessageBubble = styled(motion.div)`
-    padding: 0.8rem 1rem;
-    border-radius: 18px;
-    margin-bottom: 0.5rem;
+    padding: 0.9rem 1.2rem;
+    border-radius: 20px;
+    margin-bottom: 0.8rem;
     max-width: 70%;
     word-wrap: break-word;
-    line-height: 1.4;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    line-height: 1.5;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     position: relative;
 `;
 
 const UserMessage = styled(MessageBubble)`
     align-self: flex-end;
     background-color: ${props => props.theme.userMessageBackground};
-    color: ${props => props.theme.text};
 `;
 
 const BotMessage = styled(MessageBubble)`
     align-self: flex-start;
     background-color: ${props => props.theme.botMessageBackground};
-    color: ${props => props.theme.text};
 `;
 
 const InputContainer = styled.div`
@@ -100,21 +101,24 @@ const InputContainer = styled.div`
     padding: 1rem;
     background-color: ${props => props.theme.headerBackground};
     align-items: center;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const InputField = styled.input`
     flex: 1;
-    padding: 0.8rem 1rem;
+    padding: 0.9rem 1.2rem;
     border: none;
     border-radius: 25px;
     font-size: 1rem;
     background-color: ${props => props.theme.inputBackground};
     color: ${props => props.theme.text};
-    transition: background-color 0.3s;
+    margin-right: 0.5rem;
+    transition: background-color 0.3s, box-shadow 0.3s;
 
     &:focus {
         outline: none;
         background-color: ${props => props.theme.inputFocusBackground};
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
     }
 `;
 
@@ -122,16 +126,17 @@ const SendButton = styled.button`
     background-color: transparent;
     border: none;
     color: ${props => props.theme.sendButtonColor};
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     cursor: pointer;
     padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.3s;
+    transition: color 0.3s, box-shadow 0.3s;
 
     &:hover {
         color: ${props => props.theme.sendButtonHoverColor};
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     }
 `;
 
@@ -149,7 +154,7 @@ const ThemeToggle = styled.button`
     background: none;
     border: none;
     color: ${props => props.theme.headerText};
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     cursor: pointer;
     padding: 0.5rem;
 `;
@@ -160,33 +165,34 @@ const Timestamp = styled.span`
     opacity: 0.7;
     position: absolute;
     bottom: -1.2rem;
-    right: 0.5rem;
+    right: 0.8rem;
 `;
 
 const TypingIndicator = styled.div`
     align-self: flex-start;
     background-color: ${props => props.theme.botMessageBackground};
     color: ${props => props.theme.text};
-    padding: 0.8rem 1rem;
-    border-radius: 18px;
-    margin-bottom: 0.5rem;
+    padding: 0.9rem 1.2rem;
+    border-radius: 20px;
     font-style: italic;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 `;
 
 const AttachmentButton = styled.button`
     background: none;
     border: none;
     color: ${props => props.theme.sendButtonColor};
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     cursor: pointer;
     padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.3s;
+    transition: color 0.3s, box-shadow 0.3s;
 
     &:hover {
         color: ${props => props.theme.sendButtonHoverColor};
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     }
 `;
 

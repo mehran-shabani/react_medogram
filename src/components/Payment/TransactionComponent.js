@@ -47,7 +47,7 @@ const ContentBox = styled(Box)(({ theme }) => ({
     boxShadow: 'inset 0 2px 10px rgba(0, 0, 0, 0.1)',
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButton = styled(Button)(() => ({
     borderRadius: 30,
     padding: '12px 30px',
     fontSize: '1.1rem',
@@ -92,7 +92,7 @@ const PaymentAmount = styled(Box)(({ theme }) => ({
     },
 }));
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
+const StyledTextField = styled(TextField)(() => ({
     '& .MuiOutlinedInput-root': {
         borderRadius: 12,
         transition: 'all 0.2s',
@@ -133,9 +133,9 @@ const TransactionComponent = () => {
             return;
         }
         if (value < 100000) {
-            setAmountError('حداقل مبلغ ۱۰۰,۰۰۰ تومان است');
+            setAmountError('حداقل مبلغ ۱۰۰,۰۰۰ ریال است');
         } else if (value > 5000000) {
-            setAmountError('حداکثر مبلغ ۵,۰۰۰,۰۰۰ تومان است');
+            setAmountError('حداکثر مبلغ ۵,۰۰۰,۰۰۰ ریال است');
         } else {
             setAmountError('');
         }
@@ -193,31 +193,29 @@ const TransactionComponent = () => {
                             <Typography variant="h6" gutterBottom align="center" color="textSecondary">
                                 مبلغ مورد نظر را انتخاب کنید
                             </Typography>
-                            <Box display="flex" flexWrap="wrap" justifyContent="center" mb={3}>
-                                {predefinedAmounts.map((preset) => (
-                                    <Zoom in={true} key={preset} style={{ transitionDelay: `${predefinedAmounts.indexOf(preset) * 100}ms` }}>
-                                        <AmountButton
-                                            variant={amount === preset ? "contained" : "outlined"}
-                                            color="primary"
-                                            onClick={() => handlePresetAmountClick(preset)}
-                                            className={amount === preset ? 'Mui-selected' : ''}
-                                        >
-                                            {formatAmount(preset)} تومان
-                                        </AmountButton>
-                                    </Zoom>
-                                ))}
-                            </Box>
+                            {predefinedAmounts.map((preset) => (
+                                <Zoom in={true} key={preset} style={{ transitionDelay: `${predefinedAmounts.indexOf(preset) * 100}ms` }}>
+                                    <AmountButton
+                                        variant={amount === preset ? "contained" : "outlined"}
+                                        color="primary"
+                                        onClick={() => handlePresetAmountClick(preset)}
+                                        className={amount === preset ? 'Mui-selected' : ''}
+                                    >
+                                        {formatAmount(preset)} ریال
+                                    </AmountButton>
+                                </Zoom>
+                            ))}
                             <StyledTextField
                                 fullWidth
-                                label="مبلغ دلخواه (تومان)"
+                                label="مبلغ دلخواه (ریال)"
                                 type="number"
                                 value={amount}
                                 onChange={handleAmountChange}
                                 error={Boolean(amountError)}
-                                helperText={amountError || "مبلغ باید بین ۱۰۰,۰۰۰ تا ۵,۰۰۰,۰۰۰ تومان باشد"}
+                                helperText={amountError || "مبلغ باید بین ۱۰۰,۰۰۰ تا ۵,۰۰۰,۰۰۰ ریال باشد"}
                                 InputProps={{
                                     endAdornment: (
-                                        <Tooltip title="مبلغ را به تومان وارد کنید" arrow placement="top">
+                                        <Tooltip title="مبلغ را به ریال وارد کنید" arrow placement="top">
                                             <IconButton size="small">
                                                 <HelpOutlineIcon color="primary" />
                                             </IconButton>
@@ -230,7 +228,7 @@ const TransactionComponent = () => {
                         <PaymentAmount>
                             <PaymentIcon style={{ marginRight: theme.spacing(1), fontSize: 28 }} />
                             <Typography variant="h5" style={{ fontWeight: 'bold' }}>
-                                مبلغ قابل پرداخت: {formatAmount(amount)} تومان
+                                مبلغ قابل پرداخت: {formatAmount(amount)}ریال
                             </Typography>
                         </PaymentAmount>
 
@@ -271,7 +269,7 @@ const TransactionComponent = () => {
                                     <SecurityBadge>
                                         <SecurityIcon color="success" />
                                         <Typography variant="body2">
-                                            تراکنش شما با پروتکل (اس اس ال) محافظت می‌شود
+                                            تراکنش شما با پروتکل (SSL) محافظت می‌شود.
                                         </Typography>
                                     </SecurityBadge>
                                 </Box>
@@ -280,7 +278,7 @@ const TransactionComponent = () => {
                             <Box textAlign="center" mt={2}>
                                 <LockIcon color="error" style={{ fontSize: 56, marginBottom: theme.spacing(2) }} />
                                 <Typography color="error" variant="h6" gutterBottom>
-                                    تایید حساب الزامی است
+                                    تایید حساب الزامی است.
                                 </Typography>
                                 <Typography color="textSecondary">
                                     لطفا برای ادامه، حساب کاربری خود را تایید کنید.
