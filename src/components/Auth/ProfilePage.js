@@ -7,15 +7,21 @@ import {
     Card, CardContent, CardActions, Divider, IconButton, Fade, Paper
 } from '@mui/material';
 import { styled } from '@mui/system';
-import { Edit, Save, Cancel, Person, AccountBalance } from '@mui/icons-material';
+import { Edit, Save, Cancel, AccountBalance } from '@mui/icons-material';
 import { AuthContext } from './AuthContext';
+import { generateGeometricAvatar } from './utils/AvatarGenerator';
+import { motion } from 'framer-motion';
 
 const StyledCard = styled(Card)(({ theme }) => ({
     maxWidth: 500,
     margin: '2rem auto',
     padding: theme.spacing(3),
-    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-    borderRadius: theme.shape.borderRadius * 2,
+    boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+    borderRadius: theme.shape.borderRadius * 3,
+    transition: 'transform 0.5s',
+    '&:hover': {
+        transform: 'scale(1.05)',
+    },
 }));
 
 const ProfileAvatar = styled(Avatar)(({ theme }) => ({
@@ -23,6 +29,9 @@ const ProfileAvatar = styled(Avatar)(({ theme }) => ({
     height: theme.spacing(15),
     margin: '0 auto',
     backgroundColor: theme.palette.primary.main,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
 }));
 
 const ProfileField = styled(Box)(({ theme }) => ({
@@ -40,6 +49,11 @@ const WalletPaper = styled(Paper)(({ theme }) => ({
     color: theme.palette.primary.contrastText,
     marginBottom: theme.spacing(2),
     borderRadius: theme.shape.borderRadius,
+    boxShadow: '0px 4px 10px rgba(0,0,0,0.15)',
+    transition: 'background-color 0.5s',
+    '&:hover': {
+        backgroundColor: theme.palette.secondary.light,
+    }
 }));
 
 const ProfilePage = () => {
@@ -122,16 +136,18 @@ const ProfilePage = () => {
         <Container maxWidth="sm">
             <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
             <Fade in={true} timeout={800}>
-                <StyledCard>
+                <StyledCard component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileHover={{ scale: 1.05 }}>
                     <CardContent>
-                        <ProfileAvatar>
-                            <Person fontSize="large" />
-                        </ProfileAvatar>
+                        <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 2, repeat: Infinity }}>
+                            <ProfileAvatar>
+                                {generateGeometricAvatar(profile.username)}
+                            </ProfileAvatar>
+                        </motion.div>
                         <Typography variant="h4" component="h1" align="center" gutterBottom sx={{ mt: 2 }}>
                             {profile.username}
                         </Typography>
                         <Divider sx={{ my: 2 }} />
-                        <WalletPaper elevation={3}>
+                        <WalletPaper elevation={3} component={motion.div} initial={{ scale: 0.8 }} animate={{ scale: 1 }} whileHover={{ scale: 1.1 }}>
                             <AccountBalance sx={{ mr: 1 }} />
                             <Typography variant="h6">
                                 موجودی کیف پول: 💵  ﷼ {walletAmount !== null ? walletAmount.toFixed(0) : 'N/A'}
@@ -179,10 +195,10 @@ const ProfilePage = () => {
                     <CardActions sx={{ justifyContent: 'center' }}>
                         {isEditing ? (
                             <>
-                                <IconButton color="primary" onClick={handleSubmit}>
+                                <IconButton color="primary" onClick={handleSubmit} component={motion.div} whileHover={{ scale: 1.2 }}>
                                     <Save />
                                 </IconButton>
-                                <IconButton color="secondary" onClick={() => setIsEditing(false)}>
+                                <IconButton color="secondary" onClick={() => setIsEditing(false)} component={motion.div} whileHover={{ scale: 1.2 }}>
                                     <Cancel />
                                 </IconButton>
                             </>
@@ -192,6 +208,8 @@ const ProfilePage = () => {
                                 color="primary"
                                 startIcon={<Edit />}
                                 onClick={() => setIsEditing(true)}
+                                component={motion.div}
+                                whileHover={{ scale: 1.1 }}
                             >
                                 ویرایش پروفایل
                             </Button>
