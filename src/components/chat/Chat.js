@@ -224,7 +224,7 @@ const ChatBot = () => {
             });
 
             if (!response.ok) {
-                throw new Error('مشکلی در دریافت اطلاعات کاربر پیش آمد');
+                thrw new Error('مشکلی در دریافت اطلاعات کاربر پیش آمد');
             }
 
             const data = await response.json();
