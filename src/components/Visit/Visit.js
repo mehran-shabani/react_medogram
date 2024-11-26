@@ -22,15 +22,15 @@ const symptomCategories = [
         label: 'علائم عمومی',
         key: 'general_symptoms',
         options: [
-            { value: 'fever', label: 'تب' },
-            { value: 'fatigue', label: 'خستگی' },
-            { value: 'weight_loss', label: 'کاهش وزن' },
+            { value: 'fever', label: 'تب و لرز' },
+            { value: 'fatigue', label: 'اسهال و استفراغ' },
+            { value: 'weight_loss', label: 'سر درد' },
             { value: 'appetite_loss', label: 'کاهش اشتها' },
-            { value: 'night_sweats', label: 'تعریق شبانه' },
-            { value: 'general_pain', label: 'درد عمومی' },
-            { value: 'swollen_lymph_nodes', label: 'تورم غدد لنفاوی' },
-            { value: 'chills', label: 'لرز' },
-            { value: 'malaise', label: 'احساس ناخوشی عمومی' },
+            { value: 'night_sweats', label: 'تنگی نفس' },
+            { value: 'general_pain', label: 'علائم سرماخوردگی' },
+            { value: 'swollen_lymph_nodes', label: 'بدن  درد' },
+            { value: 'chills', label: 'دندان درد' },
+            { value: 'malaise', label: 'نمیدونم مشکلم چیه!' },
         ],
     },
     {
@@ -142,7 +142,7 @@ const Visit = () => {
 
         const symptoms = symptomCategories.map((category) => formData[category.key]).filter(Boolean);
         if (symptoms.length === 0) {
-            toast.error('لطفا حداقل یک علامت را انتخاب کنید.');
+            toast.error('لطفا حداقل یک علامت عمومی انتخاب کنید.');
             return;
         }
 
@@ -203,10 +203,10 @@ const Visit = () => {
                             fullWidth
                             margin="normal"
                         >
-                            <MenuItem value="prescription">تجویز داروهای عمومی</MenuItem>
-                            <MenuItem value="diet">درمان تغذیه‌ای</MenuItem>
-                            <MenuItem value="addiction">درمان اعتیاد</MenuItem>
-                            <MenuItem value="online_consultation">مشاوره آنلاین</MenuItem>
+                            <MenuItem value="prescription">نسخه نویسی داروهای شما</MenuItem>
+                            <MenuItem value="diet">درخواست رژیم غذایی</MenuItem>
+                            <MenuItem value="addiction">ترک اعتیاد</MenuItem>
+                            <MenuItem value="online_consultation">مشاوره و ویزیت آنلاین</MenuItem>
                         </TextField>
                     </>
                 );

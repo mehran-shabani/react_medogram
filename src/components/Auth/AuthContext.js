@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
     const [isVerified, setIsVerified] = useState(false);
     const [token, setToken] = useState(null);
 
-    // Check for existing token on component mount
     useEffect(() => {
         const storedToken = localStorage.getItem('authToken');
         if (storedToken) {
