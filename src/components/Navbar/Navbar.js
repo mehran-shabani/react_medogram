@@ -187,7 +187,7 @@ const navItems = [
         ],
     },
     {
-        title: 'مدیریت و ویریت',
+        title: 'مدیریت و ویزیت',
         subItems: [
             { title: 'انجام ویزیت!', link: '/visits' },
             { title: ' پرداخت', link: '/payment-visit' },
