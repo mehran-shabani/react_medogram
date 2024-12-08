@@ -90,6 +90,7 @@ const NavLinks = styled(motion.div)`
     right: 0;
     height: 100vh;
     width: 300px;
+    direction: rtl;
     background-color: ${({ theme }) => theme.background};
     padding: 5rem 2rem;
     box-shadow: -2px 0 10px ${({ theme }) => theme.shadow};
