@@ -171,7 +171,7 @@ const TransactionComponent = () => {
 
     const incrementAmount = () => {
         setAmount((prev) => {
-            const newValue = Math.min(prev + 1000, 5000000);
+            const newValue = Math.min(prev + 10000, 5000000);
             handleSliderChange(null, newValue);
             return newValue;
         });
@@ -179,7 +179,7 @@ const TransactionComponent = () => {
 
     const decrementAmount = () => {
         setAmount((prev) => {
-            const newValue = Math.max(prev - 1000, 100000);
+            const newValue = Math.max(prev - 10000, 100000);
             handleSliderChange(null, newValue);
             return newValue;
         });
@@ -231,7 +231,7 @@ const TransactionComponent = () => {
                         <Box display="flex" alignItems="center" justifyContent="center" mb={4}>
                             <PaymentIcon style={{ fontSize: 40, color: theme.palette.primary.main, marginRight: 10 }} />
                             <Typography variant="h5" color="primary" style={{ fontWeight: 'bold', fontFamily: 'Roboto, sans-serif' }}>
-                                پرداخت امن
+                                سیستم پرداخت
                             </Typography>
                         </Box>
 
@@ -341,7 +341,7 @@ const TransactionComponent = () => {
                                     <SecurityBadge>
                                         <SecurityIcon color="success" />
                                         <Typography variant="body2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                                            تراکنش شما با پروتکل (SSL) محافظت می‌شود
+                                            (SSL) تراکنش شما با پروتکل  محافظت می‌شود
                                         </Typography>
                                     </SecurityBadge>
                                 </Box>

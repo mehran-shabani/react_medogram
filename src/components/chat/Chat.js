@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useContext, useCallback } from 'rea
 import styled, { ThemeProvider, keyframes } from 'styled-components';
 import { AuthContext } from '../Auth/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import {
     IoSend,
     IoHappyOutline,
@@ -15,11 +16,13 @@ import {
     IoVolumeHigh
 } from 'react-icons/io5';
 
+// Define animations
 const typingAnimation = keyframes`
-  0%, 100% { transform: translateY(0px) }
-  50% { transform: translateY(-2px) }
+    0%, 100% { transform: translateY(0px) }
+    50% { transform: translateY(-2px) }
 `;
 
+// Define themes
 const lightTheme = {
     background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
     headerBackground: 'linear-gradient(135deg, #075e54 0%, #128c7e 100%)',
@@ -54,12 +57,13 @@ const darkTheme = {
     shadowMedium: '0 6px 20px rgba(0, 0, 0, 0.4)',
 };
 
+// Styled components for different sections
 const ChatContainer = styled(motion.div)`
     display: flex;
     flex-direction: column;
     height: 100vh;
     width: 100%;
-    max-width: 1000px;
+    max-width: 600px;
     margin: 0 auto;
     background: ${props => props.theme.background};
     box-shadow: ${props => props.theme.shadowMedium};
@@ -82,18 +86,6 @@ const ChatHeader = styled.div`
     justify-content: space-between;
     box-shadow: ${props => props.theme.shadowLight};
     z-index: 10;
-
-    .logo-section {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 1.4rem;
-        font-weight: 600;
-
-        svg {
-            font-size: 1.8rem;
-        }
-    }
 `;
 
 const UserInfo = styled.div`
@@ -122,16 +114,6 @@ const MessageContainer = styled.div`
     flex-direction: column;
     gap: 1.5rem;
     scroll-behavior: smooth;
-    background-image: ${props => `url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23${props.theme.text.replace('#', '')}' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")`};
-
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-    }
 `;
 
 const MessageBubble = styled(motion.div)`
@@ -142,34 +124,6 @@ const MessageBubble = styled(motion.div)`
     line-height: 1.6;
     position: relative;
     box-shadow: ${props => props.theme.shadowLight};
-
-    .message-content {
-        margin-bottom: 0.5rem;
-    }
-
-    .message-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        opacity: 0.7;
-        font-size: 0.8rem;
-    }
-
-    .message-actions {
-        position: absolute;
-        right: -40px;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    &:hover .message-actions {
-        opacity: 1;
-    }
 `;
 
 const UserMessage = styled(MessageBubble)`
@@ -333,7 +287,7 @@ const ChatBot = () => {
         }
     ]);
     const [input, setInput] = useState('');
-    const [userName, setUserName] = useState('');
+    const [profile, setProfile] = useState({ username: '', email: '' });
     const [error, setError] = useState(null);
     const [isTyping, setIsTyping] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -341,31 +295,27 @@ const ChatBot = () => {
     const { token } = useContext(AuthContext);
 
     // Fetch user profile
-    const fetchUserProfile = useCallback(async () => {
+    const fetchProfile = useCallback(async () => {
         try {
-            const response = await fetch('https://api.medogram.ir/api/profile/', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
+            const [profileResponse] = await Promise.all([
+                axios.get('https://api.medogram.ir/api/profile/', {
+                    headers: { Authorization: `Bearer ${token}` },
+                }),
+            ]);
+
+            setProfile({
+                username: profileResponse.data.username,
+                email: profileResponse.data.email,
             });
-
-            if (!response.ok) {
-                throw new Error('مشکلی در دریافت اطلاعات کاربر پیش آمد');
-            }
-
-            const data = await response.json();
-            setUserName(data.name || 'کاربر');
         } catch (error) {
             console.error('خطا در دریافت اطلاعات کاربر:', error);
-            setUserName('کاربر');
+            setProfile({ username: 'کاربر', email: '' });
         }
     }, [token]);
 
     useEffect(() => {
-        fetchUserProfile();
-    }, [fetchUserProfile]);
+        fetchProfile();
+    }, [fetchProfile]);
 
     // Handle message sending
     const handleSendMessage = useCallback(async () => {
@@ -383,37 +333,19 @@ const ChatBot = () => {
             setIsTyping(true);
 
             try {
-                const response = await fetch('https://api.medogram.ir/api/chat/', {
-                    method: 'POST',
+                const response = await axios.post('https://api.medogram.ir/api/chat/', {
+                    message: input
+                }, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ message: input }),
                 });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    let errorMessage = 'مشکلی در پردازش درخواست شما به وجود آمد.';
-                    if (response.status === 400) {
-                        if (data.error === "Insufficient funds in BoxMoney.") {
-                            errorMessage = 'موجودی کافی برای ارسال پیام ندارید. لطفاً حساب BoxMoney خود را شارژ کنید.';
-                        } else if (data.error === "User message limit not set for this user.") {
-                            errorMessage = 'محدودیت پیام برای شما تنظیم نشده است. لطفاً با پشتیبانی تماس بگیرید.';
-                        } else if (data.error === "BoxMoney does not exist for this user.") {
-                            errorMessage = 'حساب BoxMoney شما تنظیم نشده است. لطفاً با پشتیبانی تماس بگیرید.';
-                        }
-                    }
-                    setError(errorMessage);
-                    setIsTyping(false);
-                    return;
-                }
 
                 setTimeout(() => {
                     setMessages(prev => [...prev, {
                         id: Date.now() + 1,
-                        text: data.bot_response,
+                        text: response.data.bot_response,
                         sender: 'bot',
                         timestamp: new Date().toLocaleTimeString(),
                     }]);
@@ -444,7 +376,6 @@ const ChatBot = () => {
 
     const handleCopyMessage = (text) => {
         navigator.clipboard.writeText(text);
-        // You can add a toast notification here
     };
 
     useEffect(() => {
@@ -467,7 +398,7 @@ const ChatBot = () => {
                     </div>
                     <UserInfo>
                         <IoPersonCircleOutline />
-                        <span>{userName}</span>
+                        <span>{profile.username}</span>
                         <ActionButton onClick={() => setIsDarkMode(!isDarkMode)}>
                             {isDarkMode ? <IoSunny /> : <IoMoon />}
                         </ActionButton>
@@ -517,7 +448,7 @@ const ChatBot = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder="پیام خود را تایپ کنید..."
+                        placeholder="پیام خود را اینجا تایپ کنید..."
                         rows={1}
                     />
                     <SendButton

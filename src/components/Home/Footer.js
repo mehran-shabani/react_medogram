@@ -1,8 +1,12 @@
+// noinspection JSRemoveUnnecessaryParentheses
+
 import React from 'react';
 import { Container, Box, Typography, Grid, Link as MuiLink, useTheme, useMediaQuery, Paper } from '@mui/material';
 import { motion } from 'framer-motion';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import RedditIcon from '@mui/icons-material/Reddit';
 import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import AndroidIcon from '@mui/icons-material/Android';
@@ -249,20 +253,70 @@ const Footer = () => {
                             icon={<WhatsAppIcon fontSize="large" />}
                             color="#25D366"
                         />
+                        <SocialLink
+                            href="https://www.reddit.com/u/medogram/s/t84wODnQId"
+                            icon={<RedditIcon fontSize="large" />}
+                            color="#FF4500"
+                        />
+                        <SocialLink
+                            href="https://x.com/dr_hossein24918"
+                            icon={<TwitterIcon fontSize="large" />}
+                            color="#1DA1F2"
+                        />
                     </Box>
                 </Box>
 
                 <Box sx={{ mt: 4, textAlign: 'center' }}>
                     <Grid container spacing={2} justifyContent="center">
                         <Grid item>
-                            <MuiLink href="https://trustseal.enamad.ir/?id=520504&Code=jdx3UPD8Cqkiw4vGO7mwQBuVLfP5ZsCG" target="_blank">
-                                <img src="https://trustseal.enamad.ir/logo.aspx?id=520504&Code=jdx3UPD8Cqkiw4vGO7mwQBuVLfP5ZsCG" alt="نماد اعتماد" style={{ height: 60 }} />
+                            <MuiLink
+                                href="https://trustseal.enamad.ir/?id=520504&Code=jdx3UPD8Cqkiw4vGO7mwQBuVLfP5ZsCG"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <img
+                                    src="https://trustseal.enamad.ir/logo.aspx?id=520504&Code=jdx3UPD8Cqkiw4vGO7mwQBuVLfP5ZsCG"
+                                    alt="نماد اعتماد"
+                                    style={{ height: 60 }}
+                                />
                             </MuiLink>
                         </Grid>
                         <Grid item>
-                            <MuiLink href="https://bitpay.ir/certificate-671591-medogram.ir" target="_blank">
-                                <img src="https://bitpay.ir/theme/public/images/trusted-logo.svg" alt="درگاه پرداخت" style={{ height: 60 }} />
+                            <MuiLink
+                                href="https://bitpay.ir/certificate-671591-medogram.ir"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <img
+                                    src="https://bitpay.ir/theme/public/images/trusted-logo.svg"
+                                    alt="درگاه پرداخت"
+                                    style={{ height: 60 }}
+                                />
                             </MuiLink>
+                        </Grid>
+                        <Grid item>
+                            <Box
+                                component="img"
+                                referrerPolicy="origin"
+                                id="rgvjjzpejxlzsizpesgtrgvj"
+                                src="https://logo.samandehi.ir/logo.aspx?id=371903&p=qftiyndtnbpdbsiylymaqfti"
+                                alt="نماد ساماندهی"
+                                sx={{
+                                    height: 60,
+                                    cursor: 'pointer',
+                                    transition: 'transform 0.3s ease',
+                                    '&:hover': {
+                                        transform: 'scale(1.05)'
+                                    }
+                                }}
+                                onClick={() =>
+                                    window.open(
+                                        'https://logo.samandehi.ir/Verify.aspx?id=371903&p=xlaojyoerfthpfvlobpdxlao',
+                                        'Popup',
+                                        'toolbar=no, scrollbars=no, location=no, statusbar=no, menubar=no, resizable=0, width=450, height=630, top=30'
+                                    )
+                                }
+                            />
                         </Grid>
                     </Grid>
                 </Box>
@@ -277,7 +331,7 @@ const Footer = () => {
                         pt: 4
                     }}
                 >
-                    © {new Date().getFullYear()} مدوگرام - تمامی حقوق محفوظ است
+                    © {new Date().getFullYear()} Medogram - All rights reserved.
                 </Typography>
             </Container>
         </Box>

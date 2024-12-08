@@ -13,303 +13,279 @@ import {
     useMediaQuery,
     Checkbox,
     FormControlLabel,
+    Container as MuiContainer,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { motion } from 'framer-motion';
-import { Phone, Send, ExitToApp } from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Phone, Send, ExitToApp, Lock, MobileFriendly,  } from '@mui/icons-material';
 
-const Container = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(4),
-    maxWidth: 400,
-    margin: '100px auto',
-    textAlign: 'center',
-    borderRadius: 16,
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+const StyledContainer = styled(Paper)(({ theme }) => ({
+    padding: theme.spacing(6),
+    maxWidth: 480,
+    margin: '40px auto',
+    borderRadius: 32,
+    background: 'rgba(255, 255, 255, 0.95)',
+    backdropFilter: 'blur(10px)',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+    position: 'relative',
+    overflow: 'hidden',
+    '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '6px',
+        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    },
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
+    marginBottom: theme.spacing(3),
     '& .MuiOutlinedInput-root': {
-        '&:hover fieldset': {
-            borderColor: theme.palette.primary.main,
+        borderRadius: 16,
+        background: 'rgba(255, 255, 255, 0.8)',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+            background: 'rgba(255, 255, 255, 0.95)',
+            transform: 'translateY(-2px)',
         },
-        '&.Mui-focused fieldset': {
-            borderColor: theme.palette.primary.main,
+        '&.Mui-focused': {
+            background: '#ffffff',
+            transform: 'translateY(-2px)',
         },
     },
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
+const ActionButton = styled(Button)(({ theme }) => ({
     borderRadius: 25,
-    padding: '10px 0',
-    fontWeight: 'bold',
+    padding: '12px 24px',
+    fontSize: '1.1rem',
+    textTransform: 'none',
+    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
     transition: 'all 0.3s ease',
     '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        transform: 'translateY(-3px)',
+        boxShadow: `0 8px 24px ${theme.palette.primary.main}40`,
+    },
+    '&:active': {
+        transform: 'translateY(-1px)',
     },
 }));
 
-const VerificationCodeInput = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'center',
-    marginBottom: theme.spacing(2),
-}));
-
-const DigitInput = styled(TextField)(({ theme }) => ({
-    width: '240px',
+const CodeInput = styled(StyledTextField)(() => ({
     '& input': {
+        fontSize: '1.6rem',
+        letterSpacing: '0.3em',
         textAlign: 'center',
-        fontSize: '1.5rem',
-        letterSpacing: '0.5em',
-    },
-}));
+        fontFamily: 'monospace',
+        caretColor: 'transparent',
 
-const LogoutButton = styled(Button)(({ theme }) => ({
-    borderRadius: 25,
-    padding: '10px 20px',
-    fontWeight: 'bold',
-    transition: 'all 0.3s ease',
-    backgroundColor: theme.palette.error.main,
-    color: theme.palette.error.contrastText,
-    '&:hover': {
-        backgroundColor: theme.palette.error.dark,
-        transform: 'translateY(-2px)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
     },
 }));
 
 const Auth = () => {
+    const [state, setState] = useState({
+        loading: false,
+        codeSent: false,
+        timer: 60,
+        canResend: false,
+        phoneNumber: '',
+        authCode: '',
+        agreeToTerms: false,
+    });
+
     const navigate = useNavigate();
     const { registerUser, verifyUser, isVerified, logout } = useContext(AuthContext);
-    const [loading, setLoading] = useState(false);
-    const [codeSent, setCodeSent] = useState(false);
-    const [timer, setTimer] = useState(60);
-    const [canResend, setCanResend] = useState(false);
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [authCode, setAuthCode] = useState('');
-    const [agreeToTerms, setAgreeToTerms] = useState(false);
-
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     useEffect(() => {
         let interval;
-        if (codeSent && timer > 0) {
+        if (state.codeSent && state.timer > 0) {
             interval = setInterval(() => {
-                setTimer((prev) => prev - 1);
+                setState(prev => ({ ...prev, timer: prev.timer - 1 }));
             }, 1000);
-        } else if (timer === 0) {
-            setCanResend(true);
-            clearInterval(interval);
+        } else if (state.timer === 0) {
+            setState(prev => ({ ...prev, canResend: true }));
         }
         return () => clearInterval(interval);
-    }, [codeSent, timer]);
+    }, [state.codeSent, state.timer]);
 
     const handleSendCode = async () => {
-        const phoneNumberRegex = /^09\d{9}$/;
-
-        if (!phoneNumberRegex.test(phoneNumber)) {
-            toast.error('شماره تلفن نامعتبر است. باید با 09 شروع شود و 11 رقم داشته باشد.');
+        if (!/^09\d{9}$/.test(state.phoneNumber)) {
+            toast.error('شماره موبایل باید با 09 شروع شود و 11 رقم باشد');
             return;
         }
 
-        setLoading(true);
+        setState(prev => ({ ...prev, loading: true }));
         try {
-            await registerUser(phoneNumber);
-            setCodeSent(true);
-            setTimer(60);
-            setCanResend(false);
-            toast.success('کد تایید ارسال شد!');
+            await registerUser(state.phoneNumber);
+            setState(prev => ({
+                ...prev,
+                codeSent: true,
+                timer: 60,
+                canResend: false,
+            }));
+            toast.success('کد تایید ارسال شد');
         } catch (error) {
-            toast.error('خطا در ارسال کد تایید');
+            toast.error('خطا در ارسال کد');
         } finally {
-            setLoading(false);
+            setState(prev => ({ ...prev, loading: false }));
         }
     };
 
     const handleVerifyCode = async () => {
-        if (!agreeToTerms) {
-            toast.error('لطفا قوانین و مقررات را بپذیرید.');
+        if (!state.agreeToTerms) {
+            toast.error('لطفا قوانین و مقررات را مطالعه کنید و تیک آبی رو بزنید.');
             return;
         }
 
-        setLoading(true);
+        if (state.authCode.length !== 6) {
+            toast.error('کد تایید باید 6 رقمی باشد');
+            return;
+        }
+
+        setState(prev => ({ ...prev, loading: true }));
         try {
-            await verifyUser(phoneNumber, authCode);
-            toast.success('تایید موفقیت‌آمیز بود!');
+            await verifyUser(state.phoneNumber, state.authCode);
+            toast.success('ورود موفقیت‌آمیز');
             navigate('/');
         } catch (error) {
-            if (error.response && error.response.data && error.response.data.message) {
-                toast.error(error.response.data.message);
-            } else {
-                toast.error('کد تایید نامعتبر است');
-            }
+            toast.error(error.response?.data?.message || 'کد نامعتبر است');
         } finally {
-            setLoading(false);
+            setState(prev => ({ ...prev, loading: false }));
         }
-    };
-
-    const handleAuthCodeChange = (e) => {
-        const value = e.target.value.replace(/\D/g, '');
-        if (value.length <= 6) {
-            setAuthCode(value);
-        }
-    };
-
-    const handleLogout = () => {
-        logout();
-        toast.success('با موفقیت خارج شدید');
-        navigate('/');
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
-            <Container elevation={3}>
-                <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
-                    {isVerified ? 'پروفایل کاربر' : (codeSent ? 'تایید کد' : 'احراز هویت')}
-                </Typography>
-
-                {isVerified ? (
-                    <Box sx={{ mt: 3 }}>
-                        <Typography variant="body1" gutterBottom>
-                            شما با موفقیت وارد شده‌اید.
-                        </Typography>
+        <MuiContainer maxWidth="sm">
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+            >
+                <StyledContainer>
+                    <AnimatePresence mode="wait">
                         <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                        >
-                            <LogoutButton
-                                variant="contained"
-                                fullWidth
-                                onClick={handleLogout}
-                                sx={{ mt: 2 }}
-                                endIcon={<ExitToApp />}
-                            >
-                                خروج
-                            </LogoutButton>
-                        </motion.div>
-                    </Box>
-                ) : (
-                    <Box
-                        component="form"
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            codeSent ? handleVerifyCode() : handleSendCode();
-                        }}
-                        sx={{ mt: 3 }}
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, x: -50 }}
+                            key={isVerified ? 'profile' : (state.codeSent ? 'verify' : 'phone')}
+                            initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2, duration: 0.5 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
                         >
-                            <StyledTextField
-                                label="شماره تلفن"
-                                variant="outlined"
-                                fullWidth
-                                value={phoneNumber}
-                                onChange={(e) => setPhoneNumber(e.target.value)}
-                                disabled={codeSent}
-                                sx={{ mb: 2 }}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Phone color="primary" />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                            />
-                        </motion.div>
+                            <Box textAlign="center" mb={4}>
+                                {isVerified ? <MobileFriendly sx={{ fontSize: 48, color: 'primary.main' }} /> :
+                                    (state.codeSent ? <Lock sx={{ fontSize: 48, color: 'primary.main' }} /> :
+                                        <Phone sx={{ fontSize: 48, color: 'primary.main' }} />)}
+                                <Typography variant="h4" fontWeight="bold" mt={2}>
+                                    {isVerified ? 'خوش آمدید' :
+                                        (state.codeSent ? 'تایید کد' : 'ورود به حساب')}
+                                </Typography>
+                            </Box>
 
-                        {codeSent && (
-                            <motion.div
-                                initial={{ opacity: 0, x: 50 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.4, duration: 0.5 }}
-                            >
-                                <VerificationCodeInput>
-                                    <DigitInput
-                                        variant="outlined"
-                                        value={authCode}
-                                        onChange={handleAuthCodeChange}
-                                        inputProps={{
-                                            maxLength: 6,
-                                            pattern: '[0-9]*',
-                                            inputMode: 'numeric',
-                                        }}
-                                        placeholder="------"
-                                    />
-                                </VerificationCodeInput>
-                            </motion.div>
-                        )}
-
-                        {codeSent && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6, duration: 0.5 }}
-                            >
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={agreeToTerms}
-                                            onChange={(e) => setAgreeToTerms(e.target.checked)}
-                                            color="primary"
-                                        />
-                                    }
-                                    label={
-                                        <Typography variant="body2">
-                                            من <Link to="/excluded-services" target="_blank">قوانین و مقررات</Link> را می‌پذیرم
-                                        </Typography>
-                                    }
-                                />
-                            </motion.div>
-                        )}
-
-                        <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                        >
-                            <StyledButton
-                                type="submit"
-                                variant="contained"
-                                fullWidth
-                                disabled={loading || (codeSent && authCode.length !== 6)}
-                                sx={{ mt: 2 }}
-                                endIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
-                            >
-                                {loading ? 'در حال پردازش...' : (codeSent ? 'تایید کد' : 'ارسال کد')}
-                            </StyledButton>
-                        </motion.div>
-
-                        {codeSent && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.8, duration: 0.5 }}
-                            >
-                                <Button
-                                    variant="text"
+                            {isVerified ? (
+                                <ActionButton
                                     fullWidth
-                                    sx={{ mt: 2 }}
-                                    onClick={handleSendCode}
-                                    disabled={!canResend}
+                                    variant="contained"
+                                    onClick={() => {
+                                        logout();
+                                        toast.success('خروج موفقیت‌آمیز');
+                                        navigate('/');
+                                    }}
+                                    endIcon={<ExitToApp />}
                                 >
-                                    {canResend ? 'ارسال مجدد کد' : `ارسال مجدد کد در ${timer} ثانیه`}
-                                </Button>
-                            </motion.div>
-                        )}
-                    </Box>
-                )}
-            </Container>
-            <ToastContainer position={isMobile ? "bottom-center" : "top-right"} />
-        </motion.div>
+                                    خروج از حساب
+                                </ActionButton>
+                            ) : (
+                                <Box component="form" onSubmit={(e) => {
+                                    e.preventDefault();
+                                    state.codeSent ? handleVerifyCode() : handleSendCode();
+                                }}>
+                                    <StyledTextField
+                                        fullWidth
+                                        label="شماره موبایل"
+                                        value={state.phoneNumber}
+                                        onChange={(e) => setState(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                                        disabled={state.codeSent}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Phone color="primary" />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+
+                                    {state.codeSent && (
+                                        <>
+                                            <CodeInput
+                                                fullWidth
+                                                value={state.authCode}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.replace(/\D/g, '');
+                                                    if (value.length <= 6) {
+                                                        setState(prev => ({ ...prev, authCode: value }));
+                                                    }
+                                                }}
+                                                placeholder="------"
+                                                sx={{ mb: 6 }}
+                                            />
+
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        checked={state.agreeToTerms}
+                                                        onChange={(e) => setState(prev => ({ ...prev, agreeToTerms: e.target.checked }))}
+                                                    />
+                                                }
+                                                label={
+                                                    <Typography variant="body2" style={{
+                                                        direction: "rtl", justifyContent: 'center', alignItems: 'center' }}>
+                                                        <Link to="/terms" style={{ color: theme.palette.primary.main,}}>
+                                                            قوانین و مقررات
+                                                        </Link> را می‌پذیرم
+                                                    </Typography>
+                                                }
+                                            />
+                                        </>
+                                    )}
+
+                                    <ActionButton
+                                        type="submit"
+                                        fullWidth
+                                        variant="contained"
+                                        disabled={state.loading || (state.codeSent && state.authCode.length !== 6)}
+                                        endIcon={state.loading ? <CircularProgress size={24} /> : <Send />}
+                                    >
+                                        {state.loading ? 'لطفا صبر کنید...' :
+                                            (state.codeSent ? 'تایید کد' : 'دریافت کد')}
+                                    </ActionButton>
+
+                                    {state.codeSent && (
+                                        <Button
+                                            fullWidth
+                                            sx={{ mt: 2 }}
+                                            disabled={!state.canResend}
+                                            onClick={handleSendCode}
+                                        >
+                                            {state.canResend ? 'ارسال مجدد کد' :
+                                                `ارسال مجدد کد تا ${state.timer} ثانیه دیگر`}
+                                        </Button>
+                                    )}
+                                </Box>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </StyledContainer>
+            </motion.div>
+            <ToastContainer
+                position={isMobile ? "bottom-center" : "top-right"}
+                theme="colored"
+            />
+        </MuiContainer>
     );
 };
 

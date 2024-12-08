@@ -1,50 +1,52 @@
 export const generateGeometricAvatar = (username) => {
-    // Hash generation functions
     const hashCode = (str) => {
         return str.split('').reduce((acc, char, index) => {
             return char.charCodeAt(0) + ((acc << 5) - acc) + index;
         }, 0);
     };
-
-    const intToRGB = (i) => {
-        const c = (i & 0x00FFFFFF).toString(16).toUpperCase();
-        return "00000".substring(0, 6 - c.length) + c;
-    };
-
-    // Generate multiple colors based on username
     const generateColors = (baseHash) => {
-        const colors = [];
-        for (let i = 0; i < 3; i++) {
-            const newHash = (baseHash * (i + 1)) % 16777215; // 16777215 = FFFFFF in decimal
-            colors.push(`#${intToRGB(newHash)}`);
-        }
-        return colors;
+        const hue = baseHash % 360;
+        return [
+            `hsl(${hue}, 70%, 45%)`,                    // رنگ اصلی
+            `hsl(${(hue + 30) % 360}, 60%, 50%)`,      // رنگ ثانویه
+            `hsl(${(hue + 60) % 360}, 50%, 55%)`       // رنگ مکمل
+        ];
     };
 
-    // Generate random patterns based on username
-    const generatePatterns = (hash) => {
-        const patterns = [];
-        const numPatterns = (hash % 5) + 3; // 3-7 patterns
-
-        for (let i = 0; i < numPatterns; i++) {
-            const patternHash = (hash * (i + 1)) % 100;
-            patterns.push(patternHash);
+    // تولید نقاط فیبوناچی
+    const generateFibonacciPoints = (count, scale = 1) => {
+        const PHI = (1 + Math.sqrt(5)) / 2;
+        const points = [];
+        for (let i = 0; i < count; i++) {
+            const theta = i * PHI * 2 * Math.PI;
+            const r = Math.sqrt(i) * scale;
+            const x = 50 + r * Math.cos(theta);
+            const y = 50 + r * Math.sin(theta);
+            points.push({ x, y });
         }
-        return patterns;
+        return points;
+    };
+
+    const generateMandalaPattern = (segments, radius) => {
+        let path = '';
+        for (let i = 0; i < segments; i++) {
+            const angle = (i * 360) / segments;
+            const x = radius * Math.cos((angle * Math.PI) / 180);
+            const y = radius * Math.sin((angle * Math.PI) / 180);
+            const control1x = radius * 0.5 * Math.cos(((angle + 30) * Math.PI) / 180);
+            const control1y = radius * 0.5 * Math.sin(((angle + 30) * Math.PI) / 180);
+            const control2x = radius * 0.5 * Math.cos(((angle - 30) * Math.PI) / 180);
+            const control2y = radius * 0.5 * Math.sin(((angle - 30) * Math.PI) / 180);
+
+            path += `M 50 50 C ${50 + control1x} ${50 + control1y}, ${50 + control2x} ${50 + control2y}, ${50 + x} ${50 + y}`;
+        }
+        return path;
     };
 
     const hash = hashCode(username);
-    const [primaryColor, secondaryColor, accentColor] = generateColors(hash);
-    const patterns = generatePatterns(hash);
-
-    // Calculate positions and sizes based on hash
-    const calculatePosition = (index, total) => {
-        const angle = (360 / total) * index;
-        const radius = 25;
-        const x = 50 + radius * Math.cos((angle * Math.PI) / 180);
-        const y = 50 + radius * Math.sin((angle * Math.PI) / 180);
-        return { x, y };
-    };
+    const colors = generateColors(hash);
+    const fiboPoints = generateFibonacciPoints(8, 3);
+    const mandalaSegments = 8 + (hash % 6) * 2;
 
     return (
         <svg
@@ -53,113 +55,78 @@ export const generateGeometricAvatar = (username) => {
             viewBox="0 0 100 100"
             xmlns="http://www.w3.org/2000/svg"
         >
-            {/* Background */}
             <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{ stopColor: primaryColor, stopOpacity: 1 }} />
-                    <stop offset="100%" style={{ stopColor: secondaryColor, stopOpacity: 1 }} />
-                </linearGradient>
+                <radialGradient id="backgroundGradient">
+                    <stop offset="0%" style={{ stopColor: colors[0], stopOpacity: 0.9 }} />
+                    <stop offset="100%" style={{ stopColor: colors[1], stopOpacity: 0.7 }} />
+                </radialGradient>
 
-                {/* Pattern definitions */}
-                <pattern id="pattern1" patternUnits="userSpaceOnUse" width="10" height="10">
-                    <circle cx="5" cy="5" r="1" fill={accentColor} />
-                </pattern>
-
-                <filter id="shadow">
-                    <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
-                    <feOffset dx="0" dy="1" />
-                    <feComponentTransfer>
-                        <feFuncA type="linear" slope="0.3" />
-                    </feComponentTransfer>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur" />
                     <feMerge>
-                        <feMergeNode />
+                        <feMergeNode in="coloredBlur" />
                         <feMergeNode in="SourceGraphic" />
                     </feMerge>
                 </filter>
             </defs>
 
-            {/* Base background */}
-            <rect width="100" height="100" fill="url(#gradient)" />
+            {/* پس‌زمینه */}
+            <rect width="100" height="100" fill="url(#backgroundGradient)" />
 
-            {/* Pattern overlay */}
-            <rect width="100" height="100" fill="url(#pattern1)" opacity="0.1" />
-
-            {/* Central design */}
-            <g filter="url(#shadow)">
-                <circle cx="50" cy="50" r="30" fill={secondaryColor} opacity="0.8" />
-                {patterns.map((pattern, index) => {
-                    const { x, y } = calculatePosition(index, patterns.length);
-                    const size = (pattern % 10) + 5;
-                    const rotation = pattern * 20;
-
-                    return (
-                        <g key={index} transform={`rotate(${rotation}, ${x}, ${y})`}>
-                            <circle
-                                cx={x}
-                                cy={y}
-                                r={size}
-                                fill={accentColor}
-                                opacity="0.8"
-                            />
-                            <path
-                                d={`M ${x} ${y - size} L ${x + size} ${y + size} L ${x - size} ${y + size} Z`}
-                                fill={primaryColor}
-                                opacity="0.6"
-                            />
-                        </g>
-                    );
-                })}
+            {/* الگوی ماندالا */}
+            <g filter="url(#glow)">
+                <path
+                    d={generateMandalaPattern(mandalaSegments, 35)}
+                    fill="none"
+                    stroke={colors[2]}
+                    strokeWidth="0.5"
+                    opacity="0.8"
+                />
             </g>
 
-            {/* Decorative elements */}
-            <circle cx="50" cy="50" r="35"
-                    fill="none"
-                    stroke={accentColor}
-                    strokeWidth="0.5"
-                    strokeDasharray="3,3" />
+            {/* نقاط فیبوناچی */}
+            {fiboPoints.map((point, index) => (
+                <circle
+                    key={index}
+                    cx={point.x}
+                    cy={point.y}
+                    r={1.5}
+                    fill={colors[2]}
+                    opacity="0.6"
+                />
+            ))}
 
-            {/* Initial letter (optional) */}
-            {username && (
+            {/* حلقه‌های مرکزی */}
+            {[1, 2].map((ring, index) => (
+                <circle
+                    key={`ring-${index}`}
+                    cx="50"
+                    cy="50"
+                    r={20 + ring * 10}
+                    fill="none"
+                    stroke={colors[1]}
+                    strokeWidth="0.2"
+                    opacity="0.3"
+                />
+            ))}
+
+            {/* حرف مرکزی */}
+            <g filter="url(#glow)">
                 <text
                     x="50"
                     y="55"
                     textAnchor="middle"
-                    fontSize="20"
+                    fontSize="24"
                     fontFamily="Arial, sans-serif"
-                    fill="#fff"
-                    filter="url(#shadow)"
+                    fill="#FFFFFF"
+                    style={{
+                        textTransform: 'uppercase',
+                        fontWeight: 'bold',
+                    }}
                 >
-                    {username.charAt(0).toUpperCase()}
+                    {username.charAt(0)}
                 </text>
-            )}
-
-            {/* Additional geometric shapes based on username */}
-            {patterns.map((pattern, index) => {
-                const angle = (360 / patterns.length) * index;
-                const radius = 40;
-                const x = 50 + radius * Math.cos((angle * Math.PI) / 180);
-                const y = 50 + radius * Math.sin((angle * Math.PI) / 180);
-                const size = (pattern % 5) + 2;
-
-                return (
-                    <g key={`shape-${index}`}>
-                        <circle
-                            cx={x}
-                            cy={y}
-                            r={size}
-                            fill={primaryColor}
-                            opacity="0.3"
-                        >
-                            <animate
-                                attributeName="r"
-                                values={`${size};${size + 1};${size}`}
-                                dur="2s"
-                                repeatCount="indefinite"
-                            />
-                        </circle>
-                    </g>
-                );
-            })}
+            </g>
         </svg>
     );
 };
