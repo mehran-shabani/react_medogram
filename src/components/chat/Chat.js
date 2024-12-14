@@ -15,14 +15,15 @@ import {
     IoWarning,
     IoVolumeHigh
 } from 'react-icons/io5';
+import Tesseract from 'tesseract.js';
 
-// Define animations
+// تعریف انیمیشن‌ها
 const typingAnimation = keyframes`
     0%, 100% { transform: translateY(0px) }
     50% { transform: translateY(-2px) }
 `;
 
-// Define themes
+// تعریف تم‌ها
 const lightTheme = {
     background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
     headerBackground: 'linear-gradient(135deg, #075e54 0%, #128c7e 100%)',
@@ -57,7 +58,7 @@ const darkTheme = {
     shadowMedium: '0 6px 20px rgba(0, 0, 0, 0.4)',
 };
 
-// Styled components for different sections
+// استایل‌های کامپوننت‌ها
 const ChatContainer = styled(motion.div)`
     display: flex;
     flex-direction: column;
@@ -250,6 +251,45 @@ const TypingIndicator = styled.div`
     }
 `;
 
+// استایل‌های جدید برای دکمه آپلود تصویر
+const UploadButton = styled.label`
+    background: none;
+    border: none;
+    color: ${props => props.theme.sendButtonColor};
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+
+    &:hover {
+        color: ${props => props.theme.sendButtonHoverColor};
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    input {
+        display: none;
+    }
+`;
+
+const ExtractedTextBubble = styled(MessageBubble)`
+    background-color: #e0f7fa;
+    margin-top: 10px;
+`;
+
+const ProcessingBubble = styled(MessageBubble)`
+    background-color: #ffcccb;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+`;
+
+// کامپوننت پیام
 const Message = ({ message, onTextToSpeech, onCopy }) => {
     const MessageComponent = message.sender === 'user' ? UserMessage : BotMessage;
 
@@ -277,6 +317,7 @@ const Message = ({ message, onTextToSpeech, onCopy }) => {
     );
 };
 
+// کامپوننت اصلی چت بات
 const ChatBot = () => {
     const [messages, setMessages] = useState([
         {
@@ -291,10 +332,13 @@ const ChatBot = () => {
     const [error, setError] = useState(null);
     const [isTyping, setIsTyping] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [image, setImage] = useState(null);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [ocrText, setOcrText] = useState("");
     const messageContainerRef = useRef(null);
     const { token } = useContext(AuthContext);
 
-    // Fetch user profile
+    // دریافت پروفایل کاربر
     const fetchProfile = useCallback(async () => {
         try {
             const [profileResponse] = await Promise.all([
@@ -317,7 +361,7 @@ const ChatBot = () => {
         fetchProfile();
     }, [fetchProfile]);
 
-    // Handle message sending
+    // تابع ارسال پیام
     const handleSendMessage = useCallback(async () => {
         if (input.trim()) {
             const userMessage = {
@@ -359,6 +403,7 @@ const ChatBot = () => {
         }
     }, [input, token]);
 
+    // تابع مدیریت فشردن کلید
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -366,6 +411,7 @@ const ChatBot = () => {
         }
     };
 
+    // تابع تبدیل متن به گفتار
     const handleTextToSpeech = (text) => {
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(text);
@@ -374,15 +420,85 @@ const ChatBot = () => {
         }
     };
 
+    // تابع کپی کردن پیام
     const handleCopyMessage = (text) => {
         navigator.clipboard.writeText(text);
     };
 
+    // مدیریت اسکرول به انتهای پیام‌ها
     useEffect(() => {
         if (messageContainerRef.current) {
             messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
         }
     }, [messages, isTyping]);
+
+    // تابع آپلود تصویر
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImage(URL.createObjectURL(file)); // نمایش تصویر آپلود شده
+            extractTextFromImage(file);
+        }
+    };
+
+    // تابع استخراج متن از تصویر با استفاده از Tesseract.js
+    const extractTextFromImage = (imageFile) => {
+        setIsProcessing(true);
+        Tesseract.recognize(
+            imageFile,
+            'fas', // کد زبان فارسی
+            {
+                logger: (m) => console.log(m), // لاگ کردن پیشرفت (اختیاری)
+            }
+        ).then(({ data: { text } }) => {
+            setOcrText(text);
+            setIsProcessing(false);
+        }).catch(error => {
+            console.error('خطا در OCR:', error);
+            setError('استخراج متن از تصویر با مشکل مواجه شد.');
+            setIsProcessing(false);
+        });
+    };
+
+    // تابع ارسال پیام حاوی متن استخراج شده
+    const handleSendOcrText = () => {
+        if (ocrText.trim()) {
+            const userMessage = {
+                id: Date.now(),
+                text: ocrText,
+                sender: 'user',
+                timestamp: new Date().toLocaleTimeString(),
+            };
+
+            setMessages(prev => [...prev, userMessage]);
+            setOcrText('');
+            setImage(null);
+            setError(null);
+            setIsTyping(true);
+
+            // ارسال پیام استخراج شده به بات
+            axios.post('https://api.medogram.ir/api/chat/', {
+                message: ocrText
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            }).then(response => {
+                setMessages(prev => [...prev, {
+                    id: Date.now() + 1,
+                    text: response.data.bot_response,
+                    sender: 'bot',
+                    timestamp: new Date().toLocaleTimeString(),
+                }]);
+                setIsTyping(false);
+            }).catch(error => {
+                console.error('خطا:', error);
+                setError('خطایی در ارسال پیام استخراج شده رخ داد.');
+                setIsTyping(false);
+            });
+        }
+    };
 
     return (
         <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
@@ -424,6 +540,30 @@ const ChatBot = () => {
                             <span></span>
                         </TypingIndicator>
                     )}
+
+                    {/* نمایش تصویر آپلود شده */}
+                    {image && !isProcessing && (
+                        <img src={image} alt="Uploaded" style={{ maxWidth: '100%', marginBottom: '10px', borderRadius: '10px' }} />
+                    )}
+
+                    {/* نمایش متن استخراج شده */}
+                    {ocrText && !isProcessing && (
+                        <ExtractedTextBubble>
+                            <strong>متن استخراج شده:</strong>
+                            <p>{ocrText}</p>
+                            <SendButton onClick={handleSendOcrText} disabled={isProcessing}>
+                                <IoSend />
+                            </SendButton>
+                        </ExtractedTextBubble>
+                    )}
+
+                    {/* نمایش وضعیت پردازش */}
+                    {isProcessing && (
+                        <ProcessingBubble>
+                            <IoWarning />
+                            <span>در حال پردازش تصویر...</span>
+                        </ProcessingBubble>
+                    )}
                 </MessageContainer>
 
                 {error && (
@@ -441,9 +581,17 @@ const ChatBot = () => {
                 )}
 
                 <InputContainer>
-                    <ActionButton onClick={() => console.log("Attachment clicked")}>
+                    {/* دکمه آپلود تصویر */}
+                    <UploadButton htmlFor="image-upload">
                         <IoImage />
-                    </ActionButton>
+                        <input
+                            type="file"
+                            id="image-upload"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                        />
+                    </UploadButton>
+
                     <InputField
                         value={input}
                         onChange={(e) => setInput(e.target.value)}

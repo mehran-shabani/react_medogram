@@ -58,7 +58,7 @@ const serviceCards = [
     {
         title: 'مشاوره آنلاین',
         icon: <MedicalServices sx={{ fontSize: 40 }} />,
-        description: 'دریافت مشاوره پزشکی تخصصی از راحتی خانه خود با پزشکان مجرب',
+        description: 'دریافت مشاوره پزشکی تخصصی به راحتی در خانه خودتان با پزشکان مجرب',
         color: '#2196f3',
     },
     {
@@ -70,7 +70,7 @@ const serviceCards = [
     {
         title: 'درمان شخصی‌سازی‌شده',
         icon: <Medication sx={{ fontSize: 40 }} />,
-        description: 'برنامه‌های درمانی اختصاصی مطابق با نیازها و شرایط خاص شما',
+        description: 'برنامه‌های درمانی اختصاصی مطابق با نیازها و شرایط خاص شما توسط به روزترین تکنولوژی دنیا',
         color: '#ff4081',
     },
 ];
@@ -145,13 +145,13 @@ const Home = () => {
                                     align="center"
                                     sx={{ mb: 6 }}
                                 >
-                                    تحولی نوین در مراقبت‌های پزشکی با تکنولوژی پیشرفته
+                                    تحولی نوین در مراقبت‌های پزشکی با تکنولوژی پیشرفته داده کاوی و آنالیز داده
                                 </Typography>
                             </motion.div>
 
                             <Grid container spacing={4} sx={{ mb: 8 }}>
                                 {serviceCards.map((card, index) => (
-                                    <Grid item xs={12} md={4} key={index}>
+                                    <Grid  item xs={12} md={4} key={index}>
                                         <motion.div
                                             variants={itemVariants}
                                             whileHover={{
@@ -197,8 +197,8 @@ const Home = () => {
                             </Grid>
 
                             <motion.div variants={itemVariants}>
-                                <Box sx={{ mb: 6, p: 3, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 4 }}>
-                                    <Typography variant="body1" paragraph align="center" sx={{ lineHeight: 1.8 }}>
+                                <Box sx={{ mb: 6, p: 3, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 4, direction: 'rtl' }}>
+                                    <Typography variant="body1"  align="center" sx={{ lineHeight: 1.8 }}>
                                         در مدوگرام، با ترکیب تخصص پزشکی و فناوری‌های نوین، خدمات درمانی با کیفیت را به شکلی نوآورانه و مقرون به صرفه ارائه می‌دهیم.
                                         با استفاده از هوش مصنوعی و پلتفرم دیجیتال ما، مراقبت‌های پزشکی شخصی‌سازی شده را تجربه کنید.
                                     </Typography>

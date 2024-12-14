@@ -188,7 +188,7 @@ const BlogListPage = () => {
                                 </PostDate>
                             </BlogHeader>
 
-                            <BlogTitle>{blog.title}</BlogTitle>
+                            <BlogTitle src={{direction:'center'}}>{blog.title}</BlogTitle>
 
                             {blog.image1 && (
                                 <ImageContainer>
@@ -314,6 +314,7 @@ const fadeIn = keyframes`
 const PageContainer = styled.div`
     max-width: 800px;
     margin: 0 auto;
+    direction: rtl;
     padding: 20px;
     font-family: 'Vazirmatn', sans-serif;
 
@@ -427,6 +428,7 @@ const ImageContainer = styled.div`
 const BlogImage = styled.img`
     width: 100%;
     height: 400px;
+    direction: rtl;
     object-fit: cover;
     transition: transform 0.3s ease;
     cursor: pointer;
@@ -442,6 +444,7 @@ const BlogImage = styled.img`
 
 const BlogTitle = styled.h2`
     color: #2c3e50;
+    direction: ltr;
     font-size: 1.8em;
     margin-bottom: 15px;
     line-height: 1.4;
@@ -454,6 +457,7 @@ const BlogTitle = styled.h2`
 
 const BlogContent = styled.p`
     color: #34495e;
+    direction: rtl;
     line-height: 1.8;
     font-size: 1.1em;
     margin: 20px 0;

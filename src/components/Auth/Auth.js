@@ -235,18 +235,21 @@ const Auth = () => {
                                             />
 
                                             <FormControlLabel
+                                                style={{ direction: "ltr", display: "flex", alignItems: "center" }}
                                                 control={
                                                     <Checkbox
                                                         checked={state.agreeToTerms}
-                                                        onChange={(e) => setState(prev => ({ ...prev, agreeToTerms: e.target.checked }))}
+                                                        onChange={(e) =>
+                                                            setState(prev => ({ ...prev, agreeToTerms: e.target.checked }))
+                                                        }
                                                     />
                                                 }
                                                 label={
-                                                    <Typography variant="body2" style={{
-                                                        direction: "rtl", justifyContent: 'center', alignItems: 'center' }}>
-                                                        <Link to="/terms" style={{ color: theme.palette.primary.main,}}>
-                                                            قوانین و مقررات
-                                                        </Link> را می‌پذیرم
+                                                    <Typography variant="body2" style={{ direction: "ltr" }}>
+                                                        <Link to="/terms" style={{ color: theme.palette.primary.main, textDecoration: "none", marginRight: 8 }}>
+                                                            Terms & Conditions
+                                                        </Link>
+                                                        را می‌پذیرم
                                                     </Typography>
                                                 }
                                             />
