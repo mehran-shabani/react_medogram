@@ -1,3 +1,4 @@
+// ChatBot.js
 import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
 import styled, { ThemeProvider, keyframes } from 'styled-components';
 import { AuthContext } from '../Auth/AuthContext';
@@ -16,6 +17,7 @@ import {
     IoVolumeHigh
 } from 'react-icons/io5';
 import Tesseract from 'tesseract.js';
+import ImageEditor from '../utils/ImageEditor'; // وارد کردن کامپوننت ImageEditor
 
 // تعریف انیمیشن‌ها
 const typingAnimation = keyframes`
@@ -162,7 +164,7 @@ const InputField = styled.textarea`
     min-height: 24px;
     max-height: 120px;
     transition: all 0.3s ease;
-    direction: rtl;
+    direction: ltr;
 
     &:focus {
         outline: none;
@@ -279,6 +281,9 @@ const UploadButton = styled.label`
 const ExtractedTextBubble = styled(MessageBubble)`
     background-color: #e0f7fa;
     margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 `;
 
 const ProcessingBubble = styled(MessageBubble)`
@@ -322,7 +327,7 @@ const ChatBot = () => {
     const [messages, setMessages] = useState([
         {
             id: 'welcome',
-            text: "سلام! من دستیار DocAI شما هستم. چطور می‌توانم امروز به شما در مسائل سلامتیتان کمک کنم؟",
+            text: "Hello! I'm your DocAI assistant. How can I help you with your health today?",
             sender: 'bot',
             timestamp: new Date().toLocaleTimeString(),
         }
@@ -332,10 +337,13 @@ const ChatBot = () => {
     const [error, setError] = useState(null);
     const [isTyping, setIsTyping] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const [image, setImage] = useState(null);
+    const [image, setImage] = useState(null); // مسیر تصویر آپلود شده
     const [isProcessing, setIsProcessing] = useState(false);
     const [ocrText, setOcrText] = useState("");
+    const [editableOcrText, setEditableOcrText] = useState("");
+    const [showImageEditor, setShowImageEditor] = useState(false); // نمایش ImageEditor
     const messageContainerRef = useRef(null);
+    const canvasRef = useRef(null);
     const { token } = useContext(AuthContext);
 
     // دریافت پروفایل کاربر
@@ -352,8 +360,8 @@ const ChatBot = () => {
                 email: profileResponse.data.email,
             });
         } catch (error) {
-            console.error('خطا در دریافت اطلاعات کاربر:', error);
-            setProfile({ username: 'کاربر', email: '' });
+            console.error('Error fetching user profile:', error);
+            setProfile({ username: 'User', email: '' });
         }
     }, [token]);
 
@@ -396,8 +404,8 @@ const ChatBot = () => {
                     setIsTyping(false);
                 }, 1000);
             } catch (error) {
-                console.error('خطا:', error);
-                setError('خطایی غیرمنتظره رخ داد. لطفاً بعداً دوباره تلاش کنید.');
+                console.error('Error:', error);
+                setError('An unexpected error occurred. Please try again later.');
                 setIsTyping(false);
             }
         }
@@ -415,7 +423,7 @@ const ChatBot = () => {
     const handleTextToSpeech = (text) => {
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'fa-IR';
+            utterance.lang = 'en-US'; // برای زبان انگلیسی
             window.speechSynthesis.speak(utterance);
         }
     };
@@ -437,40 +445,95 @@ const ChatBot = () => {
         const file = e.target.files[0];
         if (file) {
             setImage(URL.createObjectURL(file)); // نمایش تصویر آپلود شده
-            extractTextFromImage(file);
+            setShowImageEditor(true); // نمایش ImageEditor
         }
     };
 
-    // تابع استخراج متن از تصویر با استفاده از Tesseract.js
-    const extractTextFromImage = (imageFile) => {
-        setIsProcessing(true);
-        Tesseract.recognize(
-            imageFile,
-            'fas', // کد زبان فارسی
-            {
-                logger: (m) => console.log(m), // لاگ کردن پیشرفت (اختیاری)
-            }
-        ).then(({ data: { text } }) => {
-            setOcrText(text);
-            setIsProcessing(false);
-        }).catch(error => {
-            console.error('خطا در OCR:', error);
-            setError('استخراج متن از تصویر با مشکل مواجه شد.');
-            setIsProcessing(false);
-        });
+    // تابع پیش‌پردازش تصویر
+    const preprocessImage = (canvas, ctx, img) => {
+        // تبدیل به خاکستری
+        ctx.drawImage(img, 0, 0);
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let data = imageData.data;
+
+        // تبدیل هر پیکسل به خاکستری
+        for (let i = 0; i < data.length; i += 4) {
+            let avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+            data[i] = avg;     // R
+            data[i + 1] = avg; // G
+            data[i + 2] = avg; // B
+        }
+
+        // اعمال آستانه‌گذاری
+        for (let i = 0; i < data.length; i += 4) {
+            let threshold = 128;
+            let value = data[i] > threshold ? 255 : 0;
+            data[i] = value;
+            data[i + 1] = value;
+            data[i + 2] = value;
+        }
+
+        ctx.putImageData(imageData, 0, 0);
     };
 
-    // تابع ارسال پیام حاوی متن استخراج شده
-    const handleSendOcrText = () => {
-        if (ocrText.trim()) {
+    // تابع استخراج متن از تصویر با استفاده از Tesseract.js
+    const extractTextFromImage = (adjustedImageSrc) => {
+        setIsProcessing(true);
+        setOcrText("");
+        setEditableOcrText("");
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = adjustedImageSrc;
+
+        img.onload = () => {
+            // تنظیم اندازه کانواس بر اساس اندازه تصویر
+            canvas.width = img.width;
+            canvas.height = img.height;
+            // پیش‌پردازش تصویر
+            preprocessImage(canvas, ctx, img);
+
+            // انجام OCR بر روی کانواس
+            Tesseract.recognize(
+                canvas,
+                'eng', // کد زبان انگلیسی
+                {
+                    logger: (m) => console.log(m), // لاگ کردن پیشرفت (اختیاری)
+                    tessjs_create_pdf: '0', // جلوگیری از ایجاد PDF
+                }
+            ).then(({ data: { text } }) => {
+                setOcrText(text);
+                setEditableOcrText(text); // تنظیم متن قابل ویرایش
+                setIsProcessing(false);
+                setShowImageEditor(false); // مخفی کردن ImageEditor پس از استخراج
+            }).catch(error => {
+                console.error('OCR Error:', error);
+                setError('Failed to extract text from the image.');
+                setIsProcessing(false);
+                setShowImageEditor(false);
+            });
+        };
+
+        img.onerror = (error) => {
+            console.error('Image Load Error:', error);
+            setError('Failed to load the image.');
+            setIsProcessing(false);
+            setShowImageEditor(false);
+        };
+    };
+
+    // تابع تایید متن استخراج شده
+    const handleApproveOcrText = () => {
+        if (editableOcrText.trim()) {
             const userMessage = {
                 id: Date.now(),
-                text: ocrText,
+                text: editableOcrText,
                 sender: 'user',
                 timestamp: new Date().toLocaleTimeString(),
             };
 
             setMessages(prev => [...prev, userMessage]);
+            setEditableOcrText('');
             setOcrText('');
             setImage(null);
             setError(null);
@@ -478,7 +541,7 @@ const ChatBot = () => {
 
             // ارسال پیام استخراج شده به بات
             axios.post('https://api.medogram.ir/api/chat/', {
-                message: ocrText
+                message: editableOcrText
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -493,11 +556,30 @@ const ChatBot = () => {
                 }]);
                 setIsTyping(false);
             }).catch(error => {
-                console.error('خطا:', error);
-                setError('خطایی در ارسال پیام استخراج شده رخ داد.');
+                console.error('Error sending OCR text:', error);
+                setError('An error occurred while sending the extracted text.');
                 setIsTyping(false);
             });
         }
+    };
+
+    // تابع رد متن استخراج شده
+    const handleRejectOcrText = () => {
+        setEditableOcrText('');
+        setOcrText('');
+        setImage(null);
+        setError(null);
+        setShowImageEditor(false);
+    };
+
+    // تابع ویرایش متن استخراج شده
+    const handleEditOcrText = (e) => {
+        setEditableOcrText(e.target.value);
+    };
+
+    // تابع اعمال تنظیمات تصویر از ImageEditor
+    const handleApplyImageSettings = (adjustedImageSrc) => {
+        extractTextFromImage(adjustedImageSrc);
     };
 
     return (
@@ -542,18 +624,44 @@ const ChatBot = () => {
                     )}
 
                     {/* نمایش تصویر آپلود شده */}
-                    {image && !isProcessing && (
+                    {image && !isProcessing && !showImageEditor && (
                         <img src={image} alt="Uploaded" style={{ maxWidth: '100%', marginBottom: '10px', borderRadius: '10px' }} />
                     )}
 
-                    {/* نمایش متن استخراج شده */}
+                    {/* نمایش ImageEditor */}
+                    {showImageEditor && image && (
+                        <ImageEditor
+                            imageSrc={image}
+                            onApply={handleApplyImageSettings}
+                            onCancel={handleRejectOcrText}
+                        />
+                    )}
+
+                    {/* نمایش متن استخراج شده با قابلیت ویرایش و دکمه‌های تایید و رد */}
                     {ocrText && !isProcessing && (
                         <ExtractedTextBubble>
-                            <strong>متن استخراج شده:</strong>
-                            <p>{ocrText}</p>
-                            <SendButton onClick={handleSendOcrText} disabled={isProcessing}>
-                                <IoSend />
-                            </SendButton>
+                            <strong>Extracted Text:</strong>
+                            <textarea
+                                value={editableOcrText}
+                                onChange={handleEditOcrText}
+                                style={{
+                                    width: '100%',
+                                    height: '100px',
+                                    resize: 'vertical',
+                                    padding: '10px',
+                                    borderRadius: '5px',
+                                    border: '1px solid #ccc',
+                                    fontSize: '1rem',
+                                }}
+                            />
+                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                                <SendButton onClick={handleApproveOcrText} disabled={isProcessing}>
+                                    <IoSend /> Approve
+                                </SendButton>
+                                <ActionButton onClick={handleRejectOcrText} disabled={isProcessing} style={{ background: '#c53030' }}>
+                                    <IoClose /> Reject
+                                </ActionButton>
+                            </div>
                         </ExtractedTextBubble>
                     )}
 
@@ -561,7 +669,7 @@ const ChatBot = () => {
                     {isProcessing && (
                         <ProcessingBubble>
                             <IoWarning />
-                            <span>در حال پردازش تصویر...</span>
+                            <span>Processing image...</span>
                         </ProcessingBubble>
                     )}
                 </MessageContainer>
@@ -596,7 +704,7 @@ const ChatBot = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder="پیام خود را اینجا تایپ کنید..."
+                        placeholder="Type your message here..."
                         rows={1}
                     />
                     <SendButton
@@ -606,6 +714,9 @@ const ChatBot = () => {
                         <IoSend />
                     </SendButton>
                 </InputContainer>
+
+                {/* کانواس برای رسم تصویر */}
+                <canvas ref={canvasRef} style={{ display: 'none' }} />
             </ChatContainer>
         </ThemeProvider>
     );

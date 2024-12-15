@@ -9,7 +9,7 @@ import {
 import { styled } from '@mui/system';
 import { Edit, Save, Cancel, AccountBalance } from '@mui/icons-material';
 import { AuthContext } from './AuthContext';
-import { generateGeometricAvatar } from './utils/AvatarGenerator';
+import { generateGeometricAvatar } from '../utils/AvatarGenerator';
 import { motion } from 'framer-motion';
 
 const StyledCard = styled(Card)(({ theme }) => ({
