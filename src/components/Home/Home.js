@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Box, Grid, Card, CardContent, IconButton, useMediaQuery } from '@mui/material';
+import React from 'react';
+import { Container, Typography, Box, Grid, Card, CardContent, IconButton } from '@mui/material';
 import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
-import '../../styles/Styles.css';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MedicalServices, LocalHospital, Medication, ArrowForward } from '@mui/icons-material';
+import {
+    MedicalServices,
+    LocalHospital,
+    Medication,
+    FaceRetouchingNatural,
+    ImageSearch,
+} from '@mui/icons-material'; // حواستان باشد آیکن‌های جدید را وارد کنید
 
 let theme = createTheme({
     palette: {
@@ -18,10 +22,6 @@ let theme = createTheme({
             light: '#69f0ae',
             dark: '#00a839',
         },
-        background: {
-            default: '#f8f9fa',
-            paper: '#ffffff',
-        },
     },
     typography: {
         fontFamily: 'IRANSans, Arial',
@@ -32,229 +32,127 @@ let theme = createTheme({
             fontWeight: 500,
         },
     },
-    components: {
-        MuiCard: {
-            styleOverrides: {
-                root: {
-                    borderRadius: 16,
-                    transition: 'all 0.3s ease-in-out',
-                },
-            },
-        },
-        MuiButton: {
-            styleOverrides: {
-                root: {
-                    textTransform: 'none',
-                    borderRadius: 12,
-                },
-            },
-        },
-    },
 });
 
 theme = responsiveFontSizes(theme);
 
 const serviceCards = [
     {
+        id: 1,
         title: 'مشاوره آنلاین',
         icon: <MedicalServices sx={{ fontSize: 40 }} />,
-        description: 'دریافت مشاوره پزشکی تخصصی به راحتی در خانه خودتان با پزشکان مجرب',
+        description: 'دریافت مشاوره پزشکی تخصصی با پزشکان مجرب',
+        link: '/visits',
         color: '#2196f3',
     },
     {
-        title: 'تشخیص هوشمند',
+        id: 2,
+        title: 'تشخیص دیابت',
         icon: <LocalHospital sx={{ fontSize: 40 }} />,
-        description: 'استفاده از فناوری پیشرفته هوش مصنوعی برای تشخیص دقیق و سریع بیماری‌ها',
+        description: 'تشخیص دقیق و سریع دیابت با هوش مصنوعی',
+        link: '/diabetes-prediction',
         color: '#00c853',
     },
     {
-        title: 'درمان شخصی‌سازی‌شده',
+        id: 3,
+        title: 'چت با هوش مصنوعی',
         icon: <Medication sx={{ fontSize: 40 }} />,
-        description: 'برنامه‌های درمانی اختصاصی مطابق با نیازها و شرایط خاص شما توسط به روزترین تکنولوژی دنیا',
+        description: 'چت و مشاوره آنلاین با دستیار هوشمند',
+        link: '/chat',
         color: '#ff4081',
+    },
+    // --- کارت‌های جدید ---
+    {
+        id: 4,
+        title: 'تمدید نسخ دارویی',
+        icon: <Medication sx={{ fontSize: 40 }} />,
+        description: 'تمدید سریع و راحت نسخ دارویی شما',
+        link: '/visits',
+        color: '#ff9800',
+    },
+    {
+        id: 5,
+        title: 'مشاوره زیبایی',
+        icon: <FaceRetouchingNatural sx={{ fontSize: 40 }} />,
+        description: 'مشاوره تخصصی در حوزه زیبایی و تناسب اندام',
+        link: '/visits',
+        color: '#e91e63',
+    },
+    {
+        id: 6,
+        title: 'تفسیر و بررسی جواب آزمایشات',
+        icon: <ImageSearch sx={{ fontSize: 40 }} />,
+        description: 'بررسی دقیق نتایج آزمایشات و تصاویر پزشکی شما',
+        link: '/visits',
+        color: '#9c27b0',
     },
 ];
 
 const Home = () => {
-    const [, setIsVisible] = useState(false);
-    useMediaQuery(theme.breakpoints.down('sm'));
-    useEffect(() => {
-        setIsVisible(true);
-    }, []);
-
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.3,
-            },
-        },
-    };
-
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            transition: {
-                duration: 0.5,
-            },
-        },
-    };
-
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="lg" sx={{ mt: 6, mb: 6 }}>
-                <AnimatePresence>
-                    <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        variants={containerVariants}
+                {/* عنوان صفحه */}
+                <Box textAlign="center" sx={{ mb: 6 }}>
+                    <Typography
+                        variant="h2"
+                        sx={{
+                            background: 'linear-gradient(45deg, #2196f3, #00c853)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}
                     >
-                        <Box
-                            sx={{
-                                background: 'linear-gradient(135deg, rgba(33,150,243,0.1) 0%, rgba(0,200,83,0.1) 100%)',
-                                borderRadius: 8,
-                                p: { xs: 3, md: 6 },
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-                                backdropFilter: 'blur(10px)',
-                            }}
-                        >
-                            <motion.div variants={itemVariants}>
-                                <Typography
-                                    variant="h2"
-                                    color="primary"
-                                    gutterBottom
-                                    align="center"
+                        مدوگرام
+                    </Typography>
+                    <Typography variant="h5" color="text.secondary">
+                        دسترسی آسان به خدمات پزشکی نوین
+                    </Typography>
+                </Box>
+
+                {/* کارت‌های خدمات */}
+                <Grid container spacing={4}>
+                    {serviceCards.map((card) => (
+                        <Grid item xs={12} sm={6} md={4} key={card.id}>
+                            <Card
+                                component={Link}
+                                to={card.link}
+                                sx={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    textDecoration: 'none',
+                                    p: 3,
+                                    background: `linear-gradient(135deg, ${card.color}15, ${card.color}05)`,
+                                    border: `1px solid ${card.color}30`,
+                                    '&:hover': {
+                                        boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+                                    },
+                                }}
+                            >
+                                <IconButton
                                     sx={{
-                                        background: 'linear-gradient(45deg, #2196f3, #00c853)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                        mb: 4,
-                                    }}
-                                >
-                                    MEDOGRAM
-                                </Typography>
-                            </motion.div>
-
-                            <motion.div variants={itemVariants}>
-                                <Typography
-                                    variant="h5"
-                                    paragraph
-                                    align="center"
-                                    sx={{ mb: 6 }}
-                                >
-                                    تحولی نوین در مراقبت‌های پزشکی با تکنولوژی پیشرفته داده کاوی و آنالیز داده
-                                </Typography>
-                            </motion.div>
-
-                            <Grid container spacing={4} sx={{ mb: 8 }}>
-                                {serviceCards.map((card, index) => (
-                                    <Grid  item xs={12} md={4} key={index}>
-                                        <motion.div
-                                            variants={itemVariants}
-                                            whileHover={{
-                                                scale: 1.05,
-                                                boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
-                                            }}
-                                            whileTap={{ scale: 0.95 }}
-                                        >
-                                            <Card
-                                                sx={{
-                                                    height: '100%',
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'center',
-                                                    p: 3,
-                                                    background: `linear-gradient(135deg, ${card.color}15, ${card.color}05)`,
-                                                    border: `1px solid ${card.color}30`,
-                                                }}
-                                            >
-                                                <IconButton
-                                                    sx={{
-                                                        backgroundColor: `${card.color}15`,
-                                                        mb: 2,
-                                                        '&:hover': {
-                                                            backgroundColor: `${card.color}25`,
-                                                        },
-                                                    }}
-                                                >
-                                                    {card.icon}
-                                                </IconButton>
-                                                <CardContent>
-                                                    <Typography variant="h6" gutterBottom align="center" sx={{ fontWeight: 600, color: card.color }}>
-                                                        {card.title}
-                                                    </Typography>
-                                                    <Typography variant="body1" color="text.secondary" align="center">
-                                                        {card.description}
-                                                    </Typography>
-                                                </CardContent>
-                                            </Card>
-                                        </motion.div>
-                                    </Grid>
-                                ))}
-                            </Grid>
-
-                            <motion.div variants={itemVariants}>
-                                <Box sx={{ mb: 6, p: 3, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 4, direction: 'rtl' }}>
-                                    <Typography variant="body1"  align="center" sx={{ lineHeight: 1.8 }}>
-                                        در مدوگرام، با ترکیب تخصص پزشکی و فناوری‌های نوین، خدمات درمانی با کیفیت را به شکلی نوآورانه و مقرون به صرفه ارائه می‌دهیم.
-                                        با استفاده از هوش مصنوعی و پلتفرم دیجیتال ما، مراقبت‌های پزشکی شخصی‌سازی شده را تجربه کنید.
-                                    </Typography>
-                                </Box>
-                            </motion.div>
-
-                            <motion.div variants={itemVariants}>
-                                <Box
-                                    textAlign="center"
-                                    sx={{
-                                        position: 'relative',
-                                        '&::before': {
-                                            content: '""',
-                                            position: 'absolute',
-                                            top: '50%',
-                                            left: '50%',
-                                            transform: 'translate(-50%, -50%)',
-                                            width: '200px',
-                                            height: '200px',
-                                            background: 'radial-gradient(circle, rgba(0,200,83,0.2) 0%, rgba(0,200,83,0) 70%)',
-                                            borderRadius: '50%',
-                                            zIndex: 0,
+                                        backgroundColor: `${card.color}15`,
+                                        mb: 2,
+                                        '&:hover': {
+                                            backgroundColor: `${card.color}25`,
                                         },
                                     }}
                                 >
-                                    <motion.div
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                    >
-                                        <Button
-                                            component={Link}
-                                            to="/visits"
-                                            variant="contained"
-                                            color="secondary"
-                                            size="large"
-                                            endIcon={<ArrowForward />}
-                                            sx={{
-                                                py: { xs: 1.5, md: 2 },
-                                                px: { xs: 4, md: 6 },
-                                                fontSize: { xs: '1.1rem', md: '1.3rem' },
-                                                boxShadow: '0 10px 30px rgba(0,200,83,0.3)',
-                                                position: 'relative',
-                                                zIndex: 1,
-                                                '&:hover': {
-                                                    boxShadow: '0 15px 40px rgba(0,200,83,0.4)',
-                                                },
-                                            }}
-                                        >
-                                            رزرو ویزیت آنلاین
-                                        </Button>
-                                    </motion.div>
-                                </Box>
-                            </motion.div>
-                        </Box>
-                    </motion.div>
-                </AnimatePresence>
+                                    {card.icon}
+                                </IconButton>
+                                <CardContent>
+                                    <Typography variant="h6" color="primary" gutterBottom>
+                                        {card.title}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary" align="center">
+                                        {card.description}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
             </Container>
         </ThemeProvider>
     );

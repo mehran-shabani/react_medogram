@@ -11,7 +11,7 @@ import UserVisitsPage from './components/Visit/UserVisitsPage';
 import ExcludedServices from './components/Details/ExcludedServices'
 import Navbar from './components/Navbar/Navbar';
 import { AuthProvider } from './components/Auth/AuthContext';
-import ChatPage from "./components/chat/ChatPage";
+import Chat from "./components/chat/Chat";
 import TransactionComponent from './components/Payment/TransactionComponent';
 import PaymentRedirect from "./components/Payment/PaymentRedirect";
 import ProfilePage from "./components/Auth/ProfilePage";
@@ -65,7 +65,7 @@ function App() {
                                     <Route path="/excluded-services" element={<ExcludedServices />} />
                                     <Route path="/payment-redirect" element={<PaymentRedirect />} />
                                     <Route path="/blogs" element={<BlogPostPage />} />
-                                    <Route path="/chat" element={<ChatPage/>}/>
+                                    <Route path="/chat" element={<Chat/>}/>
 
                                 </Routes>
                                 <Footer logo={logoImage} />

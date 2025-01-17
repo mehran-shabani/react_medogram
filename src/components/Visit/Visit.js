@@ -28,9 +28,10 @@ const symptomCategories = [
             { value: 'appetite_loss', label: 'کاهش اشتها' },
             { value: 'night_sweats', label: 'تنگی نفس' },
             { value: 'general_pain', label: 'علائم سرماخوردگی' },
-            { value: 'swollen_lymph_nodes', label: 'بدن  درد' },
+            { value: 'swollen_lymph_nodes', label: 'بدن درد' },
             { value: 'chills', label: 'دندان درد' },
             { value: 'malaise', label: 'نمیدونم مشکلم چیه!' },
+            { value: 'other_general_symptom', label: 'سایر' },
         ],
     },
     {
@@ -96,12 +97,27 @@ const symptomCategories = [
     },
 ];
 
-const Visit = () => {
+// لیست انواع بیمه
+const insuranceTypes = [
+    { value: 'taamin_ejtemaei', label: 'بیمه تامین اجتماعی' },
+    { value: 'salamat_urban', label: 'بیمه سلامت همگانی شهری' },
+    { value: 'salamat_isargaran', label: 'بیمه سلامت همگانی ایثارگران' },
+    { value: 'salamat_karkonan', label: 'بیمه سلامت کارکنان' },
+    { value: 'salamat_roostaei', label: 'بیمه سلامت همگانی روستایی' },
+    { value: 'naft_gas', label: 'بیمه شرکت نفت و گاز جمهوری اسلامی ایران' },
+    { value: 'niro_mosallah', label: 'بیمه نیروهای مسلح' },
+    { value: 'others', label: 'سایر' },
+    { value: 'none', label: 'آزاد' },
+];
+
+function Visit() {
     const { token } = useContext(AuthContext);
     const [activeStep, setActiveStep] = useState(0);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
+        national_code: '',
+        insurance_type: '',
         urgency: 'prescription',
         general_symptoms: '',
         neurological_symptoms: '',
@@ -135,22 +151,52 @@ const Visit = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        // ۱) ولیدیشن نام
         if (!formData.name.trim()) {
             toast.error('لطفا نام را وارد کنید.');
             return;
         }
 
-        const symptoms = symptomCategories.map((category) => formData[category.key]).filter(Boolean);
-        if (symptoms.length === 0) {
-            toast.error('لطفا حداقل یک علامت عمومی انتخاب کنید.');
+        // ۲) ولیدیشن کد ملی
+        if (!formData.national_code.trim()) {
+            toast.error('لطفا کد ملی را وارد کنید.');
+            return;
+        }
+
+        // کد ملی حتما باید عددی و ده رقمی باشد
+        if (!/^[0-9]{10}$/.test(formData.national_code)) {
+            toast.error('کد ملی باید عددی و ۱۰ رقمی باشد.');
+            return;
+        }
+
+        // ۳) ولیدیشن نوع بیمه
+        if (!formData.insurance_type.trim()) {
+            toast.error('لطفا نوع بیمه را انتخاب کنید.');
+            return;
+        }
+
+        // ۴) کاربر باید حداقل یکی از علائم عمومی را انتخاب کرده باشد
+        if (!formData.general_symptoms) {
+            toast.error('لطفا حداقل یکی از علائم عمومی را انتخاب کنید (حتی اگر گزینه «سایر» باشد).');
             return;
         }
 
         setLoading(true);
         try {
+            // ساختن فیلد توضیحات نهایی با اضافه کردن کد ملی و نوع بیمه
+            const finalDescription = `کد ملی: ${formData.national_code}
+نوع بیمه: ${insuranceTypes.find((x) => x.value === formData.insurance_type)?.label || 'مشخص نشده'}
+${formData.description}`;
+
+            const payload = {
+                ...formData,
+                description: finalDescription,
+            };
+
             const response = await axios.post(
                 'https://api.medogram.ir/api/visit/',
-                formData,
+                payload,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                 }
@@ -158,6 +204,8 @@ const Visit = () => {
 
             setFormData({
                 name: '',
+                national_code: '',
+                insurance_type: '',
                 urgency: 'prescription',
                 general_symptoms: '',
                 neurological_symptoms: '',
@@ -180,11 +228,15 @@ const Visit = () => {
         }
     };
 
+    // متدی برای رندر کردن محتوای هر مرحله از فرم
     const renderStepContent = (step) => {
         switch (step) {
             case 0:
                 return (
                     <>
+                        <Typography variant="body1" sx={{ mb: 1, color: 'gray' }}>
+                            لطفا اطلاعات بیمار را وارد کنید.
+                        </Typography>
                         <TextField
                             label="نام کامل"
                             name="name"
@@ -193,7 +245,36 @@ const Visit = () => {
                             fullWidth
                             required
                             margin="normal"
+                            helperText="نام خود را وارد کنید."
                         />
+                        <TextField
+                            label="کد ملی"
+                            name="national_code"
+                            value={formData.national_code}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                            margin="normal"
+                            helperText="کد ملی ۱۰ رقمی خود را وارد کنید."
+                        />
+                        <TextField
+                            select
+                            label="نوع بیمه"
+                            name="insurance_type"
+                            value={formData.insurance_type}
+                            onChange={handleChange}
+                            fullWidth
+                            required
+                            margin="normal"
+                            helperText="لطفا نوع بیمه خود را انتخاب کنید."
+                        >
+                            <MenuItem value="">انتخاب کنید</MenuItem>
+                            {insuranceTypes.map((ins) => (
+                                <MenuItem key={ins.value} value={ins.value}>
+                                    {ins.label}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                         <TextField
                             select
                             label="نوع ویزیت"
@@ -202,6 +283,7 @@ const Visit = () => {
                             onChange={handleChange}
                             fullWidth
                             margin="normal"
+                            helperText="لطفا یکی از گزینه‌های مربوط به نوع ویزیت را انتخاب کنید."
                         >
                             <MenuItem value="prescription">نسخه نویسی داروهای شما</MenuItem>
                             <MenuItem value="diet">درخواست رژیم غذایی</MenuItem>
@@ -211,28 +293,12 @@ const Visit = () => {
                     </>
                 );
             case 1:
-                return symptomCategories.slice(0, 3).map((category) => (
-                    <TextField
-                        key={category.key}
-                        select
-                        label={category.label}
-                        name={category.key}
-                        value={formData[category.key]}
-                        onChange={handleChange}
-                        fullWidth
-                        margin="normal"
-                    >
-                        {category.options.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                ));
-            case 2:
                 return (
                     <>
-                        {symptomCategories.slice(3).map((category) => (
+                        <Typography variant="body1" sx={{ mb: 1, color: 'gray' }}>
+                            علائم عمومی و عصبی را وارد کنید. حتما حداقل یکی از علائم عمومی را انتخاب نمایید.
+                        </Typography>
+                        {symptomCategories.slice(0, 2).map((category) => (
                             <TextField
                                 key={category.key}
                                 select
@@ -243,6 +309,35 @@ const Visit = () => {
                                 fullWidth
                                 margin="normal"
                             >
+                                <MenuItem value="">هیچ کدام</MenuItem>
+                                {category.options.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        ))}
+                    </>
+                );
+            case 2:
+                return (
+                    <>
+                        <Typography variant="body1" sx={{ mb: 1, color: 'gray' }}>
+                            علائم قلبی عروقی، گوارشی و تنفسی را وارد کنید (در صورت وجود).
+                            همچنین می‌توانید در صورت نیاز، توضیحات اضافه وارد نمایید.
+                        </Typography>
+                        {symptomCategories.slice(2).map((category) => (
+                            <TextField
+                                key={category.key}
+                                select
+                                label={category.label}
+                                name={category.key}
+                                value={formData[category.key]}
+                                onChange={handleChange}
+                                fullWidth
+                                margin="normal"
+                            >
+                                <MenuItem value="">هیچ کدام</MenuItem>
                                 {category.options.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
                                         {option.label}
@@ -259,6 +354,7 @@ const Visit = () => {
                             multiline
                             rows={4}
                             margin="normal"
+                            helperText="در صورت تمایل، توضیحات دلخواه خود را وارد کنید."
                         />
                     </>
                 );
@@ -339,6 +435,6 @@ const Visit = () => {
             <ToastContainer />
         </Box>
     );
-};
+}
 
 export default Visit;
