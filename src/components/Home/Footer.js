@@ -1,7 +1,22 @@
 // noinspection JSRemoveUnnecessaryParentheses
+import React, { useState } from 'react';
+import {
+    Container,
+    Box,
+    Typography,
+    Grid,
+    Link as MuiLink,
+    useTheme,
+    useMediaQuery,
+    Paper,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Avatar
+} from '@mui/material';
 
-import React from 'react';
-import { Container, Box, Typography, Grid, Link as MuiLink, useTheme, useMediaQuery, Paper } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { motion } from 'framer-motion';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -13,12 +28,46 @@ import AndroidIcon from '@mui/icons-material/Android';
 import WebIcon from '@mui/icons-material/Web';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 
+const ReasonItem = ({ number, text, color }) => (
+    <motion.li
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: number * 0.1 }}
+        style={{
+            marginBottom: '12px',
+            padding: '12px',
+            borderRadius: '8px',
+            background: `linear-gradient(135deg, ${color}15, ${color}05)`,
+            border: `1px solid ${color}20`,
+            display: 'flex',
+            alignItems: 'center',
+            listStyle: 'none',
+        }}
+    >
+        <Box
+            sx={{
+                minWidth: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: '12px',
+                fontSize: '0.875rem',
+                fontWeight: 'bold',
+            }}
+        >
+            {number}
+        </Box>
+        <Typography variant="body2">{text}</Typography>
+    </motion.li>
+);
+
 const FeatureBox = ({ icon, title, description }) => {
     return (
-        <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-        >
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Paper
                 elevation={2}
                 sx={{
@@ -32,7 +81,8 @@ const FeatureBox = ({ icon, title, description }) => {
                     transition: 'all 0.3s ease',
                     '&:hover': {
                         boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    }
+                    },
+                    fontFamily: 'Vazir, sans-serif',
                 }}
             >
                 <Box
@@ -44,7 +94,7 @@ const FeatureBox = ({ icon, title, description }) => {
                         justifyContent: 'center',
                         borderRadius: '50%',
                         background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)',
-                        mb: 2
+                        mb: 2,
                     }}
                 >
                     {icon}
@@ -56,7 +106,7 @@ const FeatureBox = ({ icon, title, description }) => {
                         fontWeight: 'bold',
                         background: 'linear-gradient(45deg, #1976d2, #2196f3)',
                         WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
+                        WebkitTextFillColor: 'transparent',
                     }}
                 >
                     {title}
@@ -68,13 +118,9 @@ const FeatureBox = ({ icon, title, description }) => {
         </motion.div>
     );
 };
-
 const SocialLink = ({ href, icon, color }) => {
     return (
-        <motion.div
-            whileHover={{ scale: 1.2, rotate: 10 }}
-            whileTap={{ scale: 0.9 }}
-        >
+        <motion.div whileHover={{ scale: 1.2, rotate: 10 }} whileTap={{ scale: 0.9 }}>
             <MuiLink
                 href={href}
                 target="_blank"
@@ -85,8 +131,9 @@ const SocialLink = ({ href, icon, color }) => {
                     color: color,
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                        color: `${color}99`
-                    }
+                        color: `${color}99`,
+                    },
+                    fontFamily: 'Vazir, sans-serif',
                 }}
             >
                 {icon}
@@ -114,7 +161,8 @@ const AppDownloadButton = ({ href, icon, text, gradient }) => {
                     boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
                     '&:hover': {
                         boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
-                    }
+                    },
+                    fontFamily: 'Vazir, sans-serif',
                 }}
             >
                 {icon}
@@ -124,26 +172,68 @@ const AppDownloadButton = ({ href, icon, text, gradient }) => {
     );
 };
 
+const reasons = [
+    { text: 'بهره‌مندی از هوش مصنوعی پزشک‌یار', color: '#4CAF50' },
+    { text: 'دسترسی سریع و ۲۴ ساعته به خدمات پزشکی', color: '#2196F3' },
+    { text: 'پزشکان آموزش‌دیده در زمینهٔ پزشکی راه دور', color: '#00BCD4' },
+    { text: 'امکان ویزیت آنلاین بدون تشریفات اضافی', color: '#009688' },
+    { text: 'عدم سردرگمی در انتخاب پزشک در میان صدها متخصص', color: '#8BC34A' },
+    { text: 'سیستم پیشرفته مبتنی بر استاندارد آپتودیت', color: '#4CAF50' },
+    { text: 'استفاده از متدهای روز دنیا در تلمدیسین', color: '#66BB6A' },
+    { text: 'تضمین کیفیت خدمات با استفاده از فناوری‌های جدید', color: '#81C784' },
+    { text: 'پوشش بیماران در مناطق دوردست و کم‌برخوردار', color: '#A5D6A7' },
+    { text: 'رابط کاربری ساده و قابل فهم برای همه', color: '#C8E6C9' },
+    { text: 'امکان دسترسی به پرونده پزشکی در هر زمان', color: '#2E7D32' },
+    { text: 'حفظ حریم خصوصی و امنیت اطلاعات بیمار', color: '#1B5E20' },
+    { text: 'پشتیبانی حرفه‌ای و همراهی گام به گام بیمار', color: '#388E3C' },
+];
+
 const Footer = () => {
     const theme = useTheme();
     useMediaQuery(theme.breakpoints.down('sm'));
+
     const features = [
         {
-            icon: <img src="https://cdn-icons-png.flaticon.com/512/5488/5488385.png" alt="کادر مجرب" style={{ width: 40, height: 40 }} />,
+            icon: (
+                <img
+                    src="https://cdn-icons-png.flaticon.com/512/5488/5488385.png"
+                    alt="کادر مجرب"
+                    style={{ width: 40, height: 40 }}
+                />
+            ),
             title: 'کادر مجرب',
-            description: 'تیم پزشکی متخصص با سال‌ها تجربه در خدمت سلامت شما'
+            description: 'تیم پزشکی متخصص با سال‌ها تجربه در خدمت سلامت شما',
         },
         {
-            icon: <img src="https://cdn-icons-png.flaticon.com/512/4939/4939112.png" alt="آموزش مداوم" style={{ width: 40, height: 40 }} />,
+            icon: (
+                <img
+                    src="https://cdn-icons-png.flaticon.com/512/4939/4939112.png"
+                    alt="آموزش مداوم"
+                    style={{ width: 40, height: 40 }}
+                />
+            ),
             title: 'آموزش مداوم',
-            description: 'به‌روزرسانی دانش پزشکی با آخرین استانداردهای جهانی'
+            description: 'به‌روزرسانی دانش پزشکی با آخرین استانداردهای جهانی',
         },
         {
-            icon: <img src="https://cdn-icons-png.flaticon.com/512/31/31679.png" alt="پشتیبانی" style={{ width: 40, height: 40 }} />,
+            icon: (
+                <img
+                    src="https://cdn-icons-png.flaticon.com/512/31/31679.png"
+                    alt="پشتیبانی"
+                    style={{ width: 40, height: 40 }}
+                />
+            ),
             title: 'پشتیبانی ۲۴/۷',
-            description: 'در تمام ساعات شبانه‌روز آماده خدمت‌رسانی به شما عزیزان هستیم'
+            description:
+                'در تمام ساعات شبانه‌روز آماده خدمت‌رسانی به شما عزیزان هستیم',
         },
     ];
+
+    const [expanded, setExpanded] = useState(false);
+
+    const handleChange = (event, isExpanded) => {
+        setExpanded(isExpanded);
+    };
 
     return (
         <Box
@@ -154,10 +244,93 @@ const Footer = () => {
                 pb: 4,
                 mt: 8,
                 borderTop: '1px solid #dee2e6',
-                direction: 'rtl'
+                direction: 'rtl',
+                fontFamily: 'Vazir, sans-serif',
             }}
         >
             <Container maxWidth="lg">
+                <Box mb={4}>
+                    <Accordion
+                        expanded={expanded}
+                        onChange={handleChange}
+                        sx={{
+                            background: 'transparent',
+                            boxShadow: 'none',
+                            '&:before': { display: 'none' },
+                        }}
+                    >
+                        <AccordionSummary
+                            expandIcon={
+                                <ExpandMoreIcon sx={{
+                                    color: '#4CAF50',
+                                    transform: expanded ? 'rotate(180deg)' : 'rotate(0)',
+                                    transition: 'transform 0.3s ease',
+                                }} />
+                            }
+                            sx={{
+                                background: 'linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)',
+                                borderRadius: '16px',
+                                mb: 2,
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%)',
+                                },
+                                '& .MuiAccordionSummary-content': {
+                                    margin: '16px 0',
+                                },
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Avatar sx={{
+                                    bgcolor: '#4CAF50',
+                                    width: 40,
+                                    height: 40,
+                                }}>
+                                    <QuestionMarkIcon />
+                                </Avatar>
+                                <Typography
+                                    variant="h6"
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        background: 'linear-gradient(45deg, #2E7D32, #4CAF50)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                    }}
+                                >
+                                    چرا مدوگرام؟
+                                </Typography>
+                            </Box>
+                        </AccordionSummary>
+
+                        <AccordionDetails sx={{
+                            background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)',
+                            borderRadius: '16px',
+                            p: 4,
+                        }}>
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    mb: 4,
+                                    color: '#1B5E20',
+                                    fontWeight: 500,
+                                }}
+                            >
+                                دلایل اصلی که باعث شده مدوگرام یک گزینهٔ عالی برای تلمدیسین و ارائه خدمات درمانی آنلاین باشد:
+                            </Typography>
+
+                            <Box component="ul" sx={{ p: 0 }}>
+                                {reasons.map((reason, index) => (
+                                    <ReasonItem
+                                        key={index}
+                                        number={index + 1}
+                                        text={reason.text}
+                                        color={reason.color}
+                                    />
+                                ))}
+                            </Box>
+                        </AccordionDetails>
+                    </Accordion>
+                </Box>
+
                 <Grid container spacing={4}>
                     {features.map((feature, index) => (
                         <Grid item xs={12} md={4} key={index}>
@@ -172,13 +345,16 @@ const Footer = () => {
                         p: 4,
                         borderRadius: 4,
                         background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
                     }}
                 >
                     <Grid container spacing={4} justifyContent="center">
                         <Grid item xs={12} md={6}>
                             <Box textAlign="center" mb={4}>
-                                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#1976d2' }}>
+                                <Typography
+                                    variant="h5"
+                                    sx={{ fontWeight: 'bold', mb: 3, color: '#1976d2' }}
+                                >
                                     دانلود اپلیکیشن
                                 </Typography>
                                 <Grid container spacing={2} justifyContent="center">
@@ -204,31 +380,42 @@ const Footer = () => {
 
                         <Grid item xs={12} md={6}>
                             <Box textAlign="center">
-                                <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#1976d2' }}>
+                                <Typography
+                                    variant="h5"
+                                    sx={{ fontWeight: 'bold', mb: 3, color: '#1976d2' }}
+                                >
                                     ارتباط با ما
                                 </Typography>
                                 <Grid container spacing={2} justifyContent="center">
                                     <Grid item xs={12}>
-                                        <MuiLink href="tel:09961733668" sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            color: '#555',
-                                            textDecoration: 'none',
-                                            '&:hover': { color: '#1976d2' }
-                                        }}>
+                                        <MuiLink
+                                            href="tel:09961733668"
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                color: '#555',
+                                                textDecoration: 'none',
+                                                '&:hover': { color: '#1976d2' },
+                                                fontFamily: 'Vazir, sans-serif',
+                                            }}
+                                        >
                                             <PhoneIcon sx={{ ml: 1 }} /> ۰۹۹۶-۱۷۳-۳۶۶۸
                                         </MuiLink>
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <MuiLink href="mailto:info@medogram.ir" sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            color: '#555',
-                                            textDecoration: 'none',
-                                            '&:hover': { color: '#1976d2' }
-                                        }}>
+                                        <MuiLink
+                                            href="mailto:info@medogram.ir"
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                color: '#555',
+                                                textDecoration: 'none',
+                                                '&:hover': { color: '#1976d2' },
+                                                fontFamily: 'Vazir, sans-serif',
+                                            }}
+                                        >
                                             <EmailIcon sx={{ ml: 1 }} /> info@medogram.ir
                                         </MuiLink>
                                     </Grid>
@@ -306,8 +493,8 @@ const Footer = () => {
                                     cursor: 'pointer',
                                     transition: 'transform 0.3s ease',
                                     '&:hover': {
-                                        transform: 'scale(1.05)'
-                                    }
+                                        transform: 'scale(1.05)',
+                                    },
                                 }}
                                 onClick={() =>
                                     window.open(
@@ -328,7 +515,8 @@ const Footer = () => {
                         mt: 4,
                         color: '#6c757d',
                         borderTop: '1px solid #dee2e6',
-                        pt: 4
+                        pt: 4,
+                        fontFamily: 'Vazir, sans-serif',
                     }}
                 >
                     © {new Date().getFullYear()} Medogram - All rights reserved.

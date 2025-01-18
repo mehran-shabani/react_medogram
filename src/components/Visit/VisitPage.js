@@ -4,7 +4,7 @@ import { CssBaseline, Container, Paper, Typography, Box, Alert, Link } from '@mu
 import { motion } from 'framer-motion';
 import Visit from './Visit';
 
-// Create a custom theme
+// ساخت تم دلخواه
 const theme = createTheme({
     palette: {
         primary: {
@@ -19,13 +19,14 @@ const theme = createTheme({
     },
 });
 
-// Styled components using MUI's sx prop
+// کامپوننتی که Container را استایل و انیمیت می‌کند
 const StyledContainer = ({ children }) => (
     <Container
         component={motion.div}
         maxWidth="md"
         sx={{
             display: 'flex',
+
             flexDirection: 'column',
             justifyContent: 'center',
             minHeight: '100vh',
@@ -39,13 +40,14 @@ const StyledContainer = ({ children }) => (
     </Container>
 );
 
+// کامپوننتی که Paper را استایل می‌کند
 const StyledPaper = ({ children }) => (
     <Paper
         elevation={3}
         sx={{
             borderRadius: 4,
             p: { xs: 3, md: 4 },
-            pb: 0, // Remove bottom padding
+            pb: 0,
             backgroundColor: 'white',
             display: 'flex',
             flexDirection: 'column',
@@ -74,6 +76,7 @@ const VisitPage = () => {
                         severity="warning"
                         sx={{
                             mb: 4,
+                            direction: 'rtl',
                             backgroundColor: '#ffecb3',
                             color: '#bf360c',
                             '& .MuiAlert-icon': {
@@ -81,11 +84,26 @@ const VisitPage = () => {
                             },
                         }}
                     >
-                        قیمت هر ویزیت 29,950 تومان است. لطفاً قبل از ویزیت به صفحه{' '}
-                        <Link href={'payment-visit/'} color="inherit" underline="always">
-                            پرداخت ویزیت
-                        </Link>{' '}
-                        بروید.
+                        {/* این تیتر را برجسته‌تر می‌کنیم */}
+                        <Typography
+                            variant="body1"
+                            sx={{
+                                fontWeight: 'bold',
+
+                                fontSize: '1.1rem',
+                                mb: 1,
+                            }}
+                        >
+                            شما باید قبل از ویزیت، مبلغ یک ویزیت را در حسابتان داشته باشید!
+                        </Typography>
+
+                        <Typography variant="body2">
+                            قیمت هر ویزیت 29,950 تومان است. لطفاً قبل از ویزیت به صفحه{' '}
+                            <Link href={'payment-visit/'} color="inherit" underline="always" sx={{ fontWeight: 'bold' }}>
+                                پرداخت ویزیت
+                            </Link>{' '}
+                            بروید.
+                        </Typography>
                     </Alert>
 
                     <Visit sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} />
