@@ -62,9 +62,10 @@ const StepOne = ({ formData, handleChange }) => {
                 helperText="لطفا یکی از گزینه‌های مربوط به نوع ویزیت را انتخاب کنید."
             >
                 <MenuItem value="prescription">نسخه نویسی داروهای شما</MenuItem>
-                <MenuItem value="diet">درخواست رژیم غذایی</MenuItem>
-                <MenuItem value="addiction">ترک اعتیاد</MenuItem>
-                <MenuItem value="online_consultation">مشاوره و ویزیت آنلاین</MenuItem>
+                <MenuItem value="diet">مشاوره و در خواست رژیم غذایی</MenuItem>
+                <MenuItem value="addiction">مشاوره زیبایی</MenuItem>
+                <MenuItem value="online_consultation">ویزیت و مشاوره آنلاین</MenuItem>
+                <MenuItem value="online_consultation">مشاوره اعصاب و روان</MenuItem>
             </TextField>
         </>
     );

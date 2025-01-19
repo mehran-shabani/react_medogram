@@ -1,294 +1,227 @@
-import React, { useEffect, useContext, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from './AuthContext';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     TextField,
     Button,
-    Typography,
-    Paper,
     CircularProgress,
-    InputAdornment,
-    useTheme,
-    useMediaQuery,
+    Typography,
     Checkbox,
     FormControlLabel,
-    Container as MuiContainer,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Send, ExitToApp, Lock, MobileFriendly,  } from '@mui/icons-material';
 
-const StyledContainer = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(6),
-    maxWidth: 480,
-    margin: '40px auto',
-    borderRadius: 32,
-    background: 'rgba(255, 255, 255, 0.95)',
-    backdropFilter: 'blur(10px)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-    position: 'relative',
-    overflow: 'hidden',
-    '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '6px',
-        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-    },
-}));
+import { AuthContext } from './AuthContext';      // مسیر دقیق را طبق پروژه خود اصلاح کنید
+import { getUsername, updateUsername } from './userUpdate'; // متدهای API شما
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
-    marginBottom: theme.spacing(3),
-    '& .MuiOutlinedInput-root': {
-        borderRadius: 16,
-        background: 'rgba(255, 255, 255, 0.8)',
-        transition: 'all 0.3s ease',
-        '&:hover': {
-            background: 'rgba(255, 255, 255, 0.95)',
-            transform: 'translateY(-2px)',
-        },
-        '&.Mui-focused': {
-            background: '#ffffff',
-            transform: 'translateY(-2px)',
-        },
-    },
-}));
-
-const ActionButton = styled(Button)(({ theme }) => ({
-    borderRadius: 25,
-    padding: '12px 24px',
-    fontSize: '1.1rem',
-    textTransform: 'none',
-    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-    transition: 'all 0.3s ease',
-    '&:hover': {
-        transform: 'translateY(-3px)',
-        boxShadow: `0 8px 24px ${theme.palette.primary.main}40`,
-    },
-    '&:active': {
-        transform: 'translateY(-1px)',
-    },
-}));
-
-const CodeInput = styled(StyledTextField)(() => ({
-    '& input': {
-        fontSize: '1.6rem',
-        letterSpacing: '0.3em',
-        textAlign: 'center',
-        fontFamily: 'monospace',
-        caretColor: 'transparent',
-
-    },
+// استایل کارت ورود
+const StyledContainer = styled(Box)(({ theme }) => ({
+    maxWidth: 500,
+    margin: '50px auto',
+    padding: theme.spacing(4),
+    borderRadius: '12px',
+    background: 'white',
+    boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
 }));
 
 const Auth = () => {
     const [state, setState] = useState({
-        loading: false,
-        codeSent: false,
-        timer: 60,
-        canResend: false,
+        step: 'phone', // مراحل: phone, verify, collectUsername, loading
         phoneNumber: '',
         authCode: '',
+        username: '',
         agreeToTerms: false,
+        loading: false,
     });
 
+    const { registerUser, verifyUser, token } = useContext(AuthContext);
     const navigate = useNavigate();
-    const { registerUser, verifyUser, isVerified, logout } = useContext(AuthContext);
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    useEffect(() => {
-        let interval;
-        if (state.codeSent && state.timer > 0) {
-            interval = setInterval(() => {
-                setState(prev => ({ ...prev, timer: prev.timer - 1 }));
-            }, 1000);
-        } else if (state.timer === 0) {
-            setState(prev => ({ ...prev, canResend: true }));
-        }
-        return () => clearInterval(interval);
-    }, [state.codeSent, state.timer]);
-
+    // ارسال کد به شماره موبایل
     const handleSendCode = async () => {
         if (!/^09\d{9}$/.test(state.phoneNumber)) {
-            toast.error('شماره موبایل باید با 09 شروع شود و 11 رقم باشد');
+            toast.error('شماره موبایل باید با 09 شروع شود و 11 رقم باشد.');
             return;
         }
 
         setState(prev => ({ ...prev, loading: true }));
         try {
             await registerUser(state.phoneNumber);
-            setState(prev => ({
-                ...prev,
-                codeSent: true,
-                timer: 60,
-                canResend: false,
-            }));
-            toast.success('کد تایید ارسال شد');
+            toast.success('کد احراز هویت ارسال شد.');
+            setState(prev => ({ ...prev, step: 'verify' }));
         } catch (error) {
-            toast.error('خطا در ارسال کد');
+            toast.error('ارسال کد با خطا مواجه شد.');
         } finally {
             setState(prev => ({ ...prev, loading: false }));
         }
     };
 
+    // تأیید کد و دریافت توکن
     const handleVerifyCode = async () => {
         if (!state.agreeToTerms) {
-            toast.error('لطفا قوانین و مقررات را مطالعه کنید و تیک آبی رو بزنید.');
+            toast.error('لطفاً شرایط و ضوابط را بپذیرید.');
             return;
         }
 
         if (state.authCode.length !== 6) {
-            toast.error('کد تایید باید 6 رقمی باشد');
+            toast.error('کد تایید باید 6 رقمی باشد.');
             return;
         }
 
         setState(prev => ({ ...prev, loading: true }));
         try {
-            await verifyUser(state.phoneNumber, state.authCode);
-            toast.success('ورود موفقیت‌آمیز');
+            // verifyUser اکنون فقط توکن را برمی‌گرداند
+            const newToken = await verifyUser(state.phoneNumber, state.authCode);
+
+            // در صورت موفقیت: newToken را داریم
+            if (!newToken) {
+                throw new Error('توکن دریافت نشد یا کد اشتباه بود!');
+            }
+
+            // با توکن، username کاربر را می‌گیریم
+            const userData = await getUsername(newToken);
+
+            // اگر یوزرنیم برابر با شماره موبایل باشد، یعنی کاربر نام خود را هنوز ثبت نکرده
+            if (userData.username === state.phoneNumber) {
+                setState(prev => ({ ...prev, step: 'collectUsername' }));
+            } else {
+                toast.success('ورود موفقیت‌آمیز');
+                navigate('/');
+            }
+        } catch (error) {
+            toast.error(error.message || 'کد واردشده صحیح نیست');
+        } finally {
+            setState(prev => ({ ...prev, loading: false }));
+        }
+    };
+
+    // بروزرسانی نام و نام خانوادگی
+    const handleUpdateUsername = async () => {
+        if (!state.username) {
+            toast.error('لطفاً نام و نام خانوادگی خود را وارد کنید.');
+            return;
+        }
+
+        setState(prev => ({ ...prev, loading: true }));
+        try {
+            // استفاده از توکن موجود در Context
+            await updateUsername(token, state.username);
+
+            toast.success('نام و نام خانوادگی با موفقیت ثبت شد.');
             navigate('/');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'کد نامعتبر است');
+            toast.error(error.message || 'ذخیره اطلاعات با خطا مواجه شد.');
         } finally {
             setState(prev => ({ ...prev, loading: false }));
         }
     };
 
     return (
-        <MuiContainer maxWidth="sm">
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-            >
-                <StyledContainer>
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={isVerified ? 'profile' : (state.codeSent ? 'verify' : 'phone')}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            <Box textAlign="center" mb={4}>
-                                {isVerified ? <MobileFriendly sx={{ fontSize: 48, color: 'primary.main' }} /> :
-                                    (state.codeSent ? <Lock sx={{ fontSize: 48, color: 'primary.main' }} /> :
-                                        <Phone sx={{ fontSize: 48, color: 'primary.main' }} />)}
-                                <Typography variant="h4" fontWeight="bold" mt={2}>
-                                    {isVerified ? 'خوش آمدید' :
-                                        (state.codeSent ? 'تایید کد' : 'ورود به حساب')}
-                                </Typography>
-                            </Box>
-
-                            {isVerified ? (
-                                <ActionButton
-                                    fullWidth
-                                    variant="contained"
-                                    onClick={() => {
-                                        logout();
-                                        toast.success('خروج موفقیت‌آمیز');
-                                        navigate('/');
-                                    }}
-                                    endIcon={<ExitToApp />}
+        <StyledContainer>
+            {state.step === 'phone' && (
+                <Box>
+                    <Typography variant="h5" mb={2}>
+                        ورود به حساب کاربری
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        label="شماره موبایل"
+                        value={state.phoneNumber}
+                        onChange={e => setState({ ...state, phoneNumber: e.target.value })}
+                        disabled={state.loading}
+                        margin="normal"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={state.agreeToTerms}
+                                onChange={e => setState({ ...state, agreeToTerms: e.target.checked })}
+                            />
+                        }
+                        label={
+                            <Typography variant="body2">
+                                <a
+                                    href="/terms"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ color: '#1976d2', textDecoration: 'none' }}
                                 >
-                                    خروج از حساب
-                                </ActionButton>
-                            ) : (
-                                <Box component="form" onSubmit={(e) => {
-                                    e.preventDefault();
-                                    state.codeSent ? handleVerifyCode() : handleSendCode();
-                                }}>
-                                    <StyledTextField
-                                        fullWidth
-                                        label="شماره موبایل"
-                                        value={state.phoneNumber}
-                                        onChange={(e) => setState(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                                        disabled={state.codeSent}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <Phone color="primary" />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                    />
+                                    شرایط و ضوابط
+                                </a>{' '}
+                                را می‌پذیرم.
+                            </Typography>
+                        }
+                    />
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={handleSendCode}
+                        disabled={state.loading}
+                    >
+                        {state.loading ? <CircularProgress size={24} /> : 'ارسال کد'}
+                    </Button>
+                </Box>
+            )}
 
-                                    {state.codeSent && (
-                                        <>
-                                            <CodeInput
-                                                fullWidth
-                                                value={state.authCode}
-                                                onChange={(e) => {
-                                                    const value = e.target.value.replace(/\D/g, '');
-                                                    if (value.length <= 6) {
-                                                        setState(prev => ({ ...prev, authCode: value }));
-                                                    }
-                                                }}
-                                                placeholder="------"
-                                                sx={{ mb: 6 }}
-                                            />
+            {state.step === 'verify' && (
+                <Box>
+                    <Typography variant="h5" mb={2}>
+                        تایید کد
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        label="کد تایید"
+                        value={state.authCode}
+                        onChange={e => setState({ ...state, authCode: e.target.value })}
+                        disabled={state.loading}
+                        margin="normal"
+                    />
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={handleVerifyCode}
+                        disabled={state.loading}
+                    >
+                        {state.loading ? <CircularProgress size={24} /> : 'تایید'}
+                    </Button>
+                </Box>
+            )}
 
-                                            <FormControlLabel
-                                                style={{ direction: "ltr", display: "flex", alignItems: "center" }}
-                                                control={
-                                                    <Checkbox
-                                                        checked={state.agreeToTerms}
-                                                        onChange={(e) =>
-                                                            setState(prev => ({ ...prev, agreeToTerms: e.target.checked }))
-                                                        }
-                                                    />
-                                                }
-                                                label={
-                                                    <Typography variant="body2" style={{ direction: "ltr" }}>
-                                                        <Link to="/terms" style={{ color: theme.palette.primary.main, textDecoration: "none", marginRight: 8 }}>
-                                                            Terms & Conditions
-                                                        </Link>
-                                                        را می‌پذیرم
-                                                    </Typography>
-                                                }
-                                            />
-                                        </>
-                                    )}
+            {state.step === 'collectUsername' && (
+                <Box>
+                    <Typography variant="h5" mb={2}>
+                        ثبت نام و نام خانوادگی
+                    </Typography>
+                    <TextField
+                        fullWidth
+                        label="نام و نام خانوادگی"
+                        value={state.username}
+                        onChange={e => setState({ ...state, username: e.target.value })}
+                        disabled={state.loading}
+                        margin="normal"
+                    />
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        onClick={handleUpdateUsername}
+                        disabled={state.loading}
+                    >
+                        {state.loading ? <CircularProgress size={24} /> : 'ذخیره'}
+                    </Button>
+                </Box>
+            )}
 
-                                    <ActionButton
-                                        type="submit"
-                                        fullWidth
-                                        variant="contained"
-                                        disabled={state.loading || (state.codeSent && state.authCode.length !== 6)}
-                                        endIcon={state.loading ? <CircularProgress size={24} /> : <Send />}
-                                    >
-                                        {state.loading ? 'لطفا صبر کنید...' :
-                                            (state.codeSent ? 'تایید کد' : 'دریافت کد')}
-                                    </ActionButton>
+            {state.step === 'loading' && (
+                <Box textAlign="center">
+                    <CircularProgress size={40} />
+                    <Typography mt={2}>در حال بارگذاری، لطفاً صبر کنید...</Typography>
+                </Box>
+            )}
 
-                                    {state.codeSent && (
-                                        <Button
-                                            fullWidth
-                                            sx={{ mt: 2 }}
-                                            disabled={!state.canResend}
-                                            onClick={handleSendCode}
-                                        >
-                                            {state.canResend ? 'ارسال مجدد کد' :
-                                                `ارسال مجدد کد تا ${state.timer} ثانیه دیگر`}
-                                        </Button>
-                                    )}
-                                </Box>
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
-                </StyledContainer>
-            </motion.div>
-            <ToastContainer
-                position={isMobile ? "bottom-center" : "top-right"}
-                theme="colored"
-            />
-        </MuiContainer>
+            <ToastContainer />
+        </StyledContainer>
     );
 };
 
