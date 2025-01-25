@@ -14,6 +14,8 @@ import {
     MessageContainer,
     InputContainer,
     InputField,
+    lightTheme,
+    darkTheme,
     SendButton,
     ErrorMessage,
     TypingIndicator,
@@ -22,10 +24,10 @@ import {
 } from './ChatUI';
 import ToggleModeButton from './ToggleModeButton';
 import ChatSettings from './ChatSettings';
-import { ChatContext } from './ChatContext';
 import { AuthContext } from '../Auth/AuthContext';
 import { IoHappyOutline, IoPersonCircleOutline, IoClose, IoSend } from "react-icons/io5";
 import { sendMessage } from './api';
+import {ThemeProvider} from "styled-components";
 
 const ChatLogic = () => {
     const [messages, setMessages] = useState([
@@ -41,40 +43,46 @@ const ChatLogic = () => {
     const [isTyping, setIsTyping] = useState(false);
     const messageContainerRef = useRef(null);
 
-    // از ChatContext و AuthContext
-    const { isDarkMode, toggleDarkMode, isSpecialMode, toggleSpecialMode } = useContext(ChatContext);
+    // مدیریت حالت تاریک/روشن
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
+
+    // مدیریت حالت تخصصی
+    const [isSpecialMode, setIsSpecialMode] = useState(false);
+    const toggleSpecialMode = () => setIsSpecialMode((prev) => !prev);
+
+    // انتخاب تم بر اساس حالت
+    const theme = isDarkMode ? darkTheme : lightTheme;
+
+    // از AuthContext
     const { token } = useContext(AuthContext);
 
     // ارسال پیام کاربر
     const handleSendMessage = useCallback(async () => {
-        if (!input.trim()) return; // اگر ورودی خالی بود برنگرد
+        if (!input.trim()) return;
 
-        // ساخت آبجکت پیام کاربر
         const userMessage = {
-            id: `${Date.now()}`, // پیشنهاد: یا nanoid
+            id: `${Date.now()}`,
             text: input,
             sender: 'user',
             timestamp: new Date().toLocaleTimeString(),
         };
 
-        // افزودن پیام کاربر به لیست
-        setMessages(prev => [...prev, userMessage]);
+        setMessages((prev) => [...prev, userMessage]);
         setInput('');
         setError(null);
         setIsTyping(true);
 
         try {
-            // صدا زدن تابع ارسال پیام از api.js
             const botResponse = await sendMessage({
                 message: input,
                 isSpecialMode,
                 token,
-                settings: {} // اگر تنظیمات اضافه دارید، اینجا پاس دهید
+                settings: {},
             });
 
-            // شبیه‌سازی تأخیر پاسخ سرور
             setTimeout(() => {
-                setMessages(prev => [
+                setMessages((prev) => [
                     ...prev,
                     {
                         id: `${Date.now()}-bot`,
@@ -93,7 +101,6 @@ const ChatLogic = () => {
         }
     }, [input, isSpecialMode, token]);
 
-    // ارسال پیام با فشردن Enter (بدون شیفت)
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -101,7 +108,6 @@ const ChatLogic = () => {
         }
     };
 
-    // اسکرول خودکار به آخرین پیام
     useEffect(() => {
         if (messageContainerRef.current) {
             messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
@@ -109,85 +115,88 @@ const ChatLogic = () => {
     }, [messages, isTyping]);
 
     return (
-        <ChatContainer
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
-            {/* هدر چت */}
-            <ChatHeader>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IoHappyOutline />
-                    <span>دستیار هوشمند پزشک</span>
-                </div>
-                <UserInfo>
-                    <IoPersonCircleOutline />
-                    <span>کاربر</span>
-                    <ToggleModeButton
-                        type="theme"
-                        isActive={isDarkMode}
-                        toggleMode={toggleDarkMode}
-                    />
-                    <ToggleModeButton
-                        type="mode"
-                        isActive={isSpecialMode}
-                        toggleMode={toggleSpecialMode}
-                    />
-                </UserInfo>
-            </ChatHeader>
+        <ThemeProvider theme={theme}>
+            <ChatContainer
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
+                {/* هدر چت */}
+                <ChatHeader>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <IoHappyOutline />
+                        <span>دستیار هوشمند پزشک</span>
+                    </div>
+                    <UserInfo>
+                        <IoPersonCircleOutline />
+                        <span>کاربر</span>
+                        <ToggleModeButton
+                            type="theme"
+                            isActive={isDarkMode}
+                            toggleMode={toggleDarkMode}
+                        />
+                        <ToggleModeButton
+                            type="mode"
+                            isActive={isSpecialMode}
+                            toggleMode={toggleSpecialMode}
+                        />
+                    </UserInfo>
+                </ChatHeader>
 
-            {/* نمایش تنظیمات تنها در حالت تخصصی */}
-            {isSpecialMode && <ChatSettings />}
+                {/* نمایش تنظیمات تنها در حالت تخصصی */}
+                {isSpecialMode && <ChatSettings />}
 
-            {/* بخش پیام‌ها */}
-            <MessageContainer ref={messageContainerRef}>
-                <AnimatePresence>
-                    {messages.map(msg => (
-                        <MessageUI key={msg.id} message={msg} />
-                    ))}
-                </AnimatePresence>
+                {/* بخش پیام‌ها */}
+                <MessageContainer ref={messageContainerRef}>
+                    <AnimatePresence>
+                        {messages.map((msg) => (
+                            <MessageUI key={msg.id} message={msg} />
+                        ))}
+                    </AnimatePresence>
 
-                {isTyping && (
-                    <TypingIndicator>
-                        <span />
-                        <span />
-                        <span />
-                    </TypingIndicator>
+                    {isTyping && (
+                        <TypingIndicator>
+                            <span />
+                            <span />
+                            <span />
+                        </TypingIndicator>
+                    )}
+                </MessageContainer>
+
+                {/* نمایش خطا */}
+                {error && (
+                    <ErrorMessage
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                    >
+                        {error}
+                        <ActionButton onClick={() => setError(null)}>
+                            <IoClose />
+                        </ActionButton>
+                    </ErrorMessage>
                 )}
-            </MessageContainer>
 
-            {/* نمایش خطا (در صورت وجود) */}
-            {error && (
-                <ErrorMessage
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                >
-                    {error}
-                    <ActionButton onClick={() => setError(null)}>
-                        <IoClose />
-                    </ActionButton>
-                </ErrorMessage>
-            )}
-
-            {/* نوار ارسال پیام */}
-            <InputContainer>
-                <InputField
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="پیام خود را اینجا بنویسید..."
-                    rows={1}
-                />
-                <SendButton
-                    onClick={handleSendMessage}
-                    disabled={!input.trim() || isTyping}
-                >
-                    <IoSend style={{ transform: 'scaleX(-1)' }} />
-                </SendButton>
-            </InputContainer>
-        </ChatContainer>
+                {/* نوار ارسال پیام */}
+                <InputContainer>
+                    <InputField
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="پیام خود را اینجا بنویسید..."
+                        rows={1}
+                    />
+                    <SendButton
+                        onClick={handleSendMessage}
+                        disabled={!input.trim() || isTyping}
+                    >
+                        <IoSend style={{ transform: 'scaleX(-1)' }} />
+                    </SendButton>
+                </InputContainer>
+            </ChatContainer>
+        </ThemeProvider>
     );
 };
 
 export default ChatLogic;
+

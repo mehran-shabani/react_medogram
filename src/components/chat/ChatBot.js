@@ -1,13 +1,16 @@
-// src/components/Chat/ChatBot.js
 import React from 'react';
+import { ThemeProvider } from 'styled-components';
 import ChatLogic from './ChatLogic';
-
+import {ToggleButton} from "@mui/lab";
 const ChatBot = () => {
+
+
     return (
-        <div>
-            <ChatLogic />
-        </div>
+        <ThemeProvider  theme={ToggleButton}>
+            <ChatLogic  />
+        </ThemeProvider>
     );
 };
 
 export default ChatBot;
+

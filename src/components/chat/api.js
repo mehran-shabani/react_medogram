@@ -4,7 +4,7 @@ import axios from 'axios';
 // آدرس API در حالت عادی:
 const regularChatAPI = 'http://127.0.0.1:8000/api/chat/';
 // آدرس API در حالت سفارشی (پیشرفته):
-const customChatAPI = 'http://127.0.0.1:8000/api/customchat/';
+const customChatAPI = 'http://127.0.0.1:8000/api/customchatbot/';
 
 export const sendMessage = async ({ message, isSpecialMode, token, settings = {} }) => {
     // بسته به حالت (isSpecialMode) سراغ یکی از دو آدرس می‌رویم:

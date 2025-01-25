@@ -49,14 +49,41 @@ const ChatSettings = () => {
     const [message, setMessage] = useState('');
 
     const handleSave = async () => {
+        // مقداردهی پیش‌فرض برای فیلدهای خالی
+        const modeValue = mode.trim() || null;
+        const specialtyValue = specialty.trim() || null;
+
+        // بررسی مقادیر واردشده برای گزینه‌های درمان (اگر خالی نیست)
+        const validTreatmentOptions = ['diet', 'medication', 'advice', 'consultation', 'surgery', 'therapy'];
+        const treatmentOptionsArray = treatmentOptions
+            ? treatmentOptions.split(',').map(opt => opt.trim())
+            : []; // خالی باشد، آرایه خالی ارسال می‌کنیم
+
+        if (treatmentOptions && !treatmentOptionsArray.every(opt => validTreatmentOptions.includes(opt))) {
+            setMessage('یکی از گزینه‌های درمان نامعتبر است.');
+            return;
+        }
+
+        // بررسی مقادیر واردشده برای گزینه‌های تشخیص (اگر خالی نیست)
+        const validDiagnosisOptions = ['disease_info', 'possible_diagnoses', 'tests_required', 'imaging', 'specialist_referral'];
+        const diagnosisOptionsArray = diagnosisOptions
+            ? diagnosisOptions.split(',').map(opt => opt.trim())
+            : []; // خالی باشد، آرایه خالی ارسال می‌کنیم
+
+        if (diagnosisOptions && !diagnosisOptionsArray.every(opt => validDiagnosisOptions.includes(opt))) {
+            setMessage('یکی از گزینه‌های تشخیص نامعتبر است.');
+            return;
+        }
+
         try {
             const payload = {
-                mode,
-                specialty,
-                treatment_options: treatmentOptions.split(',').map(opt => opt.trim()),
-                diagnosis_options: diagnosisOptions.split(',').map(opt => opt.trim()),
-                wants_cause: wantsCause,
+                mode: modeValue, // مقدار یا null
+                specialty: specialtyValue, // مقدار یا null
+                treatment_options: treatmentOptionsArray, // آرایه خالی اگر خالی باشد
+                diagnosis_options: diagnosisOptionsArray, // آرایه خالی اگر خالی باشد
+                wants_cause: wantsCause, // مقدار بولین
             };
+
             await saveChatSettings({ settings: payload, token });
             setMessage('تنظیمات با موفقیت ذخیره شد.');
         } catch (error) {
@@ -64,6 +91,8 @@ const ChatSettings = () => {
             setMessage('خطا در ذخیره تنظیمات.');
         }
     };
+
+
 
     return (
         <SettingsContainer>
