@@ -26,6 +26,7 @@ import theme from './styles/theme';
 import logoImage from './images/medogram-logo.png';
 import DiabetesPredict from "./components/predictions/DiabetPredict";
 import NotFound from './components/NotFound';
+import BalePaymentRedirect from "./components/Payment/baletranscription";
 
 function App() {
     const [showSplash, setShowSplash] = useState(true);
@@ -71,6 +72,7 @@ function App() {
                                         <Route path="/payment-visit" element={<TransactionComponent />} />
                                         <Route path="/excluded-services" element={<ExcludedServices />} />
                                         <Route path="/payment-redirect" element={<PaymentRedirect />} />
+                                        <Route path="/baletranscription" element={<BalePaymentRedirect/>} />
                                         <Route path="/blogs" element={<BlogPostPage />} />
                                         <Route path="/chat" element={<ChatBot />} />
                                     </Routes>
